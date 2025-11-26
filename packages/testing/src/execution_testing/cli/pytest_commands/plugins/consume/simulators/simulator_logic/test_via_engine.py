@@ -1,16 +1,24 @@
 """
 A hive based simulator that executes blocks against clients using the
-`engine_newPayloadVX` method from the Engine API. The simulator uses the
-`BlockchainEngineFixtures` to test against clients.
+`engine_newPayloadVX` method from the Engine API.
+
+The unified test function in this module supports both:
+- `BlockchainEngineFixtures`, the original engine mode with a 1-to-1 relationship between client instance and test, i.e., each test is executed against a fresh client instance.
+- `BlockchainEngineXFixtures`, enginex mode with client reuse across tests with a shared pre-alloc groups.
 
 Each `engine_newPayloadVX` is verified against the appropriate VALID/INVALID
 responses.
 """
 
 import time
+from typing import Union
 
 from execution_testing.exceptions import UndefinedException
-from execution_testing.fixtures import BlockchainEngineFixture
+from execution_testing.fixtures import (
+    BlockchainEngineFixture,
+    BlockchainEngineXFixture,
+)
+from execution_testing.fixtures.blockchain import FixtureHeader
 from execution_testing.rpc import EngineRPC, EthRPC
 from execution_testing.rpc.rpc_types import (
     ForkchoiceState,
@@ -41,62 +49,83 @@ def test_blockchain_via_engine(
     timing_data: TimingData,
     eth_rpc: EthRPC,
     engine_rpc: EngineRPC,
-    fixture: BlockchainEngineFixture,
+    fixture: Union[BlockchainEngineFixture, BlockchainEngineXFixture],
     strict_exception_matching: bool,
+    genesis_header: FixtureHeader,
 ) -> None:
     """
-    1. Check the client genesis block hash matches
-       `fixture.genesis.block_hash`.
-    2. Execute the test case fixture blocks against the client under test using
-       the `engine_newPayloadVX` method from the Engine API.
-    3. For valid payloads a forkchoice update is performed to finalize the
-       chain.
+    Execute blockchain test fixtures against a client using the Engine API.
+
+    This function supports two modes:
+
+    1. **Engine Mode** (`BlockchainEngineFixture`):
+       - Uses per-test clients (started fresh for each test).
+       - Always performs initial FCU to genesis.
+       - Always performs FCU after valid payloads.
+       - genesis_header comes from fixture.genesis (via fixture).
+       - needs_genesis_init is always True (via fixture).
+
+    2. **EngineX Mode** (`BlockchainEngineXFixture`):
+       - Reuses clients across tests with same pre-alloc group.
+       - Skips initial FCU for reused clients.
+       - Skips FCU after valid payloads to keep client at genesis.
+       - genesis_header comes from separate pre_alloc_group fixture.
+       - needs_genesis_init is False for reused clients.
+
+    Steps:
+    1. Check the client genesis block hash matches genesis_header.block_hash
+    2. Execute test fixture blocks using engine_newPayloadVX
+    3. For valid payloads, perform forkchoice update to finalize chain
+       (unless client is being reused, in which case skip FCU)
     """
-    # Send a initial forkchoice update
-    with timing_data.time("Initial forkchoice update"):
-        logger.info("Sending initial forkchoice update to genesis block...")
-        for attempt in range(1, MAX_RETRIES + 1):
-            forkchoice_response = engine_rpc.forkchoice_updated(
-                forkchoice_state=ForkchoiceState(
-                    head_block_hash=fixture.genesis.block_hash,
-                ),
-                payload_attributes=None,
-                version=fixture.payloads[0].forkchoice_updated_version,
-            )
-            status = forkchoice_response.payload_status.status
+    # Send initial FCU for engine mode (per-test clients), skip for enginex
+    if isinstance(fixture, BlockchainEngineFixture):
+        with timing_data.time("Initial forkchoice update"):
             logger.info(
-                f"Initial forkchoice update response attempt {attempt}: {status}"
+                "Sending initial forkchoice update to genesis block..."
             )
-            if status != PayloadStatusEnum.SYNCING:
-                break
+            for attempt in range(1, MAX_RETRIES + 1):
+                forkchoice_response = engine_rpc.forkchoice_updated(
+                    forkchoice_state=ForkchoiceState(
+                        head_block_hash=genesis_header.block_hash,
+                    ),
+                    payload_attributes=None,
+                    version=fixture.payloads[0].forkchoice_updated_version,
+                )
+                status = forkchoice_response.payload_status.status
+                logger.info(
+                    f"Initial forkchoice update response attempt {attempt}: {status}"
+                )
+                if status != PayloadStatusEnum.SYNCING:
+                    break
 
-            if attempt < MAX_RETRIES:
-                time.sleep(DELAY_BETWEEN_RETRIES_IN_SEC)
+                if attempt < MAX_RETRIES:
+                    time.sleep(DELAY_BETWEEN_RETRIES_IN_SEC)
 
-        if (
-            forkchoice_response.payload_status.status
-            != PayloadStatusEnum.VALID
-        ):
-            logger.error(
-                f"Client failed to initialize properly after {MAX_RETRIES} attempts, "
-                f"final status: {forkchoice_response.payload_status.status}"
-            )
-            raise LoggedError(
-                f"unexpected status on forkchoice updated to genesis: {forkchoice_response}"
-            )
+            if (
+                forkchoice_response.payload_status.status
+                != PayloadStatusEnum.VALID
+            ):
+                logger.error(
+                    f"Client failed to initialize properly after {MAX_RETRIES} attempts, "
+                    f"final status: {forkchoice_response.payload_status.status}"
+                )
+                raise LoggedError(
+                    f"unexpected status on forkchoice updated to genesis: {forkchoice_response}"
+                )
 
     with timing_data.time("Get genesis block"):
         logger.info("Calling getBlockByNumber to get genesis block...")
         genesis_block = eth_rpc.get_block_by_number(0)
         assert genesis_block is not None, "genesis_block is None"
-        if genesis_block["hash"] != str(fixture.genesis.block_hash):
-            expected = fixture.genesis.block_hash
+        if genesis_block["hash"] != str(genesis_header.block_hash):
+            expected = genesis_header.block_hash
             got = genesis_block["hash"]
             logger.fail(
                 f"Genesis block hash mismatch. Expected: {expected}, Got: {got}"
             )
             raise GenesisBlockMismatchExceptionError(
-                expected_header=fixture.genesis,
+                expected_header=genesis_header,
                 got_genesis_block=genesis_block,
             )
 
@@ -190,7 +219,9 @@ def test_blockchain_via_engine(
                                 f"Unexpected error code: {e.code}, expected: {payload.error_code}"
                             ) from e
 
-                if payload.valid():
+                if payload.valid() and isinstance(
+                    fixture, BlockchainEngineFixture
+                ):
                     with payload_timing.time(
                         f"engine_forkchoiceUpdatedV{payload.forkchoice_updated_version}"
                     ):

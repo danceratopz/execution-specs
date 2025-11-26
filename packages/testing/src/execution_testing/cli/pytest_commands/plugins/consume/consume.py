@@ -585,11 +585,24 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
         fork_markers = get_relative_fork_markers(
             test_case.fork, strict_mode=False
         )
+
+        # Build base marks (fork and format)
+        marks = [getattr(pytest.mark, m) for m in fork_markers] + [
+            getattr(pytest.mark, test_case.format.format_name)
+        ]
+
+        # Add xdist_group marker for engine x tests to enable client reuse tracking
+        if test_case.format.__name__ == "BlockchainEngineXFixture":
+            assert hasattr(test_case, "pre_hash") and test_case.pre_hash, (
+                f"BlockchainEngineXFixture test case '{test_case.id}' missing pre_hash"
+            )
+            group_identifier = test_case.pre_hash
+            marks.append(pytest.mark.xdist_group(name=group_identifier))
+
         param = pytest.param(
             test_case,
             id=test_case.id,
-            marks=[getattr(pytest.mark, m) for m in fork_markers]
-            + [getattr(pytest.mark, test_case.format.format_name)],
+            marks=marks,
         )
         param_list.append(param)
 

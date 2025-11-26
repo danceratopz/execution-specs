@@ -245,6 +245,62 @@ def test_suite(
             users_file.unlink()
 
 
+@pytest.fixture(scope="module")
+def shared_hive_test(
+    test_suite: HiveTestSuite,
+    test_suite_name: str,
+) -> Generator[HiveTest, None, None]:
+    """
+    Create a module-scoped Hive test for running multiple pytest tests against a single client.
+
+    This fixture provides a reusable Hive test context that persists across multiple
+    pytest tests within a module, enabling client reuse optimization. Instead of
+    restarting clients for each pytest test (expensive), simulators can start clients
+    under this shared test context and reuse them across multiple tests (fast).
+
+    The shared test lives for the entire module and prevents Hive from terminating
+    clients between individual pytest tests. This is essential for simulators that
+    batch multiple pytest tests against the same client instance.
+
+    Usage:
+        Simulators can start clients using this shared test context via:
+        - Direct fixture dependency: `shared_hive_test: HiveTest` parameter
+        - Implicit dependency: `@pytest.mark.usefixtures("shared_hive_test")`
+
+    Returns:
+        `HiveTest` instance that persists for the module scope.
+
+    Example:
+        ```python
+        @pytest.fixture(scope="function")
+        def client(shared_hive_test: HiveTest, ...) -> Client:
+            # Start client on shared test (won't be killed between tests)
+            client = shared_hive_test.start_client(...)
+            yield client
+            # Client lifecycle managed by simulator
+        ```
+    """
+    logger.info(
+        f"Creating shared Hive test for '{test_suite_name}' (module scope, client reuse)"
+    )
+    test: HiveTest = test_suite.start_test(
+        name=f"{test_suite_name}-shared-clients",
+        description=f"Shared test context for {test_suite_name} client management",
+    )
+    logger.info(f"Shared Hive test created: {test.id}")
+    yield test
+
+    # End the shared test at module end
+    # Note: Simulators should manage client lifecycle themselves
+    # (e.g., stop clients when done, not rely on this teardown)
+    logger.info(f"Ending shared Hive test for '{test_suite_name}'")
+    test.end(
+        result=HiveTestResult(
+            test_pass=True, details="Shared test context completed"
+        )
+    )
+
+
 @pytest.fixture(scope="function")
 def hive_test(
     request: pytest.FixtureRequest, test_suite: HiveTestSuite

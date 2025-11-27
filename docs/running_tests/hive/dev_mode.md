@@ -62,7 +62,7 @@ The following section details the setup and usage of option 3.
 
 ### EEST Docker Development Image
 
-Within the [`eest/`](https://github.com/ethereum/hive/tree/master/simulators/ethereum/eest) directory of hive, a new dockerfile must be created: `Dockerfile.dev`, with the following contents:
+Within the [`eels/`](https://github.com/ethereum/hive/tree/master/simulators/ethereum/eest) directory of hive, a new dockerfile must be created: `Dockerfile.dev`, with the following contents:
 
 ```docker
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
@@ -83,7 +83,7 @@ ENTRYPOINT ["/bin/bash"]
 
 This dockerfile will be our entry point for running EEST commands.
 
-### `eest/` Hive Directory Structure
+### `eels/` Hive Directory Structure
 
 ```tree
 ├── eest
@@ -111,7 +111,7 @@ This dockerfile will be our entry point for running EEST commands.
 3. In a separate terminal session, build the EEST development image:
 
     ```bash
-    cd simulators/ethereum/eest/
+    cd simulators/ethereum/eels/
     docker build -t macos-consume-dev -f Dockerfile.dev .
     ```
 

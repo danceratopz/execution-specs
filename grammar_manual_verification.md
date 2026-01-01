@@ -30,6 +30,6 @@ Format (but don't add a codeblock for each item):
   Suggestion: "Show help options specific to the execute eth_config command and exit."
   Reason: Same issue as above - awkward possessive structure
 
-- [ ] packages/testing/src/execution_testing/cli/fillerconvert/verify_filled.py:37-40 - "Verify post hash of the refilled test against original: Regex the original d,g,v from the refilled test name. Find the post record for this d,g,v and the fork of refilled test."
+- [x] packages/testing/src/execution_testing/cli/fillerconvert/verify_filled.py:37-40 - "Verify post hash of the refilled test against original: Regex the original d,g,v from the refilled test name. Find the post record for this d,g,v and the fork of refilled test."
   Suggestion: "Verify the post hash of the refilled test against the original. Extract the d,g,v from the refilled test name. Find the post record for this d,g,v and the fork of the refilled test."
   Reason: Multiple potential issues - "Regex" used informally as a verb, possible missing articles ("the original", "the refilled test")

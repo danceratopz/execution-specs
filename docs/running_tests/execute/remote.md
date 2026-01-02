@@ -1,4 +1,4 @@
-# Running Test on a Live Remote Network
+# Running Tests on a Live Remote Network
 
 Tests can be executed on a live remote network by running the `execute remote` command.
 
@@ -193,7 +193,7 @@ See [Transaction Metadata](./transaction_metadata.md) for details.
 
 ## `execute` Command Test Execution
 
-The `execute remote` and `execute hive` commands first creates a random sender account from which all required test accounts will be deployed and funded, and this account is funded by sweeping (by default) this "seed" account.
+The `execute remote` and `execute hive` commands first create a random sender account from which all required test accounts will be deployed and funded, and this account is funded by sweeping (by default) this "seed" account.
 
 The sweep amount can be configured by setting the `--seed-account-sweep-amount` flag:
 

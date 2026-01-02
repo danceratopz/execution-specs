@@ -31,7 +31,7 @@ The test execution with the `execute` plugin is different from the `fill` plugin
 
 ### EOA and Contract Addresses
 
-The `fill` plugin will pre-allocate all the accounts and contracts that are used in the tests, so the addresses of the accounts and contracts will be known before the tests are executed, Further more, the test contracts will start from the same address on different tests, so there are collisions on the account addresses used across different tests. This is not the case with the `execute` plugin, as the accounts and contracts are deployed on the fly, from sender keys that are randomly generated and therefore are different in each execution.
+The `fill` plugin will pre-allocate all the accounts and contracts that are used in the tests, so the addresses of the accounts and contracts will be known before the tests are executed. Furthermore, the test contracts will start from the same address on different tests, so there are collisions on the account addresses used across different tests. This is not the case with the `execute` plugin, as the accounts and contracts are deployed on the fly, from sender keys that are randomly generated and therefore are different in each execution.
 
 Reasoning behind the random generation of the sender keys is that one can execute the same test multiple times in the same network and the plugin will not fail because the accounts and contracts are already deployed.
 

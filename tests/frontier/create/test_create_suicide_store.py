@@ -1,6 +1,6 @@
 """
 Test that a dynamically created address is still callable and can perform
-storage operations after being called to self-destruct.
+storage operations after being called for selfdestruct.
 """
 
 from enum import IntEnum

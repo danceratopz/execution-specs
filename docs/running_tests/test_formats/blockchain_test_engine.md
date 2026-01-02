@@ -6,7 +6,7 @@ These are produced by the `StateTest` and `BlockchainTest` test specs.
 
 ## Description
 
-The Blockchain Engine Test fixture format is used to test block validation and the consensus rules of the Ethereum blockchain, when a block is delivered through the Engine API as a `engine_newPayloadVX` directive.
+The Blockchain Engine Test fixture format is used to test block validation and the consensus rules of the Ethereum blockchain, when a block is delivered through the Engine API as an `engine_newPayloadVX` directive.
 
 It does so by defining a pre-execution state, a series of blocks as `engine_newPayloadVX` directives, and a post-execution state, verifying that, after all the blocks have been processed, appended if valid or rejected if invalid, the result is the expected post-execution state.
 

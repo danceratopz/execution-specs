@@ -208,7 +208,7 @@ List of decoded transactions included in the block RLP.
 
 #### - `uncleHeaders`: [`List`](./common_types.md#list)`[`[`FixtureHeader`](#fixturetransaction)`]`
 
-List of uncle headers included in the block RLP. An empty list post merge.
+List of uncle headers included in the block RLP. An empty list post-merge.
 
 #### - `withdrawals`: [`Optional`](./common_types.md#optional)`[`[`List`](./common_types.md#list)`[`[`FixtureWithdrawal`](#fixturewithdrawal)`]]` `(fork: Shanghai)`
 
@@ -280,7 +280,7 @@ Max fee per blob gas to pay (Transaction type 3)
 
 #### - `blobVersionedHashes`: [`List`](./common_types.md#list)`[`[`Hash`](./common_types.md#hash)`]` `(fork: Cancun)`
 
-Max fee per blob gas to pay (Transaction type 3)
+List of blob versioned hashes the transaction includes (Transaction type 3)
 
 #### - `v`: [`ZeroPaddedHexNumber`](./common_types.md#zeropaddedhexnumber)
 

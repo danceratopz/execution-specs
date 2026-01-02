@@ -6,7 +6,7 @@ These are produced by the `TransactionTest` test spec.
 
 ## Description
 
-The transaction test fixture format is used to test client's transaction RLP parsing without executing the transaction on the EVM.
+The transaction test fixture format is used to test a client's transaction RLP parsing without executing the transaction on the EVM.
 
 It does so by defining a transaction binary RLP representation, and whether the transaction should be accepted or rejected by the client in each fork.
 

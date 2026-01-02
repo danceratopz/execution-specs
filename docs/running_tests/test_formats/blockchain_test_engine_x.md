@@ -72,7 +72,7 @@ For each [`BlockchainTestEngineXFixture`](#blockchaintestenginexfixture) test ob
    - If [`postStateDiff`](#-poststatediff-optionalalloc) is present:
      - Apply the state differences to the pre-allocation group
      - Verify the resulting state matches the client's final state
-   - If `post` field were present (not typical), verify it directly
+   - If the `post` field were present (not typical), verify it directly
 
 ## Structures
 

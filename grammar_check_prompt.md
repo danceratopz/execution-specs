@@ -35,13 +35,14 @@ Use Glob to find all matching files. For each file:
 
 For EVERY file, output this (even if no errors):
 
-```
+```text
 FILE: path/to/file.md
 ERRORS: 0 | or list each error with line number
 ```
 
 Example with errors:
-```
+
+```text
 FILE: docs/running_tests/cache.md
 ERRORS: 2
 - Line 15: "refer the" → "refer to the"

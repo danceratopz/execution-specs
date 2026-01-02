@@ -6,7 +6,7 @@ Status legend: `[ ]` pending, `[~]` in progress, `[x]` complete
 
 ## docs/running_tests (~3274 lines total, split into 4 batches)
 
-- [ ] `docs/running_tests/test_formats/common_types.md`, `blockchain_test.md`, `blockchain_test_sync.md` (~920 lines, 3 files)
+- [x] `docs/running_tests/test_formats/common_types.md`, `blockchain_test.md`, `blockchain_test_sync.md` (~920 lines, 3 files)
 - [ ] `docs/running_tests/test_formats/blockchain_test_engine.md`, `blockchain_test_engine_x.md`, `state_test.md`, `transaction_test.md`, `exceptions.md`, `index.md` (~650 lines, 6 files)
 - [ ] `docs/running_tests/consume/**/*.md`, `docs/running_tests/execute/**/*.md` (~950 lines, 10 files)
 - [ ] `docs/running_tests/hive/**/*.md`, `docs/running_tests/*.md` (~750 lines, 10 files)

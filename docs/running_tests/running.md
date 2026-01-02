@@ -25,7 +25,7 @@ The following sections describe the different methods in more detail.
 
 !!! note "`./hive --sim=eels/consume-engine` vs `consume engine`"
 
-     The execution-specs simulators can be ran either standalone using the `./hive` command or via a `uv`/Python-based command against a `./hive --dev` backend, more details are [provided below](#two-methods-to-run-eels-simulators).
+     The execution-specs simulators can be run either standalone using the `./hive` command or via a `uv`/Python-based command against a `./hive --dev` backend, more details are [provided below](#two-methods-to-run-eels-simulators).
 
 ## Direct
 
@@ -133,4 +133,4 @@ See [Execute Command](./execute/index.md).
 Many of the methods use the Hive Testing Environment to interact with clients and run tests against them. These methods are also called Hive simulators. While Hive is always necessary to run simulators, they can be called in two different ways. Both of these commands execute the same simulator code, but in different environments, we take the example of the `eels/consume-engine` simulator:
 
 1. `./hive --sim=eels/consume-engine` is a standalone command that installs and configures execution-specs and its `consume` command in a dockerized container managed by Hive. This is the standard method to execute EEST [fixture releases](./releases.md) against clients in CI environments and is the method to generate the results at [hive.ethpandaops.io](https://hive.ethpandaops.io). See [Hive](./hive/index.md) and its [Common Options](./hive/common_options.md) for help with this method.
-2. `uv run consume engine` requires the user to clone and [configure execution-specs](../getting_started/installation.md) and start a Hive server in [development mode](./hive/dev_mode.md). In this case, the simulator runs on the native system and communicate to the client via the Hive API. This is particularly useful during test development as fixtures on the local disk can be specified via `--input=fixtures/`. As the simulator runs natively, it is easy to drop into a debugger and inspect the simulator or client container state. See [Hive Developer Mode](./hive/dev_mode.md) for help with this method.
+2. `uv run consume engine` requires the user to clone and [configure execution-specs](../getting_started/installation.md) and start a Hive server in [development mode](./hive/dev_mode.md). In this case, the simulator runs on the native system and communicates to the client via the Hive API. This is particularly useful during test development as fixtures on the local disk can be specified via `--input=fixtures/`. As the simulator runs natively, it is easy to drop into a debugger and inspect the simulator or client container state. See [Hive Developer Mode](./hive/dev_mode.md) for help with this method.

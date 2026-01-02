@@ -1,6 +1,6 @@
 # Client Configuration Guide
 
-Clients ran in Hive are configured via the following `./hive` options:
+Clients run in Hive are configured via the following `./hive` options:
 
 1. `--client-file=client_config.yaml`: Specifies a YAML file defining which and how clients are built.
 2. `--client=client1,client2`: Selects a subset of clients to run from the YAML via `nametag`.

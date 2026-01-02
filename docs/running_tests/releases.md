@@ -16,7 +16,7 @@
 
 ### Versioning Scheme
 
-EEST framework and test sources and fixture releases are tagged use a semantic versioning scheme, `<optional:<pre_release_name@>>v<MAJOR>.<MINOR>.<PATCH>` as following:
+EEST framework and test sources and fixture releases are tagged using a semantic versioning scheme, `<optional:<pre_release_name@>>v<MAJOR>.<MINOR>.<PATCH>` as follows:
 
 - `<MAJOR>`: An existing fixture format has changed (potentially breaking change). Action must be taken by client teams to ensure smooth upgrade to the new format.
 - `<MINOR>`: Additional coverage (new tests, or a new format) have been added to the release.

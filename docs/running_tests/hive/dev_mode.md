@@ -1,18 +1,18 @@
 # Hive Development Mode
 
-This section explains how to run EELS simulators using their Python-based commands, e.g., `uv run consume engine`, against a Hive "development" server as apposed to using the standalone `./hive` command.
+This section explains how to run EELS simulators using their Python-based commands, e.g., `uv run consume engine`, against a Hive "development" server as opposed to using the standalone `./hive` command.
 
 This avoids running the simulator in a dockerized environment and has several advantages:
 
 1. A local directory containing fixtures can be specified (`--input=./fixtures/`).
 2. Allows dropping into a Python debugger (via `--pdb`) upon test failure to inspect the response or ssh to the client container.
 3. Provides access to a larger set of the simulator's command-line options,
-4. Runs are faster; there are no docker image rebuilds in between runs. In particular, modifications to the simulator do not require a an image rebuild.
+4. Runs are faster; there are no docker image rebuilds in between runs. In particular, modifications to the simulator do not require an image rebuild.
 
 ## Platform Support
 
 - Linux: Direct development mode supported.
-- macOS: Must be ran from a Linux environment or use a Docker-based workaround (see macOS Setup).
+- macOS: Must be run from a Linux environment or use a Docker-based workaround (see macOS Setup).
 
 ## Quick Start
 

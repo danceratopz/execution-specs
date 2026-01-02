@@ -280,7 +280,7 @@ Max fee per blob gas to pay (Transaction type 3)
 
 #### - `blobVersionedHashes`: [`List`](./common_types.md#list)`[`[`Hash`](./common_types.md#hash)`]` `(fork: Cancun)`
 
-List of blob versioned hashes the transaction includes (Transaction type 3)
+List of blob versioned hashes the transaction includes (Transaction type 3).
 
 #### - `v`: [`ZeroPaddedHexNumber`](./common_types.md#zeropaddedhexnumber)
 

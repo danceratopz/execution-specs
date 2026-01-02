@@ -13,7 +13,7 @@ EOFCREATE, RETURNCODE, and container tests.
 
 evmone tests not ported:
 - create_tx_with_eof_initcode: This calls it invalid, it is now the way to
-                               add EOF contacts to state
+                               add EOF contracts to state
 - eofcreate_extcall_returncode: Per the new initcode
                                 mode tests you cannot have RETURNCODE in a
                                 deployed contract

@@ -560,7 +560,7 @@ def test_container_multiple_returncode_references(
     eof_test: EOFTestFiller,
 ) -> None:
     """
-    Test multiple references to the same subcontainer from a RETURNCONTACT
+    Test multiple references to the same subcontainer from a RETURNCODE
     operation.
     """
     eof_test(

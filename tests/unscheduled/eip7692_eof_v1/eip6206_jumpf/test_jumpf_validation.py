@@ -67,7 +67,7 @@ def test_returning_jumpf(
     eof_test: EOFTestFiller,
     container: Container,
 ) -> None:
-    """Test cases for JUMPF instruction validation in a returning sections."""
+    """Test cases for JUMPF instruction validation in returning sections."""
     eof_test(
         container=container,
         expect_exception=EOFException.INVALID_NON_RETURNING_FLAG,

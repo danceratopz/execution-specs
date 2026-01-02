@@ -24,7 +24,7 @@ An empty JSON string `""`, used to represent an empty address. E.g. in the `to` 
 
 ### `HeaderNonce`
 
-[Bytes](#bytes) of a 8-byte fixed length.
+[Bytes](#bytes) of an 8-byte fixed length.
 
 ### `HexNumber`
 
@@ -50,7 +50,7 @@ Marks a field as optional, meaning that the field can be missing from the JSON o
 
 ### `ZeroPaddedHexNumber`
 
-Hexadecimal number with "0x" prefix encoded as a JSON string, with a single zero used to pad odd number of digits, and zero represented as "0x00".
+Hexadecimal number with "0x" prefix encoded as a JSON string, with a single zero used to pad an odd number of digits, and zero represented as "0x00".
 
 ## Composite Types
 

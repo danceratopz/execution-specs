@@ -1,6 +1,6 @@
 """
 Define a program for scenario test that executes all frontier opcodes and
-entangles its result.
+verifies its result.
 """
 
 from functools import cached_property

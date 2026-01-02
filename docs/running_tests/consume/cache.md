@@ -10,7 +10,7 @@ All `consume` subcommands have an `--input` argument, which implements the same 
 
 ## Example: Two-liner to Download the Latest Fixture Release
 
-Releases can be downloaded using EEST tooling without (manually) cloning and installing the @ethereum/execution-spec-tests tools as following:
+Releases can be downloaded using EEST tooling without (manually) cloning and installing the @ethereum/execution-spec-tests tools as follows:
 
 1. Install `uv` (a fast, rust-based Python package manager):
 
@@ -49,7 +49,7 @@ All `consume` sub-commands take an `--input=<fixture_path>|<release_spec>|<url>`
 
 1. **A local directory**: Fixtures from your local file system.
 2. **A release specification**: An EEST release tag or "release specification" `stable@latest`, `fusaka-devnet-1@v1.0.0`, etc.
-3. **A URLs**: A full URL to a custom hosted release or a Github release.
+3. **A URL**: A full URL to a custom hosted release or a Github release.
 
 ### Release Specifications
 

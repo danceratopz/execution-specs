@@ -51,8 +51,9 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         type=int,
         default=None,
         help=(
-            "Default gas price used for transactions, unless overridden by the test. "
-            "Default=None (1.5x current network gas price)"
+            "Default gas price used for transactions, unless "
+            "overridden by the test. Default=None (1.5x current "
+            "network gas price)"
         ),
     )
     execute_group.addoption(
@@ -62,8 +63,9 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         type=int,
         default=None,
         help=(
-            "Default max fee per gas used for transactions, unless overridden by the test. "
-            "Default=None (1.5x current network max fee per gas)"
+            "Default max fee per gas used for transactions, "
+            "unless overridden by the test. Default=None "
+            "(1.5x current network max fee per gas)"
         ),
     )
     execute_group.addoption(
@@ -85,8 +87,9 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         type=int,
         default=None,
         help=(
-            "Default max fee per blob gas used for transactions, unless overridden by the test. "
-            "Default=None (1.5x current network max fee per blob gas)"
+            "Default max fee per blob gas used for transactions, "
+            "unless overridden by the test. Default=None "
+            "(1.5x current network max fee per blob gas)"
         ),
     )
     execute_group.addoption(
@@ -97,7 +100,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         type=int,
         help=(
             "Maximum gas used to execute a single transaction. "
-            "Will be used as ceiling for tests that attempt to consume the entire block gas limit. "
+            "Will be used as ceiling for tests that attempt to "
+            "consume the entire block gas limit. "
             f"(Default: {EnvironmentDefaults.gas_limit // 4})"
         ),
     )
@@ -118,7 +122,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         type=float,
         default=0.3,
         help=(
-            "Time to wait after sending a forkchoice_updated before getting the payload."
+            "Time to wait after sending a forkchoice_updated "
+            "before getting the payload."
         ),
     )
     execute_group.addoption(
@@ -128,7 +133,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         default=None,
         type=int,
         help=(
-            "Maximum gas limit for all transactions in a test. Default=None (No limit)"
+            "Maximum gas limit for all transactions in a test. "
+            "Default=None (No limit)"
         ),
     )
     execute_group.addoption(
@@ -136,7 +142,10 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store_true",
         dest="dry_run",
         default=False,
-        help="Don't send transactions, just print the minimum balance required per test.",
+        help=(
+            "Don't send transactions, just print the minimum "
+            "balance required per test."
+        ),
     )
 
     report_group = parser.getgroup(
@@ -210,11 +219,13 @@ def pytest_html_results_table_header(cells: list[str]) -> None:
     )
     cells.insert(
         4,
-        '<th class="sortable" data-column-type="fundedAccounts">Funded Accounts</th>',
+        '<th class="sortable" data-column-type="fundedAccounts">'
+        "Funded Accounts</th>",
     )
     cells.insert(
         5,
-        '<th class="sortable" data-column-type="fundedAccounts">Deployed Contracts</th>',
+        '<th class="sortable" data-column-type="fundedAccounts">'
+        "Deployed Contracts</th>",
     )
     del cells[-1]  # Remove the "Links" column
 
@@ -319,11 +330,13 @@ def default_max_fee_per_gas(
     max_fee_per_gas = request.config.getoption("default_max_fee_per_gas")
     if max_fee_per_gas is not None:
         logger.debug(
-            f"Using configured default max fee per gas: {max_fee_per_gas / 10**9:.2f} Gwei"
+            "Using configured default max fee per gas: "
+            f"{max_fee_per_gas / 10**9:.2f} Gwei"
         )
     else:
         logger.debug(
-            "No default max fee per gas configured, will use network gas price * 1.5"
+            "No default max fee per gas configured, "
+            "will use network gas price * 1.5"
         )
     return max_fee_per_gas
 
@@ -338,11 +351,13 @@ def default_max_priority_fee_per_gas(
     )
     if max_priority_fee_per_gas is not None:
         logger.debug(
-            f"Using configured default max priority fee per gas: {max_priority_fee_per_gas / 10**9:.2f} Gwei"
+            "Using configured default max priority fee per gas: "
+            f"{max_priority_fee_per_gas / 10**9:.2f} Gwei"
         )
     else:
         logger.debug(
-            "No default max priority fee per gas configured, will use network max priority fee * 1.5"
+            "No default max priority fee per gas configured, "
+            "will use network max priority fee * 1.5"
         )
     return max_priority_fee_per_gas
 
@@ -357,11 +372,13 @@ def default_max_fee_per_blob_gas(
     )
     if max_fee_per_blob_gas is not None:
         logger.debug(
-            f"Using configured default max fee per blob gas: {max_fee_per_blob_gas / 10**9:.2f} Gwei"
+            "Using configured default max fee per blob gas: "
+            f"{max_fee_per_blob_gas / 10**9:.2f} Gwei"
         )
     else:
         logger.debug(
-            "No default max fee per blob gas configured, will use network blob base fee * 1.5"
+            "No default max fee per blob gas configured, "
+            "will use network blob base fee * 1.5"
         )
     return max_fee_per_blob_gas
 
@@ -371,17 +388,21 @@ def max_priority_fee_per_gas(
     eth_rpc: EthRPC,
     default_max_priority_fee_per_gas: int | None,
 ) -> int:
-    """Return max priority fee per gas used for transactions in a given test."""
+    """Return max priority fee per gas for transactions in a given test."""
     max_priority_fee_per_gas = default_max_priority_fee_per_gas
     if max_priority_fee_per_gas is None:
         network_max_priority_fee = eth_rpc.max_priority_fee_per_gas()
         max_priority_fee_per_gas = int(network_max_priority_fee * 1.5)
+        network_fee = network_max_priority_fee / 10**9
+        result_fee = max_priority_fee_per_gas / 10**9
         logger.info(
-            f"Calculated max priority fee per gas from network: {network_max_priority_fee / 10**9:.2f} Gwei * 1.5 = {max_priority_fee_per_gas / 10**9:.2f} Gwei"
+            f"Calculated max priority fee per gas from network: "
+            f"{network_fee:.2f} Gwei * 1.5 = {result_fee:.2f} Gwei"
         )
     else:
         logger.info(
-            f"Using default max priority fee per gas: {max_priority_fee_per_gas / 10**9:.2f} Gwei"
+            "Using default max priority fee per gas: "
+            f"{max_priority_fee_per_gas / 10**9:.2f} Gwei"
         )
     return max_priority_fee_per_gas
 
@@ -397,24 +418,35 @@ def max_fee_per_gas(
     if max_fee_per_gas is None:
         network_gas_price = eth_rpc.gas_price()
         max_fee_per_gas = int(network_gas_price * 1.5)
+        network_fee = network_gas_price / 10**9
+        result_fee = max_fee_per_gas / 10**9
         logger.info(
-            f"Calculated max fee per gas from network: {network_gas_price / 10**9:.2f} Gwei * 1.5 = {max_fee_per_gas / 10**9:.2f} Gwei"
+            f"Calculated max fee per gas from network: "
+            f"{network_fee:.2f} Gwei * 1.5 = {result_fee:.2f} Gwei"
         )
     else:
         logger.info(
-            f"Using default max fee per gas: {max_fee_per_gas / 10**9:.2f} Gwei"
+            f"Using default max fee per gas: "
+            f"{max_fee_per_gas / 10**9:.2f} Gwei"
         )
     if max_priority_fee_per_gas > max_fee_per_gas:
         # Depending on the timing of the request, the priority fee may be
         # greater than the max fee. This is a workaround to ensure that the
         # transaction is valid.
+        priority_gwei = max_priority_fee_per_gas / 10**9
+        max_gwei = max_fee_per_gas / 10**9
+        adjusted_gwei = (max_priority_fee_per_gas + 1) / 10**9
         logger.warning(
-            f"Max priority fee per gas ({max_priority_fee_per_gas / 10**9:.2f} Gwei) is greater than max fee per gas ({max_fee_per_gas / 10**9:.2f} Gwei), "
-            f"adjusting max fee per gas to {(max_priority_fee_per_gas + 1) / 10**9:.2f} Gwei"
+            f"Max priority fee per gas ({priority_gwei:.2f} Gwei) is "
+            f"greater than max fee per gas ({max_gwei:.2f} Gwei), "
+            f"adjusting max fee per gas to {adjusted_gwei:.2f} Gwei"
         )
         max_fee_per_gas = max_priority_fee_per_gas + 1
+    max_gwei = max_fee_per_gas / 10**9
+    priority_gwei = max_priority_fee_per_gas / 10**9
     logger.debug(
-        f"Final max fee per gas: {max_fee_per_gas / 10**9:.2f} Gwei, max priority fee per gas: {max_priority_fee_per_gas / 10**9:.2f} Gwei"
+        f"Final max fee per gas: {max_gwei:.2f} Gwei, "
+        f"max priority fee per gas: {priority_gwei:.2f} Gwei"
     )
     return max_fee_per_gas
 
@@ -424,17 +456,21 @@ def max_fee_per_blob_gas(
     eth_rpc: EthRPC,
     default_max_fee_per_blob_gas: int | None,
 ) -> int:
-    """Return max fee per blob gas used for transactions in a given test."""
+    """Return max fee per blob gas for transactions in a given test."""
     max_fee_per_blob_gas = default_max_fee_per_blob_gas
     if max_fee_per_blob_gas is None:
         network_blob_base_fee = eth_rpc.blob_base_fee()
         max_fee_per_blob_gas = int(network_blob_base_fee * 1.5)
+        network_fee = network_blob_base_fee / 10**9
+        result_fee = max_fee_per_blob_gas / 10**9
         logger.info(
-            f"Calculated max fee per blob gas from network: {network_blob_base_fee / 10**9:.2f} Gwei * 1.5 = {max_fee_per_blob_gas / 10**9:.2f} Gwei"
+            f"Calculated max fee per blob gas from network: "
+            f"{network_fee:.2f} Gwei * 1.5 = {result_fee:.2f} Gwei"
         )
     else:
         logger.info(
-            f"Using default max fee per blob gas: {max_fee_per_blob_gas / 10**9:.2f} Gwei"
+            "Using default max fee per blob gas: "
+            f"{max_fee_per_blob_gas / 10**9:.2f} Gwei"
         )
     return max_fee_per_blob_gas
 
@@ -443,8 +479,12 @@ def max_fee_per_blob_gas(
 def gas_price(max_fee_per_gas: int, max_priority_fee_per_gas: int) -> int:
     """Return gas price used for transactions in a given test."""
     calculated_gas_price = max_fee_per_gas + max_priority_fee_per_gas
+    max_gwei = max_fee_per_gas / 10**9
+    priority_gwei = max_priority_fee_per_gas / 10**9
+    result_gwei = calculated_gas_price / 10**9
     logger.debug(
-        f"Calculated gas price: {max_fee_per_gas / 10**9:.2f} Gwei (max fee) + {max_priority_fee_per_gas / 10**9:.2f} Gwei (max priority fee) = {calculated_gas_price / 10**9:.2f} Gwei"
+        f"Calculated gas price: {max_gwei:.2f} Gwei (max fee) + "
+        f"{priority_gwei:.2f} Gwei (max priority fee) = {result_gwei:.2f} Gwei"
     )
     return calculated_gas_price
 
@@ -535,10 +575,11 @@ def gas_limit_accumulator() -> Generator[GasInfoAccumulator, None, None]:
     """Return the gas limit accumulator for all tests."""
     gas_limit_accumulator = GasInfoAccumulator()
     yield gas_limit_accumulator
-    logger.info(f"Total gas limit: {gas_limit_accumulator.total_gas_limit()}")
     logger.info(
-        f"Total minimum balance: {gas_limit_accumulator.total_minimum_balance() / 10**18:.18f}"
+        f"Total gas limit: {gas_limit_accumulator.total_gas_limit()}"
     )
+    total_min_balance = gas_limit_accumulator.total_minimum_balance()
+    logger.info(f"Total minimum balance: {total_min_balance / 10**18:.18f}")
 
 
 def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
@@ -638,8 +679,8 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
                 )
                 if max_gas_limit_per_test is not None:
                     assert gas_consumption <= max_gas_limit_per_test, (
-                        f"Test gas consumption ({gas_consumption}) exceeds the gas limit allowed "
-                        f"per test({max_gas_limit_per_test})."
+                        f"Test gas consumption ({gas_consumption}) exceeds "
+                        f"gas limit per test({max_gas_limit_per_test})."
                     )
 
                 gas_limit_accumulator.add(
@@ -649,9 +690,8 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
                 )
 
                 if dry_run:
-                    logger.info(
-                        f"Minimum balance required: {minimum_balance / 10**18:.18f}"
-                    )
+                    min_bal = minimum_balance / 10**18
+                    logger.info(f"Minimum balance required: {min_bal:.18f}")
                     logger.info(f"Gas consumption: {gas_consumption}")
                     return
 
@@ -667,8 +707,9 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
                     actual_code = eth_rpc.get_code(deployed_contract)
                     if actual_code != expected_code:
                         raise Exception(
-                            f"Deployed test contract didn't match expected code at address "
-                            f"{deployed_contract} (not enough gas_limit?).\n"
+                            "Deployed test contract didn't match expected "
+                            f"code at address {deployed_contract} "
+                            f"(not enough gas_limit?).\n"
                             f"Expected: {expected_code}\n"
                             f"Actual: {actual_code}"
                         )

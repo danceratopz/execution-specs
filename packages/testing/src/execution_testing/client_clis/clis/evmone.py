@@ -11,7 +11,6 @@ from functools import cache
 from pathlib import Path
 from typing import Any, ClassVar, Dict, List, Optional
 
-from execution_testing.exceptions.exceptions.block import BlockException
 import pytest
 
 from execution_testing.client_clis.file_utils import (
@@ -26,6 +25,7 @@ from execution_testing.exceptions import (
     ExceptionMapper,
     TransactionException,
 )
+from execution_testing.exceptions.exceptions.block import BlockException
 from execution_testing.fixtures.base import FixtureFormat
 from execution_testing.fixtures.blockchain import BlockchainFixture
 from execution_testing.fixtures.state import StateFixture

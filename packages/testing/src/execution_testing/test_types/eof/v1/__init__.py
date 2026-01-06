@@ -478,9 +478,9 @@ class Container(CopyValidateModel):
         return c
 
     @classmethod
-    def Code(
+    def Code(  # noqa: N802
         cls, code: Optional[BytesConvertible] = None, **kwargs: Any
-    ) -> "Container":  # noqa: N802
+    ) -> "Container":
         """Create simple container with a single code section."""
         if code is None:
             code = Bytecode()

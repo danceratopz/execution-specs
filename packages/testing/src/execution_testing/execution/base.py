@@ -42,6 +42,8 @@ class BaseExecute(CamelModel):
         fork: Fork,
     ) -> Dict[Address, int]:
         """Get the required sender balances."""
+        del gas_price, max_fee_per_gas, max_priority_fee_per_gas
+        del max_fee_per_blob_gas, fork
         raise Exception(
             f"Method `get_required_sender_balances` not implemented for {self.format_name}"
         )

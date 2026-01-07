@@ -182,7 +182,7 @@ def eoa_iterator(request: pytest.FixtureRequest) -> Iterator[EOA]:
 class PendingTransaction(Transaction):
     """
     Custom transaction class that defines a transaction that is yet to be sent.
-    The value is allowed to be `None` to allow for the value to be set until the
+    The value is allowed to be `None` to allow setting it before the
     transaction is sent.
     """
 
@@ -292,9 +292,10 @@ class Alloc(BaseAlloc):
                 )
             balance = self._eth_rpc.get_balance(contract_address)
             nonce = self._eth_rpc.get_transaction_count(contract_address)
+            bal_eth = balance / 10**18
             logger.debug(
-                f"Stub contract {contract_address}: balance={balance / 10**18:.18f} ETH, "
-                f"nonce={nonce}, code_size={len(code)} bytes"
+                f"Stub contract {contract_address}: balance={bal_eth:.18f} "
+                f"ETH, nonce={nonce}, code_size={len(code)} bytes"
             )
             super().__setitem__(
                 contract_address,
@@ -373,11 +374,13 @@ class Alloc(BaseAlloc):
             tx_index=len(self._pending_txs),
         )
         self._pending_txs.append(deploy_tx)
+        bal_eth = Number(balance) / 10**18
+        slots = len(storage.root)
         logger.info(
             f"Contract deployment tx created (label={label}): "
             f"tx_nonce={deploy_tx.nonce}, gas_limit={deploy_gas_limit}, "
-            f"code_size={len(code)} bytes, initcode_size={len(initcode)} bytes, "
-            f"balance={Number(balance) / 10**18:.18f} ETH, storage_slots={len(storage.root)}"
+            f"code_size={len(code)} bytes, initcode={len(initcode)} bytes, "
+            f"balance={bal_eth:.18f} ETH, storage_slots={slots}"
         )
 
         contract_address = deploy_tx.created_contract
@@ -435,7 +438,8 @@ class Alloc(BaseAlloc):
                 if not isinstance(storage, Storage):
                     storage = Storage.model_validate(storage)
                 logger.debug(
-                    f"Deploying storage contract for EOA {eoa} with {len(storage)} storage slots"
+                    f"Deploying storage contract for EOA {eoa} "
+                    f"with {len(storage)} storage slots"
                 )
                 sstore_address = self.deploy_contract(
                     code=(
@@ -447,7 +451,8 @@ class Alloc(BaseAlloc):
                     )
                 )
                 logger.debug(
-                    f"Storage contract deployed at {sstore_address} for EOA {eoa}"
+                    f"Storage contract deployed at {sstore_address} "
+                    f"for EOA {eoa}"
                 )
 
                 set_storage_tx = PendingTransaction(
@@ -588,16 +593,19 @@ class Alloc(BaseAlloc):
                 current_balance = account.balance or 0
                 new_balance = current_balance + Number(amount)
                 account.balance = ZeroPaddedHexNumber(new_balance)
+                old_bal = current_balance / 10**18
+                new_bal = new_balance / 10**18
                 logger.debug(
-                    f"Updated balance for existing address {address}: "
-                    f"{current_balance / 10**18:.18f} ETH -> {new_balance / 10**18:.18f} ETH"
+                    f"Updated balance for {address}: "
+                    f"{old_bal:.18f} -> {new_bal:.18f} ETH"
                 )
                 return
 
         super().__setitem__(address, Account(balance=amount))
+        eth_val = Number(amount) / 10**18
         logger.info(
             f"Address {address} funding tx created (label={address.label}): "
-            f"{Number(amount) / 10**18:.18f} ETH"
+            f"{eth_val:.18f} ETH"
         )
 
     def empty_account(self) -> Address:
@@ -640,21 +648,22 @@ class Alloc(BaseAlloc):
         max_fee_per_blob_gas: int,
     ) -> Tuple[int, int]:
         """
-        Calculate the minimum balance required by the sender to send all pending
-        transactions.
+        Calculate the minimum balance required by the sender to send all
+        pending transactions.
         """
         minimum_balance = 0
         gas_consumption = 0
         for tx in self._pending_txs:
             if tx.value is None:
-                # WARN: This currently fails if there's an account with `pre.fund_eoa()` that
+                # WARN: Fails if there's a `pre.fund_eoa()` account that
                 # never sends a transaction during the test.
                 assert tx.to in sender_balances, (
                     "Sender balance must be set before sending"
                 )
                 sender_balance = sender_balances[tx.to]
+                bal_eth = sender_balance / 10**18
                 logger.info(
-                    f"Deferred EOA balance for {tx.to} set to {sender_balance / 10**18:.18f} ETH"
+                    f"Deferred EOA balance for {tx.to}: {bal_eth:.18f} ETH"
                 )
                 tx.value = HexNumber(sender_balance)
             tx.set_gas_price(
@@ -676,20 +685,19 @@ class Alloc(BaseAlloc):
         )
         txs = [tx.with_signature_and_sender() for tx in self._pending_txs]
         tx_hashes = self._eth_rpc.send_transactions(txs)
-        logger.info(
-            f"Sent {len(tx_hashes)} transactions: {[str(h) for h in tx_hashes[:5]]}"
-            + (f" and {len(tx_hashes) - 5} more" if len(tx_hashes) > 5 else "")
-        )
+        first_5 = [str(h) for h in tx_hashes[:5]]
+        extra = f" and {len(tx_hashes) - 5} more" if len(tx_hashes) > 5 else ""
+        logger.info(f"Sent {len(tx_hashes)} transactions: {first_5}{extra}")
         return tx_hashes
 
     def wait_for_transactions(self) -> List[TransactionByHashResponse]:
         """Wait for all transactions to be included in blocks."""
         logger.info(
-            f"Waiting for {len(self._pending_txs)} transactions to be included in blocks"
+            f"Waiting for {len(self._pending_txs)} txs to be included"
         )
         for tx in self._pending_txs:
             assert tx.value is not None, (
-                "Transaction value must be set before waiting for it to be included in a block"
+                "Transaction value must be set before waiting for inclusion"
             )
         responses = self._eth_rpc.wait_for_transactions(self._pending_txs)
         logger.info(f"All {len(responses)} transactions confirmed in blocks")
@@ -772,18 +780,21 @@ def pre(
         refund_gas_limit = 21_000
         tx_cost = refund_gas_limit * max_fee_per_gas
         if remaining_balance < tx_cost:
+            bal_eth = remaining_balance / 10**18
+            cost_eth = tx_cost / 10**18
             logger.debug(
                 f"Skipping refund for EOA {eoa} (label={eoa.label}): "
-                f"insufficient balance {remaining_balance / 10**18:.18f} ETH < "
-                f"transaction cost {tx_cost / 10**18:.18f} ETH"
+                f"balance {bal_eth:.18f} ETH < cost {cost_eth:.18f} ETH"
             )
             skipped_refunds += 1
             continue
         refund_value = remaining_balance - tx_cost
+        ref_eth = refund_value / 10**18
+        rem_eth = remaining_balance / 10**18
+        cost_eth = tx_cost / 10**18
         logger.debug(
-            f"Preparing refund transaction for EOA {eoa} (label={eoa.label}): "
-            f"{refund_value / 10**18:.18f} ETH (remaining: {remaining_balance / 10**18:.18f} ETH, "
-            f"cost: {tx_cost / 10**18:.18f} ETH)"
+            f"Preparing refund for EOA {eoa} (label={eoa.label}): "
+            f"{ref_eth:.18f} ETH (rem: {rem_eth:.18f}, cost: {cost_eth:.18f})"
         )
         refund_tx = Transaction(
             sender=eoa,

@@ -55,7 +55,7 @@ def pytest_configure(config: pytest.Config) -> None:
             returncode=4,
         )
 
-    # Use rpc_chain_id if chain_id is not provided (for backwards compatibility)
+    # Use rpc_chain_id if chain_id is not provided (backwards compat)
     if not chain_id:
         chain_id = rpc_chain_id
 

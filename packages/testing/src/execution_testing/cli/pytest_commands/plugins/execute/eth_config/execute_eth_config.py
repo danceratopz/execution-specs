@@ -235,12 +235,12 @@ def test_eth_config_majority(
                 response = eth_rpc_target.config(timeout=5)
                 if response is None:
                     logger.warning(
-                        f"Got 'None' as eth_config response from {eth_rpc_target}"
+                        f"Got 'None' as eth_config from {eth_rpc_target}"
                     )
                     continue
             except Exception as e:
                 logger.warning(
-                    f"When trying to get eth_config from {eth_rpc_target} a problem occurred: {e}"
+                    f"eth_config from {eth_rpc_target} failed: {e}"
                 )
                 continue
 
@@ -255,13 +255,12 @@ def test_eth_config_majority(
 
             break  # no need to gather more responses for this client
 
-    assert len(responses.keys()) == len(all_rpc_endpoints.keys()), (
-        "Failed to get an eth_config response "
-        f" from each specified execution client. Full list of execution clients is "
-        f"{all_rpc_endpoints.keys()} but we were only able to gather eth_config responses "
-        f"from: {responses.keys()}\n"
-        "Will try again with a different consensus-execution client combination for "
-        "this execution client"
+    all_clients = all_rpc_endpoints.keys()
+    assert len(responses.keys()) == len(all_clients), (
+        "Failed to get eth_config from each execution client. "
+        f"Clients: {list(all_clients)}, "
+        f"Responses from: {list(responses.keys())}\n"
+        "Will retry with a different CL+EL combination."
     )
     # determine hashes of client responses
     client_to_hash_dict = {}  # Dict[exec_client : response hash] # noqa: C408
@@ -297,6 +296,4 @@ def test_eth_config_majority(
         )
     assert expected_hash != ""
 
-    logger.info(
-        "All clients returned the same eth_config response. Test has been passed!"
-    )
+    logger.info("All clients returned same eth_config. Test passed!")

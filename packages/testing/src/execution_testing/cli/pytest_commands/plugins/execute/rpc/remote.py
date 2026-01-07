@@ -32,7 +32,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         dest="tx_wait_timeout",
         type=int,
         default=60,
-        help="Maximum time in seconds to wait for a transaction to be included in a block",
+        help="Max seconds to wait for tx block inclusion",
     )
     remote_rpc_group.addoption(
         "--address-stubs",
@@ -40,8 +40,10 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         dest="address_stubs",
         default=AddressStubs(root={}),
         type=AddressStubs.model_validate_json_or_file,
-        help="The address stubs for contracts that have already been placed in the chain and to "
-        "use for the test. Can be a JSON formatted string or a path to a YAML or JSON file.",
+        help=(
+            "Address stubs for pre-deployed contracts. "
+            "Can be JSON string or path to YAML/JSON file."
+        ),
     )
 
     engine_rpc_group = parser.getgroup(
@@ -53,10 +55,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store",
         default=None,
         dest="engine_endpoint",
-        help="Engine endpoint to an execution client, which implies that the execute command "
-        "will be used to drive the chain. If not provided, it's assumed that the execution client "
-        "is connected to a beacon node and the chain progresses automatically. If provided, the "
-        "JWT secret must be provided as well.",
+        help=(
+            "Engine endpoint to an execution client (implies execute command "
+            "drives the chain). If not provided, assumes chain progresses "
+            "automatically via beacon node. Requires JWT secret."
+        ),
     )
     engine_rpc_group.addoption(
         "--engine-jwt-secret",
@@ -64,8 +67,10 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store",
         default=None,
         dest="engine_jwt_secret",
-        help="JWT secret to be used to authenticate with the engine endpoint. Provided string "
-        "will be converted to bytes using the UTF-8 encoding.",
+        help=(
+            "JWT secret for engine endpoint authentication. "
+            "String will be converted to bytes using UTF-8 encoding."
+        ),
     )
     engine_rpc_group.addoption(
         "--engine-jwt-secret-file",
@@ -73,8 +78,10 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store",
         default=None,
         dest="engine_jwt_secret_file",
-        help="Path to a file containing the JWT secret to be used to authenticate with the engine "
-        "endpoint. The file must contain only the JWT secret as a hex string.",
+        help=(
+            "Path to file containing JWT secret for engine auth. "
+            "File must contain only the hex-encoded JWT secret."
+        ),
     )
 
 
@@ -86,9 +93,9 @@ def pytest_configure(config: pytest.Config) -> None:
     remote_chain_id = eth_rpc.chain_id()
     if remote_chain_id != ChainConfigDefaults.chain_id:
         pytest.exit(
-            f"Chain ID obtained from the remote RPC endpoint ({remote_chain_id}) does not match "
-            f"the configured chain ID ({ChainConfigDefaults.chain_id})."
-            "Please check if the chain ID is correctly configured with the --chain-id flag."
+            f"Remote RPC chain ID ({remote_chain_id}) does not match "
+            f"configured chain ID ({ChainConfigDefaults.chain_id}). "
+            "Check --chain-id flag."
         )
     engine_endpoint = config.getoption("engine_endpoint")
     engine_rpc = None
@@ -97,9 +104,8 @@ def pytest_configure(config: pytest.Config) -> None:
         jwt_secret_file = config.getoption("engine_jwt_secret_file")
         if jwt_secret is None and jwt_secret_file is None:
             pytest.exit(
-                "JWT secret must be provided if engine endpoint is provided. "
-                "Please check if the JWT secret is correctly configured with the "
-                "--engine-jwt-secret or --engine-jwt-secret-file flag."
+                "JWT secret required with engine endpoint. Use "
+                "--engine-jwt-secret or --engine-jwt-secret-file."
             )
         elif jwt_secret_file is not None:
             with open(jwt_secret_file, "r") as f:
@@ -110,9 +116,8 @@ def pytest_configure(config: pytest.Config) -> None:
                 jwt_secret = bytes.fromhex(jwt_secret)
             except ValueError:
                 pytest.exit(
-                    "JWT secret must be a hex string if provided as a file. "
-                    "Please check if the JWT secret is correctly configured with the "
-                    "--engine-jwt-secret-file flag."
+                    "JWT secret file must contain a hex string. "
+                    "Check --engine-jwt-secret-file."
                 )
         if isinstance(jwt_secret, str):
             jwt_secret = jwt_secret.encode("utf-8")

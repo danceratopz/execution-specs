@@ -49,10 +49,8 @@ class TimingData:
         """Recursively format the timing data with correct indentation."""
         assert self.start_time is not None
         assert self.end_time is not None
-        formatted = (
-            f"{' ' * indent}{self.name}: "
-            f"{TimingData.format_float(self.end_time - self.start_time, precision)}\n"
-        )
+        elapsed = TimingData.format_float(self.end_time - self.start_time, precision)
+        formatted = f"{' ' * indent}{self.name}: {elapsed}\n"
         for timing in self.timings:
             formatted += timing.formatted(precision, indent + 2)
         return formatted

@@ -23,7 +23,9 @@ import pytest
         pytest.param(
             """
             import pytest
-            @pytest.mark.with_all_tx_types(selector=lambda tx_type: tx_type != 0)
+            @pytest.mark.with_all_tx_types(
+                selector=lambda tx_type: tx_type != 0
+            )
             @pytest.mark.valid_from("Paris")
             @pytest.mark.valid_until("Paris")
             @pytest.mark.state_test_only
@@ -38,7 +40,9 @@ import pytest
             """
             import pytest
             @pytest.mark.with_all_tx_types(
-                marks=lambda tx_type: pytest.mark.skip("incompatible") if tx_type == 1 else None,
+                marks=lambda tx_type: (
+                    pytest.mark.skip("incompatible") if tx_type == 1 else None
+                ),
             )
             @pytest.mark.valid_from("Paris")
             @pytest.mark.valid_until("Paris")
@@ -110,7 +114,8 @@ import pytest
             @pytest.mark.valid_until("Paris")
             @pytest.mark.state_test_only
             def test_case(request, state_test, tx_type):
-                mark_names = [mark.name for mark in request.node.iter_markers()]
+                marks = request.node.iter_markers()
+                mark_names = [mark.name for mark in marks]
 
                 assert "state_test" in mark_names
                 if tx_type == 1:
@@ -201,7 +206,7 @@ import pytest
             import pytest
             from execution_testing import  EVMCodeType
             @pytest.mark.with_all_call_opcodes(
-                selector=(lambda _, evm_code_type: evm_code_type == EVMCodeType.LEGACY)
+                selector=lambda _, t: t == EVMCodeType.LEGACY
             )
             @pytest.mark.valid_from("Cancun")
             @pytest.mark.valid_until("Cancun")
@@ -217,7 +222,9 @@ import pytest
             """
             import pytest
             from execution_testing import Op
-            @pytest.mark.with_all_call_opcodes(selector=lambda call_opcode: call_opcode == Op.CALL)
+            @pytest.mark.with_all_call_opcodes(
+                selector=lambda call_opcode: call_opcode == Op.CALL
+            )
             @pytest.mark.valid_from("Cancun")
             @pytest.mark.valid_until("Cancun")
             @pytest.mark.state_test_only
@@ -296,7 +303,8 @@ import pytest
             @pytest.mark.state_test_only
             def test_case(state_test, typed_transaction):
                 assert isinstance(typed_transaction, Transaction)
-                assert typed_transaction.ty in [0, 1]  # Berlin supports types 0 and 1
+                # Berlin supports types 0 and 1
+                assert typed_transaction.ty in [0, 1]
             """,
             {"passed": 2, "failed": 0, "skipped": 0, "errors": 0},
             None,
@@ -312,7 +320,8 @@ import pytest
             @pytest.mark.state_test_only
             def test_case(state_test, typed_transaction, pre):
                 assert isinstance(typed_transaction, Transaction)
-                assert typed_transaction.ty in [0, 1, 2]  # London supports types 0, 1, 2
+                # London supports types 0, 1, 2
+                assert typed_transaction.ty in [0, 1, 2]
             """,
             {"passed": 3, "failed": 0, "skipped": 0, "errors": 0},
             None,
@@ -427,9 +436,13 @@ import pytest
             import pytest
 
             def covariant_function(fork):
-                return [[1, 2], [3, 4]] if fork.name() == "Paris" else [[4, 5], [5, 6], [6, 7]]
+                if fork.name() == "Paris":
+                    return [[1, 2], [3, 4]]
+                return [[4, 5], [5, 6], [6, 7]]
 
-            @pytest.mark.parametrize_by_fork("test_parameter,test_parameter_2", covariant_function)
+            @pytest.mark.parametrize_by_fork(
+                "test_parameter,test_parameter_2", covariant_function
+            )
             @pytest.mark.valid_from("Paris")
             @pytest.mark.valid_until("Shanghai")
             @pytest.mark.state_test_only

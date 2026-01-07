@@ -9,7 +9,8 @@ invalid_cli_option_test_cases = (
         "from_nonexistent_fork",
         (
             ("--from", "Marge"),  # codespell:ignore marge
-            "Unsupported fork provided to --from: Marge",  # codespell:ignore marge
+            # codespell:ignore marge
+            "Unsupported fork provided to --from: Marge",
         ),
     ),
     (
@@ -30,14 +31,14 @@ invalid_cli_option_test_cases = (
         "fork_and_from",
         (
             ("--fork", "Frontier", "--from", "Frontier"),
-            "--fork cannot be used in combination with --from or --until",
+            "--fork cannot be combined with --from or --until",
         ),
     ),
     (
         "fork_and_until",
         (
             ("--fork", "Frontier", "--until", "Frontier"),
-            "--fork cannot be used in combination with --from or --until",
+            "--fork cannot be combined with --from or --until",
         ),
     ),
     (

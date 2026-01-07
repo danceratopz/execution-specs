@@ -384,22 +384,22 @@ def covariant_decorator(
 fork_covariant_decorators: List[Type[CovariantDecorator]] = [
     covariant_decorator(
         marker_name="with_all_tx_types",
-        description="marks a test to be parametrized for all tx types at parameter named tx_type"
-        " of type int",
+        description="parametrize test for all tx types at parameter "
+        "tx_type of type int",
         fork_attribute_name="tx_types",
         argnames=["tx_type"],
     ),
     covariant_decorator(
         marker_name="with_all_contract_creating_tx_types",
-        description="marks a test to be parametrized for all tx types that can create a contract"
-        " at parameter named tx_type of type int",
+        description="parametrize test for all contract-creating tx types "
+        "at parameter tx_type of type int",
         fork_attribute_name="contract_creating_tx_types",
         argnames=["tx_type"],
     ),
     covariant_decorator(
         marker_name="with_all_typed_transactions",
-        description="marks a test to be parametrized with default typed transactions named "
-        "typed_transaction",
+        description="parametrize test with default typed transactions "
+        "named typed_transaction",
         fork_attribute_name="tx_types",
         argnames=["typed_transaction"],
         # indirect means the values from `tx_types` will be passed to the
@@ -408,36 +408,36 @@ fork_covariant_decorators: List[Type[CovariantDecorator]] = [
     ),
     covariant_decorator(
         marker_name="with_all_precompiles",
-        description="marks a test to be parametrized for all precompiles at parameter named"
-        " precompile of type int",
+        description="parametrize test for all precompiles at parameter "
+        "precompile of type int",
         fork_attribute_name="precompiles",
         argnames=["precompile"],
     ),
     covariant_decorator(
         marker_name="with_all_evm_code_types",
-        description="marks a test to be parametrized for all EVM code types at parameter named"
-        " `evm_code_type` of type `EVMCodeType`, such as `LEGACY` and `EOF_V1`",
+        description="parametrize test for all EVM code types at parameter "
+        "evm_code_type of type EVMCodeType (LEGACY, EOF_V1)",
         fork_attribute_name="evm_code_types",
         argnames=["evm_code_type"],
     ),
     covariant_decorator(
         marker_name="with_all_call_opcodes",
-        description="marks a test to be parametrized for all *CALL opcodes at parameter named"
-        " call_opcode, and also the appropriate EVM code type at parameter named evm_code_type",
+        description="parametrize test for all *CALL opcodes at parameter "
+        "call_opcode, plus evm_code_type",
         fork_attribute_name="call_opcodes",
         argnames=["call_opcode", "evm_code_type"],
     ),
     covariant_decorator(
         marker_name="with_all_create_opcodes",
-        description="marks a test to be parametrized for all *CREATE* opcodes at parameter named"
-        " create_opcode, and also the appropriate EVM code type at parameter named evm_code_type",
+        description="parametrize test for all *CREATE* opcodes at "
+        "parameter create_opcode, plus evm_code_type",
         fork_attribute_name="create_opcodes",
         argnames=["create_opcode", "evm_code_type"],
     ),
     covariant_decorator(
         marker_name="with_all_system_contracts",
-        description="marks a test to be parametrized for all system contracts at parameter named"
-        " system_contract of type int",
+        description="parametrize test for all system contracts at "
+        "parameter system_contract of type int",
         fork_attribute_name="system_contracts",
         argnames=["system_contract"],
     ),
@@ -475,8 +475,8 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
         "markers",
         (
-            "parametrize_by_fork(names, values_fn): parametrize a test case by fork using the "
-            "specified names and values returned by the function values_fn(fork)"
+            "parametrize_by_fork(names, values_fn): parametrize test "
+            "by fork using names and values from values_fn(fork)"
         ),
     )
     for d in fork_covariant_decorators:
@@ -533,7 +533,7 @@ def pytest_configure(config: pytest.Config) -> None:
 
     if single_fork and (forks_from or forks_until):
         print(
-            "Error: --fork cannot be used in combination with --from or --until",
+            "Error: --fork cannot be combined with --from or --until",
             file=sys.stderr,
         )
         pytest.exit(
@@ -555,9 +555,9 @@ def pytest_configure(config: pytest.Config) -> None:
     ):
         pytest.exit(
             f"""
-            Expected exactly one fork to be specified, got {len(selected_fork_set)}
+            Expected exactly one fork, got {len(selected_fork_set)}
             ({selected_fork_set}).
-            Make sure to specify exactly one fork using the --fork command line argument.
+            Use --fork to specify exactly one fork.
             """,
             returncode=pytest.ExitCode.USAGE_ERROR,
         )
@@ -635,7 +635,7 @@ def session_fork(request: pytest.FixtureRequest) -> Fork | None:
     ):
         return list(request.config.selected_fork_set)[0]  # type: ignore
     raise AssertionError(
-        "Plugin used `session_fork` fixture without the correct configuration (single_fork_mode)."
+        "session_fork fixture requires single_fork_mode configuration."
     )
 
 
@@ -1079,8 +1079,8 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
                     marks=[
                         pytest.mark.skip(
                             reason=(
-                                f"{test_name} is not valid for any of the forks specified on "
-                                "the command-line."
+                                f"{test_name} not valid for any "
+                                "specified forks"
                             )
                         )
                     ],

@@ -176,7 +176,7 @@ invalid_validity_marker_test_cases = (
             def test_case(state_test):
                 assert 0
             """,
-            "The markers 'valid_from' and 'valid_at_transition_to' can't be combined",
+            "'valid_from' and 'valid_at_transition_to' can't be combined",
         ),
     ),
     (
@@ -189,7 +189,7 @@ invalid_validity_marker_test_cases = (
             def test_case(state_test):
                 assert 0
             """,
-            "The markers 'valid_until' and 'valid_at_transition_to' can't be combined",
+            "'valid_until' and 'valid_at_transition_to' can't be combined",
         ),
     ),
     (

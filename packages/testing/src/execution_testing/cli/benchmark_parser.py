@@ -55,7 +55,7 @@ class OpcodeExtractor(ast.NodeVisitor):
         if not self._has_benchmark_test_param(node):
             return
 
-        # Filter for code generator usage (required for fixed-opcode-count mode)
+        # Filter for code generator usage (required for fixed-opcode-count)
         if not self._uses_code_generator(node):
             return
 
@@ -153,15 +153,18 @@ class OpcodeExtractor(ast.NodeVisitor):
             Result: ["ADD", "MUL"]
 
         Case 2a - pytest.param with direct opcode:
-            @pytest.mark.parametrize("opcode", [pytest.param(Op.ADD, id="add")])
+            @pytest.mark.parametrize(
+                "opcode", [pytest.param(Op.ADD, id="add")])
             Result: ["ADD"]
 
         Case 2b - pytest.param with tuple (opcode first):
-            @pytest.mark.parametrize("opcode,arg", [pytest.param((Op.ADD, 123))])
+            @pytest.mark.parametrize(
+                "opcode,arg", [pytest.param((Op.ADD, 123))])
             Result: ["ADD"]
 
         Case 3 - Plain tuple (opcode first):
-            @pytest.mark.parametrize("opcode,arg", [(Op.ADD, 123), (Op.MUL, 456)])
+            @pytest.mark.parametrize(
+                "opcode,arg", [(Op.ADD, 123), (Op.MUL, 456)])
             Result: ["ADD", "MUL"]
         """
         # Case 1: Direct opcode - Op.ADD

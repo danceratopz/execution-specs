@@ -82,7 +82,8 @@ class TestFillPytester:
     """
     Test fill command using pytester.
 
-    This mode skips the fill command's Click CLI and uses pytester to run the command.
+    This mode skips the fill command's Click CLI and uses pytester to run
+    the command.
 
     Pytester allows actually filling the Python test files.
     """
@@ -144,7 +145,8 @@ class TestFillPytester:
     @pytest.fixture()
     def default_html_report_file_path(self) -> str:
         """File path for fill's pytest html report."""
-        return execution_testing.cli.pytest_commands.plugins.filler.filler.default_html_report_file_path()
+        filler_mod = execution_testing.cli.pytest_commands.plugins.filler
+        return filler_mod.filler.default_html_report_file_path()
 
     @pytest.fixture(scope="function")
     def default_fixtures_output(

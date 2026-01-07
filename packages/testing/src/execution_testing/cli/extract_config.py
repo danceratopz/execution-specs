@@ -324,15 +324,13 @@ def extract_config(
 
                 if len(new_containers) != 1:
                     click.echo(
-                        f"Expected exactly 1 new container, found {len(new_containers)}",
+                        f"Expected 1 container, found {len(new_containers)}",
                         err=True,
                     )
                     sys.exit(1)
 
                 container_id = new_containers.pop()
-                click.echo(
-                    f"Client started successfully (Container ID: {container_id})"
-                )
+                click.echo(f"Client started (Container ID: {container_id})")
 
                 # Optionally list files in container
                 if list_files:

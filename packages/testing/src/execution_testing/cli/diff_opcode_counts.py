@@ -135,9 +135,11 @@ def compare_opcode_counts(
     "--remove-from-fixture-names",
     "-r",
     multiple=True,
-    help="String to be removed from the fixture name, in case the fixture names have changed, "
-    "in order to make the comparison easier. "
-    "Can be specified multiple times.",
+    help=(
+        "String to be removed from the fixture name, in case the fixture "
+        "names have changed, in order to make the comparison easier. "
+        "Can be specified multiple times."
+    ),
 )
 def main(
     base: Path,
@@ -204,9 +206,7 @@ def main(
             "\nNo differences found in opcode counts between common fixtures!"
         )
     elif show_common:
-        print(
-            f"\n{common_with_same_counts} fixtures have identical opcode counts"
-        )
+        print(f"\n{common_with_same_counts} fixtures have identical counts")
 
 
 if __name__ == "__main__":

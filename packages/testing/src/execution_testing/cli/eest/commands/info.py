@@ -38,12 +38,13 @@ def info() -> None:
     title = click.style("EEST", fg="green", bold=True)
 
     version = AppConfig().version
+    git_hash = get_current_commit_hash_or_tag(shorten_hash=True)
 
     info_text = f"""
     {title} {click.style(f"v{version}", fg="blue", bold=True)}
 {"─" * 50}
 
-    Git commit: {click.style(get_current_commit_hash_or_tag(shorten_hash=True), fg="yellow")}
+    Git: {click.style(git_hash, fg="yellow")}
     Python: {click.style(platform.python_version(), fg="blue")}
     uv: {click.style(get_uv_version(), fg="magenta")}
     OS: {click.style(f"{platform.system()} {platform.release()}", fg="cyan")}

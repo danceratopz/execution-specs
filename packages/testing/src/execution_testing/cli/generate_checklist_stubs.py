@@ -132,7 +132,8 @@ class _CallableChecklistItem:
     @overload
     def __call__(self, func: F) -> F: ...
     @overload
-    def __call__(self, *, eip: Any = ..., **kwargs: Any) -> pytest.MarkDecorator: ...
+    def __call__(
+        self, *, eip: Any = ..., **kwargs: Any) -> pytest.MarkDecorator: ...
     def __str__(self) -> str: ...
 
 '''
@@ -173,11 +174,12 @@ class _CallableChecklistItem:
         )
 
         click.echo(
-            "\n💡 This stub file helps mypy understand that EIPChecklist classes are callable."
+            "\n💡 This stub file helps mypy understand that EIPChecklist "
+            "classes are callable."
         )
         click.echo(
-            "   You can now use @EIPChecklist.Opcode.Test.StackComplexOperations() "
-            "without type errors!"
+            "   You can now use @EIPChecklist.Opcode.Test.StackComplex"
+            "Operations() without type errors!"
         )
 
     except ImportError as e:

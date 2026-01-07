@@ -62,9 +62,8 @@ def eof_wrap(input_path: str, output_dir: str, traces: bool) -> None:
     try:
         EvmOneTransitionTool()
     except CLINotFoundInPathError:
-        print(
-            f"Error: {EvmOneTransitionTool.default_binary} must be in the PATH."
-        )
+        binary = EvmOneTransitionTool.default_binary
+        print(f"Error: {binary} must be in the PATH.")
         sys.exit(1)
     except Exception as e:
         raise Exception(f"Unexpected exception: {e}") from e
@@ -282,7 +281,8 @@ class EofWrapper:
                 ) + len(fixture_eof_codes)
 
                 print(
-                    f"Exception {e} occurred during generation of {in_path}: {fixture_id}"
+                    f"Exception {e} during generation of "
+                    f"{in_path}: {fixture_id}"
                 )
 
         if len(out_fixtures) == 0:

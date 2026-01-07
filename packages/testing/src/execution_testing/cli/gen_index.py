@@ -46,8 +46,8 @@ def count_json_files_exclude_index(start_path: Path) -> int:
 
 @click.command(
     help=(
-        "Generate an index file of all the json fixtures in the specified directory. "
-        "The index file is saved as 'index.json' in the specified directory."
+        "Generate an index file of all json fixtures in the specified "
+        "directory. The index file is saved as 'index.json' in that directory."
     )
 )
 @click.option(
@@ -123,20 +123,16 @@ def generate_fixtures_index(
                 root_hash
             ):
                 if not quiet_mode:
-                    rich.print(
-                        f"Index file [bold cyan]{output_file}[/] is up-to-date."
-                    )
+                    rich.print(f"Index [bold cyan]{output_file}[/] current.")
                 return
         except Exception as e:
             rich.print(f"Ignoring exception {e}")
-            rich.print(
-                f"...generating a new index file [bold cyan]{output_file}[/]"
-            )
+            rich.print(f"...generating index [bold cyan]{output_file}[/]")
 
-    filename_display_width = 25
+    width = 25
     with Progress(
         TextColumn(
-            f"[bold cyan]{{task.fields[filename]:<{filename_display_width}}}[/]",
+            f"[bold cyan]{{task.fields[filename]:<{width}}}[/]",
             justify="left",
             table_column=Column(ratio=1),
         ),

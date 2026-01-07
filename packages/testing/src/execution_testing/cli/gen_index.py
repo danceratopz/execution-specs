@@ -188,21 +188,17 @@ def generate_fixtures_index(
                 fixture_formats.add(fixture.format_name)
 
             display_filename = file.name
-            if len(display_filename) > filename_display_width:
-                display_filename = (
-                    display_filename[: filename_display_width - 3] + "..."
-                )
+            if len(display_filename) > width:
+                display_filename = display_filename[: width - 3] + "..."
             else:
-                display_filename = display_filename.ljust(
-                    filename_display_width
-                )
+                display_filename = display_filename.ljust(width)
 
             progress.update(task_id, advance=1, filename=display_filename)
 
         progress.update(
             task_id,
             completed=total_files,
-            filename="Indexing complete 🦄".ljust(filename_display_width),
+            filename="Indexing complete 🦄".ljust(width),
         )
 
     index = IndexFile(

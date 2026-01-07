@@ -45,7 +45,8 @@ class BaseExecute(CamelModel):
         del gas_price, max_fee_per_gas, max_priority_fee_per_gas
         del max_fee_per_blob_gas, fork
         raise Exception(
-            f"Method `get_required_sender_balances` not implemented for {self.format_name}"
+            f"Method `get_required_sender_balances` not implemented "
+            f"for {self.format_name}"
         )
 
     @abstractmethod

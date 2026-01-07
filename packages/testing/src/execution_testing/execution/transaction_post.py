@@ -41,7 +41,8 @@ class TransactionPost(BaseExecute):
 
     format_name: ClassVar[str] = "transaction_post_test"
     description: ClassVar[str] = (
-        "Simple transaction sending, then post-check after all transactions are included"
+        "Simple transaction sending, then post-check after all "
+        "transactions are included"
     )
 
     def get_required_sender_balances(
@@ -84,7 +85,8 @@ class TransactionPost(BaseExecute):
             for tx in block:
                 if not isinstance(tx, NetworkWrappedTransaction):
                     assert tx.ty != 3, (
-                        "Unwrapped transaction type 3 is not supported in execute mode."
+                        "Unwrapped transaction type 3 is not "
+                        "supported in execute mode."
                     )
 
         # Track transaction hashes for gas validation (benchmarking)
@@ -121,14 +123,15 @@ class TransactionPost(BaseExecute):
                     else:
                         logger.info(
                             f"Sending transaction expecting rejection "
-                            f"(expected error: {transaction.error})..."
+                            f"(error: {transaction.error})..."
                         )
                         with pytest.raises(
                             SendTransactionExceptionError
                         ) as exc_info:
                             eth_rpc.send_transaction(transaction)
                         logger.info(
-                            f"Transaction rejected as expected: {exc_info.value}"
+                            f"Transaction rejected as expected: "
+                            f"{exc_info.value}"
                         )
             else:
                 eth_rpc.send_wait_transactions(signed_txs)
@@ -151,10 +154,11 @@ class TransactionPost(BaseExecute):
                 total_gas_used += gas_used
 
             # Verify that the total gas consumed matches expectations
-            assert total_gas_used == self.expected_benchmark_gas_used, (
+            expected = self.expected_benchmark_gas_used
+            diff = total_gas_used - expected
+            assert total_gas_used == expected, (
                 f"Total gas used ({total_gas_used}) does not match "
-                f"expected benchmark gas ({self.expected_benchmark_gas_used}), "
-                f"difference: {total_gas_used - self.expected_benchmark_gas_used}"
+                f"expected benchmark gas ({expected}), difference: {diff}"
             )
 
         for address, account in self.post.root.items():
@@ -174,15 +178,18 @@ class TransactionPost(BaseExecute):
             else:
                 if "balance" in account.model_fields_set:
                     assert balance == account.balance, (
-                        f"Balance of {address} is {balance}, expected {account.balance}."
+                        f"Balance of {address} is {balance}, "
+                        f"expected {account.balance}."
                     )
                 if "code" in account.model_fields_set:
                     assert code == account.code, (
-                        f"Code of {address} is {code}, expected {account.code}."
+                        f"Code of {address} is {code}, "
+                        f"expected {account.code}."
                     )
                 if "nonce" in account.model_fields_set:
                     assert nonce == account.nonce, (
-                        f"Nonce of {address} is {nonce}, expected {account.nonce}."
+                        f"Nonce of {address} is {nonce}, "
+                        f"expected {account.nonce}."
                     )
                 if "storage" in account.model_fields_set:
                     for key, value in account.storage.items():
@@ -190,6 +197,6 @@ class TransactionPost(BaseExecute):
                             address, Hash(key)
                         )
                         assert storage_value == value, (
-                            f"Storage value at {key} of {address} is {storage_value},"
-                            f"expected {value}."
+                            f"Storage at {key} of {address} "
+                            f"is {storage_value}, expected {value}."
                         )

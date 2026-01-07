@@ -200,7 +200,8 @@ class EOFParse:
         )
         if result.returncode not in [0, 1]:
             raise Exception(
-                f"`{self.binary.name}` call failed with return code {result.returncode}."
+                f"`{self.binary.name}` call failed with "
+                f"return code {result.returncode}."
             )
         return result
 
@@ -350,8 +351,8 @@ class EOFTest(BaseTest):
                 assert (
                     self.expect_exception == self.container.validity_error
                 ), (
-                    f"Container validity error {self.container.validity_error} "
-                    f"does not match expected exception {self.expect_exception}."
+                    f"Container validity error {self.container.validity_error}"
+                    f" != expected {self.expect_exception}."
                 )
             self.expect_exception = self.container.validity_error  # type: ignore[assignment]
             assert self.deployed_container is None, (
@@ -405,7 +406,8 @@ class EOFTest(BaseTest):
             eof_parse = EOFParse()
         except FileNotFoundError as e:
             warnings.warn(
-                f"{e} Skipping EOF fixture verification. Fixtures may be invalid!",
+                f"{e} Skipping EOF fixture verification. "
+                "Fixtures may be invalid!",
                 stacklevel=2,
             )
             return fixture
@@ -486,7 +488,8 @@ class EOFTest(BaseTest):
                 # deployed container. Try to infer the deployed container from
                 # the sections of the init-container.
                 assert self.container.raw_bytes is None, (
-                    "deployed_container must be set for initcode containers with raw_bytes."
+                    "deployed_container must be set for initcode "
+                    "containers with raw_bytes."
                 )
                 for section in self.container.sections:
                     if section.kind == SectionKind.CONTAINER:
@@ -495,7 +498,7 @@ class EOFTest(BaseTest):
 
                 assert deployed_container is not None, (
                     "Unable to infer deployed container for init-container. "
-                    "Use field `deployed_container` to set the expected deployed container."
+                    "Use `deployed_container` to set expected container."
                 )
         else:
             assert self.deployed_container is None, (
@@ -585,8 +588,8 @@ class EOFStateTest(EOFTest, Transaction):
     Container deployment/validation is **not** tested like in the `EOFTest`
     unless the container under test is an initcode container.
 
-    All fields from `execution_testing.test_types.Transaction` are available for use in
-    the test.
+    All fields from `execution_testing.test_types.Transaction` are available
+    for use in the test.
     """
 
     gas_limit: HexNumber = Field(
@@ -714,7 +717,8 @@ class EOFStateTest(EOFTest, Transaction):
                 # Gracefully skip duplicate tests because one EOFStateTest can
                 # generate multiple state fixtures with the same data.
                 pytest.skip(
-                    f"Duplicate EOF container on EOFStateTest: {self.node_id()}"
+                    f"Duplicate EOF container on EOFStateTest: "
+                    f"{self.node_id()}"
                 )
             return self.make_eof_test_fixture()
         elif fixture_format in StateTest.supported_fixture_formats:

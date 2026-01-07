@@ -184,7 +184,7 @@ class StateTest(BaseTest):
             )
         except Exception as e:
             logger.debug(
-                f"Transactions are not equivalent (gas_limit={current_gas_limit})"
+                f"Transactions not equivalent (gas_limit={current_gas_limit})"
             )
             logger.debug(e)
             return False
@@ -201,14 +201,14 @@ class StateTest(BaseTest):
         for k in base_tool_alloc.root.keys():
             if k not in modified_tool_alloc:
                 logger.debug(
-                    f"Post alloc is not equivalent (gas_limit={current_gas_limit})"
+                    f"Post alloc not equivalent (gas_limit={current_gas_limit})"
                 )
                 return False
             base_account = base_tool_alloc[k]
             modified_account = modified_tool_alloc[k]
             if (modified_account is None) != (base_account is None):
                 logger.debug(
-                    f"Post alloc is not equivalent (gas_limit={current_gas_limit})"
+                    f"Post alloc not equivalent (gas_limit={current_gas_limit})"
                 )
                 return False
             if (
@@ -217,7 +217,7 @@ class StateTest(BaseTest):
                 and base_account.nonce != modified_account.nonce
             ):
                 logger.debug(
-                    f"Post alloc is not equivalent (gas_limit={current_gas_limit})"
+                    f"Post alloc not equivalent (gas_limit={current_gas_limit})"
                 )
                 return False
         logger.debug(
@@ -247,10 +247,12 @@ class StateTest(BaseTest):
         Generate the genesis environment for the BlockchainTest formatted test.
         """
         assert self.env.number >= 1, (
-            "genesis block number cannot be negative, set state test env.number to at least 1"
+            "genesis block number cannot be negative, "
+            "set state test env.number to at least 1"
         )
         assert self.env.timestamp >= 1, (
-            "genesis timestamp cannot be negative, set state test env.timestamp to at least 1"
+            "genesis timestamp cannot be negative, "
+            "set state test env.timestamp to at least 1"
         )
         # There's only a handful of values that we need to set in the genesis
         # for the environment values at block 1 to make sense:
@@ -433,10 +435,10 @@ class StateTest(BaseTest):
                             and minimum_gas_limit
                             > self._gas_optimization_max_gas_limit
                         ):
-                            raise Exception(
-                                "Requires more than the minimum "
-                                f"{self._gas_optimization_max_gas_limit} wanted."
-                            )
+                            max_gas = self._gas_optimization_max_gas_limit
+                        raise Exception(
+                            f"Requires more than the min {max_gas} wanted."
+                        )
 
                 assert self.verify_modified_gas_limit(
                     t8n=t8n,
@@ -459,10 +461,11 @@ class StateTest(BaseTest):
             )
             gas_used = int(transition_tool_output.result.gas_used)
             if not self.skip_gas_used_validation:
-                assert gas_used == expected_benchmark_gas_used, (
-                    f"gas_used ({gas_used}) does not match expected_benchmark_gas_used "
-                    f"({expected_benchmark_gas_used})"
-                    f", difference: {gas_used - expected_benchmark_gas_used}"
+                expected = expected_benchmark_gas_used
+                diff = gas_used - expected
+                assert gas_used == expected, (
+                    f"gas_used ({gas_used}) != expected ({expected})"
+                    f", difference: {diff}"
                 )
 
         return StateFixture(

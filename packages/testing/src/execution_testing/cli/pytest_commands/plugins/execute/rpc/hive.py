@@ -32,7 +32,7 @@ from execution_testing.test_types import (
     Withdrawal,
 )
 
-from ...consume.simulators.helpers.ruleset import ruleset
+from ...consume import ruleset
 from .chain_builder_eth_rpc import ChainBuilderEthRPC
 
 

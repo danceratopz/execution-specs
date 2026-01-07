@@ -27,9 +27,7 @@ from pydantic import (
 )
 
 from execution_testing.base_types import Alloc
-from execution_testing.cli.pytest_commands.plugins.consume.simulators.helpers.ruleset import (
-    ruleset,
-)
+from execution_testing.cli.pytest_commands.plugins.consume import ruleset
 from execution_testing.fixtures import (
     BlockchainEngineFixture,
     BlockchainFixtureCommon,
@@ -130,13 +128,17 @@ def extract_client_files(
 
 
 class GenesisState(BaseModel):
+    """
+    Model defining a client genesis file.
+    """
+
     header: FixtureHeader
     alloc: Alloc
     chain_id: int = Field(exclude=True)
     fork: Fork = Field(exclude=True)
 
     @model_serializer(mode="wrap")
-    def serialize_model(
+    def serialize_model(  # noqa: D102
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
         serialized = handler(self)
@@ -190,7 +192,7 @@ class GenesisState(BaseModel):
 
     def get_client_environment(self) -> dict:
         """
-        Get the environment variables for starting a client with the given fixture.
+        Get the environment variables to start a client with the given fixture.
         """
         if self.fork not in ruleset:
             raise ValueError(f"Fork '{self.fork}' not found in hive ruleset")
@@ -199,7 +201,7 @@ class GenesisState(BaseModel):
             "HIVE_CHAIN_ID": str(self.chain_id),
             "HIVE_FORK_DAO_VOTE": "1",
             "HIVE_NODETYPE": "full",
-            "HIVE_CHECK_LIVE_PORT": "8545",  # Using RPC port for liveness check
+            "HIVE_CHECK_LIVE_PORT": "8545",  # Use RPC port for liveness check
             **{k: f"{v:d}" for k, v in ruleset[self.fork].items()},
         }
 

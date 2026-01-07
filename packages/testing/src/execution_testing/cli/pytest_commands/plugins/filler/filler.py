@@ -876,7 +876,7 @@ def pytest_terminal_summary(
             terminalreporter.write_sep(
                 "=",
                 (
-                    f' No tests executed - the test fixtures in '
+                    f" No tests executed - the test fixtures in "
                     f'"{output_dir}" may now be executed against a client '
                 ),
                 bold=True,
@@ -1323,6 +1323,7 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
         scope="function",
         name=cls.pytest_parameter_name(),
     )
+    # @pytest.mark.usefixtures("fixed_opcode_count")
     def base_test_parametrizer_func(
         request: pytest.FixtureRequest,
         t8n: TransitionTool,
@@ -1349,6 +1350,8 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
         When parametrize, indirect must be used along with the fixture format
         as value.
         """
+        # fixed_opcode_count triggers pytest_generate_tests parametrization
+        del fixed_opcode_count
         if hasattr(request.node, "fixture_format"):
             fixture_format = request.node.fixture_format
         else:

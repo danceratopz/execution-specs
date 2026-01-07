@@ -625,6 +625,8 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
         When parametrize, indirect must be used along with the fixture format
         as value.
         """
+        # fixed_opcode_count triggers pytest_generate_tests parametrization
+        del fixed_opcode_count
         execute_format = request.param
         assert execute_format in BaseExecute.formats.values()
         assert issubclass(execute_format, BaseExecute)

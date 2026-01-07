@@ -159,9 +159,10 @@ class Blob(CamelModel):
             bytes_per_field: int = cast(
                 int, fork.get_blob_constant("BYTES_PER_FIELD_ELEMENT")
             )
-            assert len(data) == field_elements * bytes_per_field, (
-                f"Expected blob of length "
-                f"{field_elements * bytes_per_field} but got blob of length {len(data)}"
+            expected_len = field_elements * bytes_per_field
+            assert len(data) == expected_len, (
+                f"Expected blob of length {expected_len} "
+                f"but got blob of length {len(data)}"
             )
 
             # calculate commitment
@@ -207,8 +208,9 @@ class Blob(CamelModel):
                 return proofs
 
             raise AssertionError(
-                f"get_proof() has not been implemented yet for fork: {fork.name()}."
-                f"Got amount of cell proofs {amount_cell_proofs} but expected 128."
+                f"get_proof() has not been implemented yet for "
+                f"fork: {fork.name()}. Got amount of cell proofs "
+                f"{amount_cell_proofs} but expected 128."
             )
 
         def get_cells(fork: Fork, data: Bytes) -> List[Bytes] | None:
@@ -228,8 +230,9 @@ class Blob(CamelModel):
                 return cells  # List[bytes]
 
             raise AssertionError(
-                f"get_cells() has not been implemented yet for fork: {fork.name()}. Got amount of "
-                f"cell proofs {amount_cell_proofs} but expected 128."
+                f"get_cells() has not been implemented yet for "
+                f"fork: {fork.name()}. Got amount of cell proofs "
+                f"{amount_cell_proofs} but expected 128."
             )
 
         # first, create cached blobs dir if necessary
@@ -250,7 +253,8 @@ class Blob(CamelModel):
         with FileLock(lock_file_path):
             if blob_location.exists():
                 logger.debug(
-                    f"Blob exists already, reading it from file {blob_location}"
+                    f"Blob exists already, reading it from file "
+                    f"{blob_location}"
                 )
                 return Blob.from_file(Blob.get_filename(fork, seed))
 
@@ -293,8 +297,8 @@ class Blob(CamelModel):
         """
         # ensure filename was passed
         assert file_name.startswith("blob_"), (
-            f"You provided an invalid blob filename. Expected it to start with 'blob_' "
-            f"but got: {file_name}"
+            "You provided an invalid blob filename. Expected it "
+            f"to start with 'blob_' but got: {file_name}"
         )
 
         if ".json" not in file_name:
@@ -305,7 +309,8 @@ class Blob(CamelModel):
 
         # check whether blob exists
         assert blob_file_location.exists(), (
-            f"Tried to load blob from file but {blob_file_location} does not exist"
+            f"Tried to load blob from file but {blob_file_location} "
+            "does not exist"
         )
 
         # read blob from file
@@ -326,7 +331,8 @@ class Blob(CamelModel):
             # warn if existing static_blob gets overwritten
             if output_location.exists():
                 logger.debug(
-                    f"Blob {output_location} already exists. It will be overwritten."
+                    f"Blob {output_location} already exists. "
+                    "It will be overwritten."
                 )
 
             # overwrite existing
@@ -343,14 +349,16 @@ class Blob(CamelModel):
         )
 
         assert amount_cell_proofs > 0, (
-            f"verify_cell_kzg_proof_batch() is not available for your fork: {self.fork.name()}."
+            "verify_cell_kzg_proof_batch() is not available for "
+            f"your fork: {self.fork.name()}."
         )
 
         assert self.cells is not None, "self.cells is None, critical error."
 
         assert len(cell_indices) == len(self.cells), (
-            f"Cell Indices list (detected length {len(cell_indices)}) and Cell list "
-            f"(detected length {len(self.cells)}) should have same length."
+            f"Cell Indices list (length {len(cell_indices)}) and "
+            f"Cell list (length {len(self.cells)}) should have "
+            "same length."
         )
 
         # each cell refers to the same commitment

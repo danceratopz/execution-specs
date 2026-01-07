@@ -414,7 +414,7 @@ class Frontier(BaseFork, solc_name="homestead"):
     ) -> int | None:
         """Return the version of the full blob transaction wrapper."""
         raise NotImplementedError(
-            f"Full blob transaction wrapper version is not supported in {cls.name()}"
+            f"Full blob tx wrapper version not supported in {cls.name()}"
         )
 
     @classmethod
@@ -1485,7 +1485,7 @@ class Cancun(Shanghai):
         """Return blob constant if it exists."""
         retrieved_constant = cls.BLOB_CONSTANTS.get(name)
         assert retrieved_constant is not None, (
-            f"You tried to retrieve the blob constant {name} but it does not exist!"
+            f"Blob constant {name} does not exist!"
         )
         return retrieved_constant
 

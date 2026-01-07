@@ -235,12 +235,14 @@ def test_fork_in_pydantic_model() -> None:
         "fork_2": "ParisToShanghaiAtTime15k",
         "fork_3": None,
     }
-    assert (
-        model.model_dump_json()
-        == '{"fork_1":"Paris","fork_2":"ParisToShanghaiAtTime15k","fork_3":null}'
+    expected = (
+        '{"fork_1":"Paris",'
+        '"fork_2":"ParisToShanghaiAtTime15k","fork_3":null}'
     )
+    assert model.model_dump_json() == expected
     model = ForkInPydanticModel.model_validate_json(
-        '{"fork_1": "Paris", "fork_2": "ParisToShanghaiAtTime15k", "fork_3": null}'
+        '{"fork_1": "Paris", "fork_2": '
+        '"ParisToShanghaiAtTime15k", "fork_3": null}'
     )
     assert model.fork_1 == Paris
     assert model.fork_2 == ParisToShanghaiAtTime15k

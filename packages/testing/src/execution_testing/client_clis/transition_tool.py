@@ -521,7 +521,8 @@ class TransitionTool(EthereumCLI):
             with profiler.pause():
                 request_info = (
                     f"Server URL: {self.server_url}\n\n"
-                    f"Request Data:\n{json.dumps(request_data_json, indent=2)}\n"
+                    "Request Data:\n"
+                    f"{json.dumps(request_data_json, indent=2)}\n"
                 )
                 dump_files_to_directory(
                     debug_output_path,
@@ -536,7 +537,9 @@ class TransitionTool(EthereumCLI):
                             tx.model_dump(mode="json", **model_dump_config)
                             for tx in request_data.input.txs
                         ],
-                        "input/blob_params.json": request_data.input.blob_params,
+                        "input/blob_params.json": (
+                            request_data.input.blob_params
+                        ),
                         "request_info.txt": request_info,
                     },
                 )
@@ -563,9 +566,10 @@ class TransitionTool(EthereumCLI):
 
         if debug_output_path:
             with profiler.pause():
+                headers_json = json.dumps(dict(response.headers), indent=2)
                 response_info = (
                     f"Status Code: {response.status_code}\n\n"
-                    f"Headers:\n{json.dumps(dict(response.headers), indent=2)}\n\n"
+                    f"Headers:\n{headers_json}\n\n"
                     f"Content:\n{response.text}\n"
                 )
                 dump_files_to_directory(

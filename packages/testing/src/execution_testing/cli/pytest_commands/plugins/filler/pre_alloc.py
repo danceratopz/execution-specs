@@ -50,7 +50,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         dest="strict_alloc",
         default=False,
         help=(
-            "[DEBUG ONLY] Disallows deploying a contract in a predefined address."
+            "[DEBUG] Disallow deploying contract at predefined address."
         ),
     )
     pre_alloc_group.addoption(
@@ -69,7 +69,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         dest="test_contract_address_increments",
         default=f"{CONTRACT_ADDRESS_INCREMENTS_DEFAULT}",
         type=str,
-        help="The address increment value for each deployed contract by a test.",
+        help="Address increment for each test-deployed contract.",
     )
     pre_alloc_group.addoption(
         "--evm-code-type",

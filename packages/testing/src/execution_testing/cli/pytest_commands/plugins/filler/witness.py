@@ -53,8 +53,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         dest="witness",
         default=False,
         help=(
-            "Generate execution witness data for blockchain test fixtures using the "
-            "witness-filler tool (must be installed separately)."
+            "Generate execution witness data for blockchain fixtures "
+            "using witness-filler tool (install separately)."
         ),
     )
 
@@ -70,10 +70,9 @@ def pytest_configure(config: pytest.Config) -> None:
         # Check if witness-filler binary is available in PATH
         if not shutil.which("witness-filler"):
             pytest.exit(
-                "witness-filler tool not found in PATH. Please build and install witness-filler "
-                "from https://github.com/kevaundray/reth.git before using --witness flag.\n"
-                "Example: cargo install --git https://github.com/kevaundray/reth.git "
-                "witness-filler",
+                "witness-filler not in PATH. Install from "
+                "https://github.com/kevaundray/reth.git\n"
+                "Example: cargo install --git URL witness-filler",
                 1,
             )
 
@@ -119,7 +118,7 @@ def witness_generator(
 
         if result.returncode != 0:
             raise RuntimeError(
-                f"witness-filler tool failed with exit code {result.returncode}. "
+                f"witness-filler failed (exit {result.returncode}). "
                 f"stderr: {result.stderr}"
             )
 
@@ -135,9 +134,11 @@ def witness_generator(
                     if isinstance(block, FixtureBlock):
                         block.execution_witness = witness
         except Exception as e:
+            truncated = result.stdout[:500]
+            suffix = "..." if len(result.stdout) > 500 else ""
             raise RuntimeError(
-                f"Failed to parse witness data from witness-filler tool. "
-                f"Output was: {result.stdout[:500]}{'...' if len(result.stdout) > 500 else ''}"
+                f"Failed to parse witness data from witness-filler. "
+                f"Output: {truncated}{suffix}"
             ) from e
 
     return generate_witness

@@ -218,7 +218,7 @@ class ConflictingChecklistItemsWarning(ChecklistWarning):
             return None
 
         details = [
-            "The following checklist items were marked both as not applicable and covered:",
+            "Items marked both as not applicable and covered:",
             "",
             "| ID | Description | Not Applicable | Tests |",
             "|---|---|---|---|",
@@ -226,7 +226,7 @@ class ConflictingChecklistItemsWarning(ChecklistWarning):
         for item in conflicting_items:
             details.append(
                 f"| {item.id} | {item.description} | "
-                + f"{item.not_applicable_reason} | {', '.join(sorted(item.tests))} |"
+                f"{item.not_applicable_reason} | {', '.join(sorted(item.tests))} |"
             )
 
         return cls(details=details)
@@ -315,8 +315,7 @@ class EIP:
                 ids = resolve_id(item_id)
                 if not ids:
                     logger.warning(
-                        f"Item ID {item_id} not found in the checklist template, "
-                        f"for EIP {self.number}"
+                        f"Item ID {item_id} not in checklist for EIP {self.number}"
                     )
                     continue
                 for id_covered in ids:
@@ -343,8 +342,7 @@ class EIP:
                 ids = resolve_id(item_id)
                 if not ids:
                     logger.warning(
-                        f"Item ID {item_id} not found in the checklist template, "
-                        f"for EIP {self.number}"
+                        f"Item ID {item_id} not in checklist for EIP {self.number}"
                     )
                     continue
                 for id_covered in ids:
@@ -362,9 +360,10 @@ class EIP:
             # Find the line with this item ID
             lines[checklist_item.line_number - 1] = str(checklist_item)
 
+        pct = f"{self.percentage:.2f}%"
         lines[lines.index(PERCENTAGE_LINE)] = (
-            f"| {self.total_items} | {self.covered_items} | {self.completeness_emoji} "
-            f"{self.percentage:.2f}% |"
+            f"| {self.total_items} | {self.covered_items} | "
+            f"{self.completeness_emoji} {pct} |"
         )
 
         # Replace the title line with the EIP number
@@ -451,8 +450,7 @@ class EIPChecklistCollector:
         for marker in item.iter_markers("eip_checklist"):
             if not marker.args:
                 pytest.fail(
-                    f"eip_checklist marker on {item.nodeid} must have at least one argument "
-                    "(item_id)"
+                    f"eip_checklist marker on {item.nodeid} requires item_id arg"
                 )
             additional_eips = marker.kwargs.get("eip", [])
             if not isinstance(additional_eips, list):
@@ -463,8 +461,8 @@ class EIPChecklistCollector:
             if additional_eips:
                 if any(not isinstance(eip, int) for eip in additional_eips):
                     pytest.fail(
-                        "EIP numbers must be integers. Found non-integer EIPs in "
-                        f"{item.nodeid}: {additional_eips}"
+                        f"EIP numbers must be integers in {item.nodeid}: "
+                        f"{additional_eips}"
                     )
                 eips += [self.get_eip(eip) for eip in additional_eips]
 
@@ -473,8 +471,7 @@ class EIPChecklistCollector:
                 covered_ids = resolve_id(item_id.strip())
                 if not covered_ids:
                     logger.warning(
-                        f"Item ID {item_id} not found in the checklist template, "
-                        f"for test {item.nodeid}"
+                        f"Item ID {item_id} not in checklist for {item.nodeid}"
                     )
                     continue
                 for id_covered in covered_ids:

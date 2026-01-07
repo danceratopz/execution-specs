@@ -228,11 +228,8 @@ class FillerFile(pytest.File):
                     )
                     if not test_fork_set:
                         pytest.fail(
-                            "The test function's "
-                            f"'{key}' fork validity markers generate "
-                            "an empty fork range. Please check the arguments to its "
-                            f"markers:  @pytest.mark.valid_from and "
-                            f"@pytest.mark.valid_until."
+                            f"Test '{key}' has empty fork range. "
+                            "Check @pytest.mark.valid_from and valid_until args."
                         )
                     intersection_set = (
                         test_fork_set & self.config.selected_fork_set  # type: ignore
@@ -273,7 +270,8 @@ class FillerFile(pytest.File):
                                 for mark in fixture_format_parameter_set.marks
                                 if mark.name != "parametrize"
                             ]
-                            test_id = f"fork_{fork.name()}-{fixture_format_parameter_set.id}"
+                            ps_id = fixture_format_parameter_set.id
+                            test_id = f"fork_{fork.name()}-{ps_id}"
                             if "fork" in func_parameters:
                                 params["fork"] = fork
                             if "pre" in func_parameters:
@@ -409,10 +407,10 @@ def yul(fork: Fork, request: pytest.FixtureRequest) -> Type[Yul]:
     """
     Fixture that allows contract code to be defined with Yul code.
 
-    This fixture defines a class that wraps the ::execution_testing.tools.Yul class
-    so that upon instantiation within the test case, it provides the test
-    case's current fork parameter. The fork is then available for use in
-    solc's arguments for the Yul code compilation.
+    This fixture wraps the ::execution_testing.tools.Yul class so that upon
+    instantiation within the test case, it provides the test case's current
+    fork parameter. The fork is then available for use in solc's arguments
+    for the Yul code compilation.
 
     Test cases can override the default value by specifying a fixed version
     with the @pytest.mark.compile_yul_with(FORK) marker.
@@ -425,7 +423,7 @@ def yul(fork: Fork, request: pytest.FixtureRequest) -> Type[Yul]:
     if marker:
         if not marker.args[0]:
             pytest.fail(
-                f"{request.node.name}: Expected one argument in 'compile_yul_with' marker."
+                f"{request.node.name}: Expected arg in 'compile_yul_with'."
             )
         for fork in request.config.all_forks:  # type: ignore
             if fork.name() == marker.args[0]:
@@ -433,7 +431,7 @@ def yul(fork: Fork, request: pytest.FixtureRequest) -> Type[Yul]:
                 break
         else:
             pytest.fail(
-                f"{request.node.name}: Fork {marker.args[0]} not found in forks list."
+                f"{request.node.name}: Fork {marker.args[0]} not found."
             )
     else:
         solc_target_fork = get_closest_fork(fork)
@@ -444,8 +442,9 @@ def yul(fork: Fork, request: pytest.FixtureRequest) -> Type[Yul]:
             solc_target_fork != fork
             and request.config.getoption("verbose") >= 1
         ):
+            target = solc_target_fork.name()
             warnings.warn(
-                f"Compiling Yul for {solc_target_fork.name()}, not {fork.name()}.",
+                f"Compiling Yul for {target}, not {fork.name()}.",
                 stacklevel=2,
             )
 

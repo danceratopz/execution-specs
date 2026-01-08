@@ -16,7 +16,7 @@ from execution_testing.base_types import (
     HexNumber,
     ZeroPaddedHexNumber,
 )
-from execution_testing.cli.pytest_commands.plugins.filler.static_filler import (
+from execution_testing.cli.pytest_commands.plugins.filler.static_filler import (  # noqa: E501
     NoIntResolver,
 )
 from execution_testing.specs import StateStaticTest

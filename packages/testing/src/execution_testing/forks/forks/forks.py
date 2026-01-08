@@ -1470,7 +1470,7 @@ class Cancun(Shanghai):
         "CELL_LENGTH": 2048,
         # EIP-2537: Main subgroup order = q, due to this BLS_MODULUS
         # every blob byte (uint256) must be smaller than 116
-        "BLS_MODULUS": 0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001,
+        "BLS_MODULUS": 0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001,  # noqa: E501
         # https://github.com/ethereum/consensus-specs/blob/
         # cc6996c22692d70e41b7a453d925172ee4b719ad/specs/deneb/
         # polynomial-commitments.md?plain=1#L78
@@ -1747,7 +1747,8 @@ class Cancun(Shanghai):
         new_allocation = {
             0x000F3DF6D732807EF1319FB7B8BB8522D0BEAC02: {
                 "nonce": 1,
-                "code": "0x3373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5f"
+                # Beacon roots contract bytecode (EIP-4788)
+                "code": "0x3373fffffffffffffffffffffffffffffffffffffffe14604d57602036146024575f5f"  # noqa: E501
                 "fd5b5f35801560495762001fff810690815414603c575f5ffd5b62001fff01545f5260205ff35b5f"
                 "5ffd5b62001fff42064281555f359062001fff015500",
             }

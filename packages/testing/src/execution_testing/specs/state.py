@@ -198,27 +198,22 @@ class StateTest(BaseTest):
                 f"Post alloc is not equivalent (gas_limit={current_gas_limit})"
             )
             return False
+        msg = f"Post alloc not equivalent (gas_limit={current_gas_limit})"
         for k in base_tool_alloc.root.keys():
             if k not in modified_tool_alloc:
-                logger.debug(
-                    f"Post alloc not equivalent (gas_limit={current_gas_limit})"
-                )
+                logger.debug(msg)
                 return False
             base_account = base_tool_alloc[k]
             modified_account = modified_tool_alloc[k]
             if (modified_account is None) != (base_account is None):
-                logger.debug(
-                    f"Post alloc not equivalent (gas_limit={current_gas_limit})"
-                )
+                logger.debug(msg)
                 return False
             if (
                 modified_account is not None
                 and base_account is not None
                 and base_account.nonce != modified_account.nonce
             ):
-                logger.debug(
-                    f"Post alloc not equivalent (gas_limit={current_gas_limit})"
-                )
+                logger.debug(msg)
                 return False
         logger.debug(
             f"Gas limit is equivalent (gas_limit={current_gas_limit})"

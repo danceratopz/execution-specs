@@ -88,14 +88,11 @@ def default_t8n(
     instance = installed_transition_tool_instances.get(
         DEFAULT_TRANSITION_TOOL_FOR_UNIT_TESTS.__name__
     )
+    tool_name = DEFAULT_TRANSITION_TOOL_FOR_UNIT_TESTS.__name__
     if instance is None:
-        raise Exception(
-            f"Failed to instantiate {DEFAULT_TRANSITION_TOOL_FOR_UNIT_TESTS.__name__}"
-        )
+        raise Exception(f"Failed to instantiate {tool_name}")
     if isinstance(instance, Exception):
-        raise Exception(
-            f"Failed to instantiate {DEFAULT_TRANSITION_TOOL_FOR_UNIT_TESTS.__name__}"
-        ) from instance
+        raise Exception(f"Failed to instantiate {tool_name}") from instance
     return instance
 
 

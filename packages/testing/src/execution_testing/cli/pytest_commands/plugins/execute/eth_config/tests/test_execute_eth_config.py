@@ -532,7 +532,8 @@ def test_fork_config_from_fork(
         f"{current_config.model_dump_json()}"
     )
     assert current_config.fork_id == expected_eth_config.current.fork_id, (
-        f"Expected {expected_eth_config.current.fork_id} but got {current_config.fork_id}"
+        f"Expected {expected_eth_config.current.fork_id} "
+        f"but got {current_config.fork_id}"
     )
     if expected_eth_config.next is not None:
         assert next_config is not None, "Expected next to be not None"
@@ -543,7 +544,8 @@ def test_fork_config_from_fork(
             f"{next_config.model_dump_json()}"
         )
         assert next_config.fork_id == expected_eth_config.next.fork_id, (
-            f"Expected {expected_eth_config.next.fork_id} but got {next_config.fork_id}"
+            f"Expected {expected_eth_config.next.fork_id} "
+            f"but got {next_config.fork_id}"
         )
     else:
         assert next_config is None, "Expected next to be None"
@@ -556,7 +558,8 @@ def test_fork_config_from_fork(
             f"{eth_config.last.model_dump_json()}"
         )
         assert eth_config.last.fork_id == expected_eth_config.last.fork_id, (
-            f"Expected {expected_eth_config.last.fork_id} but got {eth_config.last.fork_id}"
+            f"Expected {expected_eth_config.last.fork_id} "
+            f"but got {eth_config.last.fork_id}"
         )
     else:
         assert eth_config.last is None, "Expected last to be None"
@@ -614,19 +617,22 @@ def test_fork_ids(
 ) -> None:
     """Test various configurations of fork Ids for different timestamps."""
     assert expected_current_fork_id == eth_config.current.fork_id, (
-        f"Unexpected current fork id: {eth_config.current.fork_id} != {expected_current_fork_id}"
+        f"Unexpected current fork id: {eth_config.current.fork_id} "
+        f"!= {expected_current_fork_id}"
     )
     if expected_next_fork_id is not None:
         assert eth_config.next is not None, "Expected next to be not None"
         assert expected_next_fork_id == eth_config.next.fork_id, (
-            f"Unexpected next fork id: {eth_config.next.fork_id} != {expected_next_fork_id}"
+            f"Unexpected next fork id: {eth_config.next.fork_id} "
+            f"!= {expected_next_fork_id}"
         )
     else:
         assert eth_config.next is None, "Expected next to be None"
     if expected_last_fork_id is not None:
         assert eth_config.last is not None, "Expected last to be not None"
         assert expected_last_fork_id == eth_config.last.fork_id, (
-            f"Unexpected last fork id: {eth_config.last.fork_id} != {expected_last_fork_id}"
+            f"Unexpected last fork id: {eth_config.last.fork_id} "
+            f"!= {expected_last_fork_id}"
         )
     else:
         assert eth_config.last is None, "Expected last to be None"

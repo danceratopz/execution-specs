@@ -250,7 +250,9 @@ def base_hive_test(
         else:
             test = test_suite.start_test(
                 name="Base Hive Test",
-                description="Base test to deploy the main client for all tests.",
+                description=(
+                    "Base test to deploy the main client for all tests."
+                ),
             )
             with open(base_file, "w") as f:
                 json.dump(asdict(test), f)
@@ -335,8 +337,8 @@ def client(
                         )
 
     error_message = (
-        f"Unable to connect to client container ({client_type.name}) via Hive. "
-        "Check client or Hive server logs."
+        f"Unable to connect to client container ({client_type.name}) "
+        "via Hive. Check client or Hive server logs."
     )
     assert client is not None, error_message
 

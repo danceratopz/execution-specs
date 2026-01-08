@@ -190,9 +190,7 @@ def pytest_configure(config: pytest.Config) -> None:
             logger.info("Toggling majority test on")
             config.option.majority_clients = clients  # List[str]
     else:
-        logger.info(
-            "Majority test mode disabled (no --clients value passed)."
-        )
+        logger.info("Majority test mode disabled (no --clients value passed).")
 
     if config.getoption("collectonly", default=False):
         return
@@ -280,9 +278,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
         if len(all_rpc_endpoints_dict) < 2:
             # The test function is not run because we only have a single
             # client, so no majority comparison
-            logger.info(
-                "Skipping eth_config majority (less than 2 clients)"
-            )
+            logger.info("Skipping eth_config majority (less than 2 clients)")
             metafunc.parametrize(
                 ["all_rpc_endpoints"],
                 [

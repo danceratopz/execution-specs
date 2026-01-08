@@ -87,7 +87,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 def pytest_configure(config: pytest.Config) -> None:
     """Check if a chain ID configuration is provided."""
-    # Verify the chain ID configuration is consistent with the remote RPC endpoint
+    # Verify the chain ID config is consistent with the remote RPC endpoint
     rpc_endpoint = config.getoption("rpc_endpoint")
     eth_rpc = EthRPC(rpc_endpoint)
     remote_chain_id = eth_rpc.chain_id()

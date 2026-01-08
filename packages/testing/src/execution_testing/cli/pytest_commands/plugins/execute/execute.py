@@ -575,9 +575,7 @@ def gas_limit_accumulator() -> Generator[GasInfoAccumulator, None, None]:
     """Return the gas limit accumulator for all tests."""
     gas_limit_accumulator = GasInfoAccumulator()
     yield gas_limit_accumulator
-    logger.info(
-        f"Total gas limit: {gas_limit_accumulator.total_gas_limit()}"
-    )
+    logger.info(f"Total gas limit: {gas_limit_accumulator.total_gas_limit()}")
     total_min_balance = gas_limit_accumulator.total_minimum_balance()
     logger.info(f"Total minimum balance: {total_min_balance / 10**18:.18f}")
 

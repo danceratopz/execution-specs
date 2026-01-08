@@ -692,9 +692,7 @@ class Alloc(BaseAlloc):
 
     def wait_for_transactions(self) -> List[TransactionByHashResponse]:
         """Wait for all transactions to be included in blocks."""
-        logger.info(
-            f"Waiting for {len(self._pending_txs)} txs to be included"
-        )
+        logger.info(f"Waiting for {len(self._pending_txs)} txs to be included")
         for tx in self._pending_txs:
             assert tx.value is not None, (
                 "Transaction value must be set before waiting for inclusion"

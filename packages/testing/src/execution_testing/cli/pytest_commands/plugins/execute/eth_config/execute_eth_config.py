@@ -239,9 +239,7 @@ def test_eth_config_majority(
                     )
                     continue
             except Exception as e:
-                logger.warning(
-                    f"eth_config from {eth_rpc_target} failed: {e}"
-                )
+                logger.warning(f"eth_config from {eth_rpc_target} failed: {e}")
                 continue
 
             response_str = json.dumps(

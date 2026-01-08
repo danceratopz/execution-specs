@@ -224,9 +224,10 @@ class ConflictingChecklistItemsWarning(ChecklistWarning):
             "|---|---|---|---|",
         ]
         for item in conflicting_items:
+            tests_str = ", ".join(sorted(item.tests))
             details.append(
                 f"| {item.id} | {item.description} | "
-                f"{item.not_applicable_reason} | {', '.join(sorted(item.tests))} |"
+                f"{item.not_applicable_reason} | {tests_str} |"
             )
 
         return cls(details=details)
@@ -315,7 +316,8 @@ class EIP:
                 ids = resolve_id(item_id)
                 if not ids:
                     logger.warning(
-                        f"Item ID {item_id} not in checklist for EIP {self.number}"
+                        f"Item ID {item_id} not in checklist "
+                        f"for EIP {self.number}"
                     )
                     continue
                 for id_covered in ids:
@@ -342,7 +344,8 @@ class EIP:
                 ids = resolve_id(item_id)
                 if not ids:
                     logger.warning(
-                        f"Item ID {item_id} not in checklist for EIP {self.number}"
+                        f"Item ID {item_id} not in checklist "
+                        f"for EIP {self.number}"
                     )
                     continue
                 for id_covered in ids:
@@ -450,7 +453,8 @@ class EIPChecklistCollector:
         for marker in item.iter_markers("eip_checklist"):
             if not marker.args:
                 pytest.fail(
-                    f"eip_checklist marker on {item.nodeid} requires item_id arg"
+                    f"eip_checklist marker on {item.nodeid} "
+                    "requires item_id arg"
                 )
             additional_eips = marker.kwargs.get("eip", [])
             if not isinstance(additional_eips, list):

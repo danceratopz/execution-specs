@@ -49,9 +49,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store_true",
         dest="strict_alloc",
         default=False,
-        help=(
-            "[DEBUG] Disallow deploying contract at predefined address."
-        ),
+        help=("[DEBUG] Disallow deploying contract at predefined address."),
     )
     pre_alloc_group.addoption(
         "--ca-start",
@@ -442,8 +440,9 @@ def eoa_iterator(
         eoa_start_pk = sha256_from_string(node_id_for_entropy)
         return iter(
             EOA(
+                # secp256k1 curve order
                 key=(eoa_start_pk + i)
-                % 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141,
+                % 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141,  # noqa: E501
                 nonce=0,
             )
             for i in count()

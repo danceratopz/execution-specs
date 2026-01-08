@@ -213,12 +213,11 @@ class FillerFile(pytest.File):
                                 test_type.pytest_parameter_name()
                             )
                             session = self.config.filling_session  # type: ignore[attr-defined]
+                            supported = test_type.supported_fixture_formats
                             fixture_formats.extend(
-                                fixture_format
-                                for fixture_format in test_type.supported_fixture_formats
-                                if session.should_generate_format(
-                                    fixture_format
-                                )
+                                fmt
+                                for fmt in supported
+                                if session.should_generate_format(fmt)
                             )
 
                     test_fork_set = (
@@ -228,8 +227,8 @@ class FillerFile(pytest.File):
                     )
                     if not test_fork_set:
                         pytest.fail(
-                            f"Test '{key}' has empty fork range. "
-                            "Check @pytest.mark.valid_from and valid_until args."
+                            f"Test '{key}' has empty fork range. Check "
+                            "@pytest.mark.valid_from and valid_until args."
                         )
                     intersection_set = (
                         test_fork_set & self.config.selected_fork_set  # type: ignore

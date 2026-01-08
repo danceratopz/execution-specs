@@ -231,7 +231,8 @@ def get_test_function_test_type(item: pytest.Item) -> str:
     logger.warning(
         f"Could not determine the test function type for {item.nodeid}"
     )
-    issue_url = create_github_issue_url("docs(bug): unknown test function type")
+    issue_title = "docs(bug): unknown test function type"
+    issue_url = create_github_issue_url(issue_title)
     return f"unknown ([📖🐛]({issue_url}))"
 
 

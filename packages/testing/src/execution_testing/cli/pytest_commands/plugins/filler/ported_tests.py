@@ -83,8 +83,9 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         dest="skip_coverage_missed_reason",
         default=False,
         help=(
-            "With --show-ported-from, exclude tests with coverage_missed_reason "
-            "in their ported_from marker (intentionally not ported tests)."
+            "With --show-ported-from, exclude tests with "
+            "coverage_missed_reason in their ported_from marker "
+            "(intentionally not ported tests)."
         ),
     )
     ported_from_group.addoption(

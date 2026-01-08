@@ -58,13 +58,15 @@ def hive_clients_yaml_generator_command(
                 .yaml()
                 .replace(" ", "&nbsp;")
             )
-            return f'echo "\\\n{yaml_content}" > {hive_clients_yaml_target_filename}'
+            target = hive_clients_yaml_target_filename
+            return f'echo "\\\n{yaml_content}" > {target}'
         except Exception as e:
             raise ValueError(f"Failed to generate YAML: {str(e)}") from e
     except ValueError as e:
         error_message = str(e)
         warnings.warn(
-            f"{error_message}. The Hive clients YAML generator command will not be available.",
+            f"{error_message}. The Hive clients YAML generator command "
+            "will not be available.",
             stacklevel=2,
         )
 
@@ -76,7 +78,8 @@ def hive_clients_yaml_generator_command(
 
         return (
             f"Error: {error_message}\n"
-            f'Please <a href="{issue_url}">create an issue</a> to report this problem.'
+            f'Please <a href="{issue_url}">create an issue</a> '
+            "to report this problem."
         )
 
 
@@ -148,7 +151,8 @@ def hive_dev_command(
     Return the command used to instantiate hive alongside the `consume`
     command.
     """
-    return f"./hive --dev {hive_client_config_file_parameter} --client {client_type.name}"
+    cfg = hive_client_config_file_parameter
+    return f"./hive --dev {cfg} --client {client_type.name}"
 
 
 @pytest.fixture(scope="function")

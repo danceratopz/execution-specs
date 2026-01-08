@@ -495,9 +495,10 @@ def pytest_configure(config: pytest.Config) -> None:  # noqa: D103
     config.test_cases = index.test_cases  # type: ignore[attr-defined]
 
     for fixture_format in BaseFixture.formats.values():
+        fmt_name = fixture_format.format_name
         config.addinivalue_line(
             "markers",
-            f"{fixture_format.format_name}: Tests in {fixture_format.format_name} format",
+            f"{fmt_name}: Tests in {fmt_name} format",
         )
 
     # All forked defined within EEST

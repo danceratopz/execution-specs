@@ -38,7 +38,10 @@ def test_suite_name() -> str:
 @pytest.fixture(scope="module")
 def test_suite_description() -> str:
     """The description of the hive test suite used in this simulator."""
-    return "Execute blockchain tests via RLP-encoded blocks to client at start-up."
+    return (
+        "Execute blockchain tests via RLP-encoded blocks "
+        "to client at start-up."
+    )
 
 
 @pytest.fixture(scope="function")

@@ -106,7 +106,8 @@ def test_blockchain_via_engine(
                             *payload.params,
                             version=payload.new_payload_version,
                         )
-                        logger.info(f"Payload status: {payload_response.status}")
+                        status = payload_response.status
+                        logger.info(f"Payload status: {status}")
                         expected_validity = (
                             PayloadStatusEnum.VALID
                             if payload.valid()
@@ -128,19 +129,19 @@ def test_blockchain_via_engine(
                         ):
                             if payload_response.validation_error is None:
                                 raise LoggedError(
-                                    "Client returned INVALID but no validation "
-                                    "error was provided."
+                                    "Client returned INVALID but no "
+                                    "validation error was provided."
                                 )
                             if isinstance(
                                 payload_response.validation_error,
                                 UndefinedException,
                             ):
+                                val_err = payload_response.validation_error
                                 message = (
                                     "Undefined exception message: "
                                     f'expected: "{payload.validation_error}", '
-                                    f'returned: "{payload_response.validation_error}" '
-                                    f"(mapper: "
-                                    f'"{payload_response.validation_error.mapper_name}")'
+                                    f'returned: "{val_err}" '
+                                    f'(mapper: "{val_err.mapper_name}")'
                                 )
                                 if strict_exception_matching:
                                     raise LoggedError(message)
@@ -151,10 +152,12 @@ def test_blockchain_via_engine(
                                     payload.validation_error
                                     not in payload_response.validation_error
                                 ):
+                                    val_err = payload_response.validation_error
+                                    exp_err = payload.validation_error
                                     message = (
-                                        "Client returned unexpected validation "
-                                        f'error: got "{payload_response.validation_error}" '
-                                        f'expected "{payload.validation_error}"'
+                                        "Client returned unexpected "
+                                        f'validation error: got "{val_err}" '
+                                        f'expected "{exp_err}"'
                                     )
                                     if strict_exception_matching:
                                         raise LoggedError(message)
@@ -195,8 +198,9 @@ def test_blockchain_via_engine(
                             forkchoice_response.payload_status.status
                             != PayloadStatusEnum.VALID
                         ):
+                            status = forkchoice_response.payload_status.status
                             raise LoggedError(
-                                f"unexpected status: want {PayloadStatusEnum.VALID},"
-                                f" got {forkchoice_response.payload_status.status}"
+                                f"unexpected status: want "
+                                f"{PayloadStatusEnum.VALID}, got {status}"
                             )
         logger.info("All payloads processed successfully.")

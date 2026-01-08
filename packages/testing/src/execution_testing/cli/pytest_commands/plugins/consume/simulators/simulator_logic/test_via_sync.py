@@ -192,9 +192,7 @@ def test_blockchain_via_sync(
                                         logger.warning(message)
 
                     except JSONRPCError as e:
-                        logger.info(
-                            f"JSONRPC error: {e.code} - {e.message}"
-                        )
+                        logger.info(f"JSONRPC error: {e.code} - {e.message}")
                         if payload.error_code is None:
                             raise LoggedError(
                                 f"Unexpected error: {e.code} - {e.message}"

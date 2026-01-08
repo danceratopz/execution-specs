@@ -73,7 +73,9 @@ class GenesisBlockMismatchExceptionError(Exception):
                 "\nIs the fork configuration correct?"
             )
         else:
-            message += "No differences in expected/received genesis block headers."
+            message += (
+                "No differences in expected/received genesis block headers."
+            )
         super().__init__(message)
 
     @staticmethod

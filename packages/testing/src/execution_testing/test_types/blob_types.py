@@ -394,24 +394,27 @@ class Blob(CamelModel):
         )
 
         assert amount_cell_proofs > 0, (
-            f"delete_cells_then_recover_them() is not available for fork: {self.fork.name()}"
+            "delete_cells_then_recover_them() is not available for fork: "
+            f"{self.fork.name()}"
         )
 
         assert self.cells is not None, "self.cells is None, critical problem."
 
         assert isinstance(self.proof, list), (
-            "This function only works when self.proof is a list, but it seems to be "
-            " of type bytes (not a list)"
+            "This function only works when self.proof is a list, "
+            "but it seems to be of type bytes (not a list)"
         )
 
         assert len(self.cells) == 128, (
-            f"You are supposed to pass a full cell list with 128 elements to this function, "
-            f"but got list of length {len(self.cells)}"
+            "You are supposed to pass a full cell list with 128 elements "
+            f"to this function, but got list of length {len(self.cells)}"
         )
 
         assert len(deletion_indices) < 129, (
-            f"You can't delete more than every cell (max len of deletion indices list is 128), "
-            f"but you passed a deletion indices list of length {len(deletion_indices)}"
+            "You can't delete more than every cell "
+            "(max len of deletion indices list is 128), "
+            f"but you passed a deletion indices list of length "
+            f"{len(deletion_indices)}"
         )
         for i in deletion_indices:
             assert 0 <= i <= 127, (
@@ -433,23 +436,26 @@ class Blob(CamelModel):
 
         # determine success/failure
         assert len(recovered_cells) == len(self.cells), (
-            f"Failed to recover cell list. Original cell list had length {len(self.cells)} but "
-            f"recovered cell list has length {len(recovered_cells)}"
+            f"Failed to recover cell list. Original cell list had length "
+            f"{len(self.cells)} but recovered cell list has length "
+            f"{len(recovered_cells)}"
         )
         assert len(recovered_proofs) == len(self.proof), (
-            f"Failed to recover proofs list. Original proofs list had length {len(self.proof)} "
-            f"but recovered proofs list has length {len(recovered_proofs)}"
+            f"Failed to recover proofs list. Original proofs list had length "
+            f"{len(self.proof)} but recovered proofs list has length "
+            f"{len(recovered_proofs)}"
         )
 
         for i in range(len(recovered_cells)):
             assert self.cells[i] == recovered_cells[i], (
-                f"Failed to correctly restore missing cells. At index {i} original cell was "
-                f"0x{self.cells[i].hex()} but reconstructed cell does not match: "
-                f"0x{recovered_cells[i].hex()}"
+                f"Failed to correctly restore missing cells. At index {i} "
+                f"original cell was 0x{self.cells[i].hex()} but reconstructed "
+                f"cell does not match: 0x{recovered_cells[i].hex()}"
             )
             assert self.proof[i] == recovered_proofs[i], (
-                f"Failed to correctly restore missing proofs. At index {i} original proof was "
-                f"0x{self.proof[i].hex()} but reconstructed proof does not match: "
+                f"Failed to correctly restore missing proofs. At index {i} "
+                f"original proof was 0x{self.proof[i].hex()} "
+                f"but reconstructed proof does not match: "
                 f"0x{recovered_proofs[i].hex()}"
             )
 
@@ -510,7 +516,8 @@ class Blob(CamelModel):
 
         # pre-osaka (cancun and prague)
         assert amount_cell_proofs == 0, (
-            f"You need to adjust corrupt_proof to handle fork {self.fork.name()}"
+            f"You need to adjust corrupt_proof to handle fork "
+            f"{self.fork.name()}"
         )
         assert isinstance(self.proof, Bytes), (
             "proof was expected to be Bytes but it isn't"

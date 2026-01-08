@@ -816,7 +816,8 @@ class Transaction(
         if self.ty == 3 and self.blob_versioned_hashes is not None:
             max_fee_per_blob_gas = self.max_fee_per_blob_gas
             assert max_fee_per_blob_gas is not None, (
-                "Impossible to calculate minimum balance without max_fee_per_blob_gas"
+                "Impossible to calculate minimum balance without "
+                "max_fee_per_blob_gas"
             )
             return (
                 gas_price * gas_limit
@@ -951,7 +952,10 @@ class NetworkWrappedTransaction(CamelModel, RLPSerializable):
         max_priority_fee_per_gas: int,
         max_fee_per_blob_gas: int,
     ) -> None:
-        """Set the gas price to the appropriate values of the current execution environment."""
+        """
+        Set the gas price to the appropriate values of the current
+        execution environment.
+        """
         self.tx.set_gas_price(
             gas_price=gas_price,
             max_fee_per_gas=max_fee_per_gas,

@@ -44,7 +44,8 @@ def _remove_field_from_accounts(
             # sanity check that we found all addresses specified
             missing = set(addresses) - found_addresses
             raise ValueError(
-                f"Some specified addresses were not found in the BAL: {missing}"
+                "Some specified addresses were not found in the BAL: "
+                f"{missing}"
             )
 
         return BlockAccessList(root=new_root)

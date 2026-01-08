@@ -51,7 +51,9 @@ class BalAccountExpectation(CamelModel):
     )
     absent_values: Optional[BalAccountAbsentValues] = Field(
         default=None,
-        description="Explicit absent value expectations using BalAccountAbsentValues",
+        description=(
+            "Explicit absent value expectations using BalAccountAbsentValues"
+        ),
     )
 
     _EMPTY: ClassVar[Optional["BalAccountExpectation"]] = None
@@ -204,8 +206,9 @@ class BlockAccessListExpectation(CamelModel):
             elif not expectation.model_fields_set:
                 # Disallow ambiguous BalAccountExpectation() with no fields set
                 raise BlockAccessListValidationError(
-                    f"Address {address}: BalAccountExpectation() with no fields set is "
-                    f"ambiguous. Use BalAccountExpectation.empty() to validate no changes, "
+                    f"Address {address}: BalAccountExpectation() with no "
+                    f"fields set is ambiguous. Use "
+                    f"BalAccountExpectation.empty() to validate no changes, "
                     f"or explicitly set the fields to validate "
                     f"(e.g., nonce_changes=[...])."
                 )
@@ -221,9 +224,10 @@ class BlockAccessListExpectation(CamelModel):
                     if actual_accounts_by_addr.get(
                         address
                     ) != BalAccountChange(address=address):
+                        actual_changes = actual_accounts_by_addr[address]
                         raise BlockAccessListValidationError(
-                            f"No account changes expected for {address} but found "
-                            f"changes: {actual_accounts_by_addr[address]}"
+                            f"No account changes expected for {address} but "
+                            f"found changes: {actual_changes}"
                         )
 
                 actual_account = actual_accounts_by_addr[address]
@@ -273,8 +277,9 @@ class BlockAccessListExpectation(CamelModel):
                 # Check both ordering and duplicates
                 if tx_indices != sorted(tx_indices):
                     raise BlockAccessListValidationError(
-                        f"Transaction indices not in ascending order in {field_name} of account "
-                        f"{account.address}. Got: {tx_indices}, Expected: {sorted(tx_indices)}"
+                        f"Transaction indices not in ascending order in "
+                        f"{field_name} of account {account.address}. "
+                        f"Got: {tx_indices}, Expected: {sorted(tx_indices)}"
                     )
 
                 if len(tx_indices) != len(set(tx_indices)):
@@ -286,8 +291,8 @@ class BlockAccessListExpectation(CamelModel):
                         }
                     )
                     raise BlockAccessListValidationError(
-                        f"Duplicate transaction indices in {field_name} of account "
-                        f"{account.address}. Duplicates: {duplicates}"
+                        f"Duplicate transaction indices in {field_name} of "
+                        f"account {account.address}. Duplicates: {duplicates}"
                     )
 
             # Check storage slot ordering
@@ -296,10 +301,11 @@ class BlockAccessListExpectation(CamelModel):
                     account.storage_changes[i - 1].slot
                     >= account.storage_changes[i].slot
                 ):
+                    prev_slot = account.storage_changes[i - 1].slot
+                    curr_slot = account.storage_changes[i].slot
                     raise BlockAccessListValidationError(
                         f"Storage slots not in ascending order in account "
-                        f"{account.address}: {account.storage_changes[i - 1].slot} >= "
-                        f"{account.storage_changes[i].slot}"
+                        f"{account.address}: {prev_slot} >= {curr_slot}"
                     )
 
             # Check transaction index ordering and uniqueness within storage
@@ -313,9 +319,10 @@ class BlockAccessListExpectation(CamelModel):
                 # Check both ordering and duplicates
                 if tx_indices != sorted(tx_indices):
                     raise BlockAccessListValidationError(
-                        f"Transaction indices not in ascending order in storage slot "
-                        f"{storage_slot.slot} of account {account.address}. "
-                        f"Got: {tx_indices}, Expected: {sorted(tx_indices)}"
+                        f"Transaction indices not in ascending order in "
+                        f"storage slot {storage_slot.slot} of account "
+                        f"{account.address}. Got: {tx_indices}, "
+                        f"Expected: {sorted(tx_indices)}"
                     )
 
                 if len(tx_indices) != len(set(tx_indices)):
@@ -335,10 +342,11 @@ class BlockAccessListExpectation(CamelModel):
             # Check storage reads ordering
             for i in range(1, len(account.storage_reads)):
                 if account.storage_reads[i - 1] >= account.storage_reads[i]:
+                    prev_read = account.storage_reads[i - 1]
+                    curr_read = account.storage_reads[i]
                     raise BlockAccessListValidationError(
                         f"Storage reads not in ascending order in account "
-                        f"{account.address}: {account.storage_reads[i - 1]} >= "
-                        f"{account.storage_reads[i]}"
+                        f"{account.address}: {prev_read} >= {curr_read}"
                     )
 
     @staticmethod
@@ -386,7 +394,8 @@ class BlockAccessListExpectation(CamelModel):
             # Check if explicitly set to empty but actual has values
             if not expected_list and actual_list:
                 raise BlockAccessListValidationError(
-                    f"Expected {field_name} to be empty but found {actual_list}"
+                    f"Expected {field_name} to be empty "
+                    f"but found {actual_list}"
                 )
 
             if field_name == "storage_reads":
@@ -403,8 +412,8 @@ class BlockAccessListExpectation(CamelModel):
 
                     if not found:
                         raise BlockAccessListValidationError(
-                            f"Storage read {expected_read} not found or not in correct order. "
-                            f"Actual reads: {actual_list}"
+                            f"Storage read {expected_read} not found or not "
+                            f"in correct order. Actual reads: {actual_list}"
                         )
 
             elif field_name == "storage_changes":
@@ -447,11 +456,12 @@ class BlockAccessListExpectation(CamelModel):
                                         slot_actual_idx += 1
 
                                     if not slot_found:
+                                        exp = expected_slot.slot
                                         raise BlockAccessListValidationError(
-                                            f"Storage change {expected_change} not found "
-                                            f"or not in correct order in slot "
-                                            f"{expected_slot.slot}. "
-                                            f"Actual slot changes: {actual_slot_changes}"
+                                            f"Storage change {expected_change}"
+                                            f" not found or out of order "
+                                            f"in slot {exp}. "
+                                            f"Actual: {actual_slot_changes}"
                                         )
 
                             found = True
@@ -511,8 +521,9 @@ class BlockAccessListExpectation(CamelModel):
 
                     if not found:
                         raise BlockAccessListValidationError(
-                            f"{item_type.capitalize()} change {exp_tuple} not found "
-                            f"or not in correct order. Actual changes: {actual_tuples}"
+                            f"{item_type.capitalize()} change {exp_tuple} "
+                            f"not found or not in correct order. "
+                            f"Actual changes: {actual_tuples}"
                         )
 
 

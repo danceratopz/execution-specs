@@ -42,7 +42,7 @@ KW_ARGS_DEFAULTS_TYPE = Mapping[str, "int | bytes | str | Opcode | Bytecode"]
 
 
 def _stack_argument_to_bytecode(
-    arg: "int | bytes | SupportsBytes | str | Opcode | Bytecode | Iterable[int]",
+    arg: "int | bytes | SupportsBytes | str | Opcode | Bytecode | Iterable[int]",  # noqa: E501
 ) -> Bytecode:
     """Convert stack argument in an opcode or macro to bytecode."""
     if isinstance(arg, Bytecode):
@@ -224,7 +224,8 @@ class Opcode(Bytecode):
                 )
             else:
                 raise TypeError(
-                    "Opcode data portion must be either an int or bytes/hex string"
+                    "Opcode data portion must be either an int or "
+                    "bytes/hex string"
                 )
         popped_stack_items = self.popped_stack_items
         pushed_stack_items = self.pushed_stack_items
@@ -317,8 +318,8 @@ class Opcode(Bytecode):
             invalid_kwargs = set(kwargs.keys()) - set(self.kwargs)
             if invalid_kwargs:
                 raise ValueError(
-                    f"Invalid keyword argument(s) {list(invalid_kwargs)} for opcode "
-                    f"{self._name_}. Valid arguments are: {self.kwargs}"
+                    f"Invalid keyword argument(s) {list(invalid_kwargs)} "
+                    f"for opcode {self._name_}. Valid args: {self.kwargs}"
                 )
 
             for kw in self.kwargs:
@@ -333,8 +334,9 @@ class Opcode(Bytecode):
             unchecked or self.unchecked_stack
         ):
             raise ValueError(
-                f"Opcode {self._name_} requires {self.popped_stack_items} stack elements, but "
-                f"{len(args)} were provided. Use 'unchecked=True' parameter to ignore this check."
+                f"Opcode {self._name_} requires {self.popped_stack_items} "
+                f"stack elements, but {len(args)} were provided. "
+                f"Use 'unchecked=True' parameter to ignore this check."
             )
 
         pre_opcode_bytecode = Bytecode()

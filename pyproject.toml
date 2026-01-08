@@ -378,6 +378,19 @@ ignore = [
     "F403",  # Star imports needed for whitelisting
     "F405",  # Undefined names from star imports
 ]
+# Test files with code templates in triple-quoted strings (textwrap.dedent)
+"packages/testing/src/execution_testing/cli/pytest_commands/plugins/filler/tests/test_benchmarking.py" = ["E501"]
+"packages/testing/src/execution_testing/cli/pytest_commands/plugins/filler/tests/test_prealloc_group.py" = ["E501"]
+"packages/testing/src/execution_testing/cli/pytest_commands/plugins/filler/tests/test_slow_marker_pre_alloc.py" = ["E501"]
+"packages/testing/src/execution_testing/cli/pytest_commands/plugins/filler/tests/test_verify_sync_marker.py" = ["E501"]
+# Test files with long hex addresses/hashes in JSON/YAML test data strings
+"packages/testing/src/execution_testing/cli/pytest_commands/plugins/execute/eth_config/tests/test_execute_eth_config.py" = ["E501"]
+"packages/testing/src/execution_testing/rpc/tests/test_types.py" = ["E501"]
+"packages/testing/src/execution_testing/test_types/tests/test_blob_types.py" = ["E501"]
+"packages/testing/src/execution_testing/test_types/tests/test_block_access_lists.py" = ["E501"]
+"packages/testing/src/execution_testing/test_types/tests/test_eof_v1.py" = ["E501"]
+"packages/testing/src/execution_testing/test_types/tests/test_post_alloc.py" = ["E501"]
+"packages/testing/src/execution_testing/test_types/tests/test_types.py" = ["E501"]
 
 [tool.codespell]
 builtin = "clear,code,usage"

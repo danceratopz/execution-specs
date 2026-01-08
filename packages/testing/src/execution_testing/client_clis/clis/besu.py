@@ -234,8 +234,7 @@ class BesuExceptionMapper(ExceptionMapper):
             "invalid Upfront gas cost cannot exceed 2^256 Wei"
         ),
         TransactionException.INSUFFICIENT_MAX_FEE_PER_GAS: (
-            "transaction invalid gasPrice is less than the current "
-            "BaseFee"
+            "transaction invalid gasPrice is less than the current BaseFee"
         ),
         TransactionException.GAS_ALLOWANCE_EXCEEDED: (
             "provided gas insufficient"
@@ -258,8 +257,7 @@ class BesuExceptionMapper(ExceptionMapper):
             "Failed to decode transactions from block parameter"
         ),
         TransactionException.TYPE_3_TX_PRE_FORK: (
-            "Transaction type BLOB is invalid, accepted transaction "
-            "types are"
+            "Transaction type BLOB is invalid, accepted transaction types are"
         ),
         TransactionException.TYPE_4_EMPTY_AUTHORIZATION_LIST: (
             "transaction invalid transaction code delegation "
@@ -276,16 +274,13 @@ class BesuExceptionMapper(ExceptionMapper):
             "Failed to decode transactions from block parameter"
         ),
         BlockException.INCORRECT_EXCESS_BLOB_GAS: (
-            "Payload excessBlobGas does not match calculated "
-            "excessBlobGas"
+            "Payload excessBlobGas does not match calculated excessBlobGas"
         ),
         BlockException.BLOB_GAS_USED_ABOVE_LIMIT: (
-            "Payload BlobGasUsed does not match calculated "
-            "BlobGasUsed"
+            "Payload BlobGasUsed does not match calculated BlobGasUsed"
         ),
         BlockException.INCORRECT_BLOB_GAS_USED: (
-            "Payload BlobGasUsed does not match calculated "
-            "BlobGasUsed"
+            "Payload BlobGasUsed does not match calculated BlobGasUsed"
         ),
         BlockException.INVALID_GAS_USED_ABOVE_LIMIT: (
             "Header validation failed (FULL)"

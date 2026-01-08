@@ -132,8 +132,7 @@ class NimbusExceptionMapper(ExceptionMapper):
         ),
         BlockException.INVALID_GASLIMIT: "invalid gas limit",
         BlockException.INVALID_GAS_USED_ABOVE_LIMIT: (
-            "gasUsed should be non negative and smaller or equal "
-            "gasLimit"
+            "gasUsed should be non negative and smaller or equal gasLimit"
         ),
         BlockException.INVALID_BLOCK_HASH: "blockhash mismatch",
         BlockException.INVALID_STATE_ROOT: "stateRoot mismatch",

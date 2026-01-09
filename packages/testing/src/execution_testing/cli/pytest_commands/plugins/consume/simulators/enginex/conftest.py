@@ -198,6 +198,9 @@ def client(
         "Check the client or Hive server logs for more information."
     )
 
+    # Mark as shared client so register_shared_client() will work
+    client.shared = True
+
     logger.info(
         f"Client ({client_type.name}) ready for group "
         f"{format_group_identifier(group_identifier)}"

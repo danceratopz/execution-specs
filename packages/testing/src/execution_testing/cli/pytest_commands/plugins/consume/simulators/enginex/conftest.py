@@ -138,7 +138,8 @@ def check_live_port(test_suite_name: str) -> int:
 
 @pytest.fixture(scope="function")
 def client(
-    shared_hive_test: HiveTest,
+    hive_test: HiveTest,  # Creates individual test case for reporting
+    shared_hive_test: HiveTest,  # Manages client lifecycle across tests
     multi_test_client_manager: MultiTestClientManager,
     fixture: BlockchainEngineXFixture,
     client_type: ClientType,
@@ -151,7 +152,13 @@ def client(
     Get or create a shared client for this test's pre-allocation group.
 
     This function-scoped fixture is called for each test, but it reuses clients
-    across tests that share the same pre-allocation group.
+    across tests that share the same pre-allocation group. Each test is reported
+    individually to hive via `hive_test`, while clients are managed via
+    `shared_hive_test` for cross-test reuse.
+
+    The client is registered with both:
+    - `shared_hive_test`: For lifecycle management (start/stop)
+    - `hive_test`: For per-test reporting (client logs link in UI)
     """
     group_identifier = fixture.pre_hash
     test_id = request.node.nodeid
@@ -163,6 +170,8 @@ def client(
             f"♻️  Reusing client for group "
             f"{format_group_identifier(group_identifier)}"
         )
+        # Register the shared client with this individual test for UI visibility
+        hive_test.register_shared_client(existing_client)
         try:
             yield existing_client
         finally:
@@ -195,6 +204,9 @@ def client(
     )
 
     multi_test_client_manager.register_client(group_identifier, client)
+
+    # Register the shared client with this individual test for UI visibility
+    hive_test.register_shared_client(client)
 
     try:
         yield client

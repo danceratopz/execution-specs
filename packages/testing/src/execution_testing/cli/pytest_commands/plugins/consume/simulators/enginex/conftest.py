@@ -171,6 +171,7 @@ def client(
             f"{format_group_identifier(group_identifier)}"
         )
         # Register the shared client with this individual test for UI visibility
+        existing_client.shared = True
         hive_test.register_shared_client(existing_client)
         try:
             yield existing_client
@@ -198,9 +199,6 @@ def client(
         "Check the client or Hive server logs for more information."
     )
 
-    # Mark as shared client so register_shared_client() will work
-    client.shared = True
-
     logger.info(
         f"Client ({client_type.name}) ready for group "
         f"{format_group_identifier(group_identifier)}"
@@ -208,7 +206,8 @@ def client(
 
     multi_test_client_manager.register_client(group_identifier, client)
 
-    # Register the shared client with this individual test for UI visibility
+    # Register the new client with this test for UI visibility
+    client.shared = True
     hive_test.register_shared_client(client)
 
     try:

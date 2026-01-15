@@ -11,7 +11,7 @@ from typing import Generator, Mapping
 
 import pytest
 from hive.client import Client, ClientType
-from hive.testing import HiveTest
+from hive.testing import HiveTest, HiveTestResult, HiveTestSuite
 
 from execution_testing.fixtures import BlockchainEngineXFixture
 from execution_testing.fixtures.blockchain import FixtureHeader
@@ -115,6 +115,20 @@ def _configure_client_manager(
     multi_test_client_manager.set_test_tracker(pre_alloc_group_test_tracker)
 
 
+@pytest.fixture(scope="function", autouse=True)
+def _ensure_hive_test_reporting(hive_test: HiveTest) -> None:
+    """
+    Ensure hive_test fixture runs for each test.
+
+    This autouse fixture ensures that hive_test is requested for every test,
+    which triggers:
+    1. Client startup (via hive_test's dependency on client)
+    2. Test registration with hive
+    3. Per-test log tracking via register_shared_client
+    """
+    pass  # hive_test handles everything in its setup/teardown
+
+
 @pytest.fixture(scope="module")
 def test_suite_name() -> str:
     """The name of the hive test suite used in this simulator."""
@@ -138,8 +152,7 @@ def check_live_port(test_suite_name: str) -> int:
 
 @pytest.fixture(scope="function")
 def client(
-    hive_test: HiveTest,  # Creates individual test case for reporting
-    shared_hive_test: HiveTest,  # Manages client lifecycle across tests
+    shared_hive_test: HiveTest,
     multi_test_client_manager: MultiTestClientManager,
     fixture: BlockchainEngineXFixture,
     client_type: ClientType,
@@ -152,13 +165,11 @@ def client(
     Get or create a shared client for this test's pre-allocation group.
 
     This function-scoped fixture is called for each test, but it reuses clients
-    across tests that share the same pre-allocation group. Each test is reported
-    individually to hive via `hive_test`, while clients are managed via
-    `shared_hive_test` for cross-test reuse.
+    across tests that share the same pre-allocation group. Clients are managed
+    via `shared_hive_test` for cross-test reuse.
 
-    The client is registered with both:
-    - `shared_hive_test`: For lifecycle management (start/stop)
-    - `hive_test`: For per-test reporting (client logs link in UI)
+    Note: Per-test registration with hive (for log tracking) is handled by
+    the `hive_test` fixture which depends on this fixture.
     """
     group_identifier = fixture.pre_hash
     test_id = request.node.nodeid
@@ -170,9 +181,6 @@ def client(
             f"♻️  Reusing client for group "
             f"{format_group_identifier(group_identifier)}"
         )
-        # Register the shared client with this individual test for UI visibility
-        existing_client.shared = True
-        hive_test.register_shared_client(existing_client)
         try:
             yield existing_client
         finally:
@@ -199,16 +207,16 @@ def client(
         "Check the client or Hive server logs for more information."
     )
 
+    # Mark client as shared for register_shared_client to work.
+    # This enables per-test log tracking via the registerSharedNode API.
+    client.shared = True
+
     logger.info(
         f"Client ({client_type.name}) ready for group "
         f"{format_group_identifier(group_identifier)}"
     )
 
     multi_test_client_manager.register_client(group_identifier, client)
-
-    # Register the new client with this test for UI visibility
-    client.shared = True
-    hive_test.register_shared_client(client)
 
     try:
         yield client
@@ -222,3 +230,127 @@ def client(
 def genesis_header(pre_alloc_group: PreAllocGroup) -> FixtureHeader:
     """Provide the genesis header from the pre-allocation group."""
     return pre_alloc_group.genesis
+
+
+@pytest.fixture(scope="function")
+def hive_test(
+    request: pytest.FixtureRequest,
+    test_suite: HiveTestSuite,
+    client: Client,
+) -> Generator[HiveTest, None, None]:
+    """
+    Override base hive_test to ensure client starts BEFORE test timing begins.
+
+    By depending on `client`, client startup occurs during fixture setup,
+    before `test_suite.start_test()` begins the test timer. This ensures:
+    1. Client startup time is NOT attributed to the first test in a group.
+    2. Each test gets its own `clientInfo` via `register_shared_client`.
+    """
+    try:
+        test_case_description = request.getfixturevalue("test_case_description")
+    except pytest.FixtureLookupError:
+        pytest.exit(
+            "Error: The 'test_case_description' fixture has not been defined!"
+        )
+
+    test_parameter_string = request.node.name
+    test: HiveTest = test_suite.start_test(
+        name=test_parameter_string,
+        description=test_case_description,
+    )
+
+    # Register the shared client with this test for individual log tracking.
+    test.register_shared_client(client)
+
+    yield test
+
+    try:
+        # Collect all logs from all phases.
+        captured = []
+        setup_out = ""
+        call_out = ""
+        for phase in ("setup", "call", "teardown"):
+            report = getattr(request.node, f"result_{phase}", None)
+            if report:
+                stdout = report.capstdout or "None"
+                stderr = report.capstderr or "None"
+
+                # Remove setup output from call phase output.
+                if phase == "setup":
+                    setup_out = stdout
+                if phase == "call":
+                    call_out = stdout
+                    if call_out.startswith(setup_out):
+                        stdout = call_out.removeprefix(setup_out)
+
+                captured.append(
+                    f"# Captured Output from Test {phase.capitalize()}\n\n"
+                    f"## stdout:\n{stdout}\n"
+                    f"## stderr:\n{stderr}\n"
+                )
+
+        captured_output = "\n".join(captured)
+
+        if (
+            hasattr(request.node, "result_call")
+            and request.node.result_call.passed
+        ):
+            test_passed = True
+            test_result_details = "Test passed.\n\n" + captured_output
+        elif (
+            hasattr(request.node, "result_call")
+            and not request.node.result_call.passed
+        ):
+            test_passed = False
+            test_result_details = (
+                request.node.result_call.longreprtext + "\n" + captured_output
+            )
+        elif (
+            hasattr(request.node, "result_setup")
+            and not request.node.result_setup.passed
+        ):
+            test_passed = False
+            test_result_details = (
+                "Test setup failed.\n\n"
+                + request.node.result_setup.longreprtext
+                + "\n"
+                + captured_output
+            )
+        elif (
+            hasattr(request.node, "result_teardown")
+            and not request.node.result_teardown.passed
+        ):
+            test_passed = False
+            test_result_details = (
+                "Test teardown failed.\n\n"
+                + request.node.result_teardown.longreprtext
+                + "\n"
+                + captured_output
+            )
+        else:
+            test_passed = False
+            test_result_details = (
+                "Test failed for unknown reason (setup or call status unknown).\n\n"
+                + captured_output
+            )
+
+        test.end(
+            result=HiveTestResult(
+                test_pass=test_passed, details=test_result_details
+            )
+        )
+        logger.info(f"Finished processing logs for test: {request.node.nodeid}")
+
+    except Exception as e:
+        logger.warning(
+            f"Error processing logs for test {request.node.nodeid}: {str(e)}"
+        )
+        test_passed = False
+        test_result_details = (
+            f"Exception whilst processing test result: {str(e)}"
+        )
+        test.end(
+            result=HiveTestResult(
+                test_pass=test_passed, details=test_result_details
+            )
+        )

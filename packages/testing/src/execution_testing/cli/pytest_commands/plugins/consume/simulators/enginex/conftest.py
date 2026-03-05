@@ -134,6 +134,21 @@ def test_suite_description() -> str:
     )
 
 
+@pytest.fixture(scope="function", autouse=True)
+def _per_test_reporting(
+    hive_test: HiveTest,
+    client: Client,
+) -> None:
+    """Activate per-test result reporting for multi-test clients.
+
+    Register the client with the per-test hive_test at setup time so
+    the Go backend captures the current log file offset as ``Begin``
+    before the test runs.  ``End`` is captured later when hive_test
+    teardown calls ``test.end()``.
+    """
+    hive_test.use_multi_test_client(client)
+
+
 @pytest.fixture(scope="function")
 def client(
     multi_test_hive_test: HiveTest,
@@ -161,6 +176,7 @@ def client(
             f"♻️  Reusing client for group "
             f"{format_group_identifier(group_identifier)}"
         )
+        existing_client.multi_test = True
         try:
             yield existing_client
         finally:
@@ -198,6 +214,7 @@ def client(
     )
 
     multi_test_client_manager.register_client(group_identifier, client)
+    client.multi_test = True
 
     try:
         yield client

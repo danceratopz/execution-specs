@@ -54,6 +54,7 @@ from .hive_info import ClientFile, HiveInfo
 logger = get_logger(__name__)
 
 
+
 def pytest_configure(config: pytest.Config) -> None:  # noqa: D103
     hive_simulator_url = config.getoption("hive_simulator")
     if hive_simulator_url is None:

@@ -122,6 +122,20 @@ def test_suite_description() -> str:
     )
 
 
+@pytest.fixture(scope="function", autouse=True)
+def _per_test_reporting(
+    hive_test: HiveTest,
+    client: Client,
+) -> None:
+    """
+    Register a test for execution against a multi-test client.
+
+    This activates log segment capturing in the Hive backend for
+    correct client log reporting in the multi-test client case.
+    """
+    hive_test.register_multi_test_client(client)
+
+
 @pytest.fixture(scope="function")
 def client(
     multi_test_hive_test: HiveTest,
@@ -179,6 +193,7 @@ def client(
         multi_test_client_manager.register_client(
             group_identifier, resolved_client
         )
+        resolved_client.multi_test = True
 
     try:
         yield resolved_client

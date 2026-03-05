@@ -148,3 +148,4 @@ required-version = ">=0.7.0"
 
 [tool.uv.sources]
 ethereum-execution = { workspace = true }
+ethereum-hive = { git = "https://github.com/ethereum/hive-python-api", branch = "update-api-for-multi-client-tests" }

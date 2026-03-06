@@ -832,6 +832,7 @@ source = { editable = "." }
 dependencies = [
     { name = "coincurve" },
     { name = "cryptography" },
+    { name = "ethereum-hive" },
     { name = "ethereum-rlp" },
     { name = "ethereum-types" },
     { name = "libcst" },
@@ -943,6 +944,7 @@ requires-dist = [
     { name = "coincurve", specifier = ">=20,<21" },
     { name = "cryptography", specifier = ">=45.0.1,<46" },
     { name = "ethash", marker = "extra == 'optimized'", specifier = ">=1.1.0,<2" },
+    { name = "ethereum-hive", specifier = ">=0.1.0a4,<1.0.0" },
     { name = "ethereum-rlp", specifier = ">=0.1.5,<0.2" },
     { name = "ethereum-types", specifier = ">=0.3.0,<0.4" },
     { name = "libcst", specifier = ">=1.8,<2" },
@@ -1155,14 +1157,13 @@ test = [{ name = "pytest-cov", specifier = ">=4.1.0,<5" }]
 
 [[package]]
 name = "ethereum-hive"
-version = "0.1.0a2"
+version = "0.1.0a4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b3/9b/f15c86866245ad5c22dbc98f433158fdeaab3e96eae4efd1bf6a12a7717c/ethereum_hive-0.1.0a2.tar.gz", hash = "sha256:9ddc08a8dfe2828a9a4abfca1c0972f88882fa06fb6a3e111ec013b66906f843", size = 74796, upload-time = "2025-07-15T05:38:36.983Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/74/60/1daf13c49bbefed6b67dd8a5d1280386e1ad22c9ec61737d44047064632e/ethereum_hive-0.1.0a2-py3-none-any.whl", hash = "sha256:0b0253146428240725e2b83a86bbc9eab975c460b8d76ce3937ba5295aa2448b", size = 37578, upload-time = "2025-07-15T05:38:35.334Z" },
+    { url = "https://files.pythonhosted.org/packages/f7/b6/7d9328fbd98b68a44dd50de0c0507d0f62df5cdc35f99bd76c8a3c919db5/ethereum_hive-0.1.0a4-py3-none-any.whl", hash = "sha256:4897db0fb5e105187caa679e6aeccb9c29837ee42b912eef30b10874533c3bf6", size = 37552, upload-time = "2026-03-06T08:48:44.515Z" },
 ]
 
 [[package]]

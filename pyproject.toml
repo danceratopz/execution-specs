@@ -29,6 +29,7 @@ dependencies = [
     "cryptography>=45.0.1,<46",
     "platformdirs>=4.2,<5",
     "libcst>=1.8,<2",
+    "ethereum-hive>=0.1.0a4,<1.0.0",
 ]
 
 [tool.setuptools.package-dir]

@@ -219,9 +219,10 @@ class Txs:
             if t8n.fork.has_signing_hash_155:
                 if protected:
                     signing_hash = t8n.fork.signing_hash_155(
-                        tx_decoded, U64(1)
+                        tx_decoded, self.t8n.chain_id
                     )
-                    v_addend = U256(37)  # Assuming chain_id = 1
+                    # EIP-155: CHAIN_ID * 2 + 35
+                    v_addend = U256(self.t8n.chain_id) * U256(2) + U256(35)
                 else:
                     signing_hash = t8n.fork.signing_hash_pre155(tx_decoded)
                     v_addend = U256(27)

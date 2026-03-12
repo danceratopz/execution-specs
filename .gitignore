@@ -19,6 +19,7 @@
 # Cache
 cached_downloads/
 .cache
+.meta/
 .mypy_cache/
 .ruff_cache/
 __pycache__/

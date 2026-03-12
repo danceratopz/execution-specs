@@ -39,6 +39,12 @@ from execution_testing.cli.gen_index import (
 )
 from execution_testing.client_clis import TransitionTool
 from execution_testing.client_clis.clis.geth import FixtureConsumerTool
+from execution_testing.client_clis.content_cache import (
+    CodeState,
+    ContentCacheManifest,
+    ContentCacheStats,
+    _find_repo_root,
+)
 from execution_testing.fixtures import (
     BaseFixture,
     BlockchainEngineFixture,
@@ -715,6 +721,17 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             "groups, phase 2 generates all supported fixture formats."
         ),
     )
+    test_group.addoption(
+        "--regenerate-t8n-cache",
+        action="store_true",
+        dest="regenerate_t8n_cache",
+        default=False,
+        help=(
+            "Ignore existing t8n content cache and generate a fresh one. "
+            "The cache records cross-fork t8n equivalences to skip "
+            "redundant t8n calls in subsequent runs."
+        ),
+    )
 
     optimize_gas_group = parser.getgroup(
         "optimize gas",
@@ -926,6 +943,44 @@ def pytest_configure(config: pytest.Config) -> None:
         config.t8n_cache_stats_aggregated = (  # type: ignore[attr-defined]
             TransitionToolCacheStats()
         )
+        config.content_cache_stats_aggregated = (  # type: ignore[attr-defined]
+            ContentCacheStats()
+        )
+
+    # Set up cross-fork content cache
+    _setup_content_cache(config)
+
+
+def _setup_content_cache(config: pytest.Config) -> None:
+    """Initialize the cross-fork t8n content cache."""
+    regenerate = config.getoption("regenerate_t8n_cache", False)
+    repo_root = _find_repo_root()
+    if repo_root is None:
+        logger = logging.getLogger("fill.content_cache")
+        logger.warning(
+            "Not in a git repository, content cache disabled"
+        )
+        return
+
+    code_state = CodeState.compute(repo_root)
+    manifest_path = repo_root / ".meta" / "t8n_content_cache.json"
+
+    if regenerate:
+        manifest = ContentCacheManifest(code_state=code_state)
+    else:
+        manifest = ContentCacheManifest.load(manifest_path, code_state)
+
+    stats = ContentCacheStats()
+    if manifest.has_equivalences:
+        stats.equivalence_groups = len(manifest.equivalences)
+
+    t8n: TransitionTool = config.t8n  # type: ignore[attr-defined]
+    t8n.setup_content_cache(manifest, stats, recording=regenerate)
+
+    # Store for session finish (manifest save) and stats aggregation
+    config.content_cache_manifest = manifest  # type: ignore[attr-defined]
+    config.content_cache_manifest_path = manifest_path  # type: ignore[attr-defined]
+    config.content_cache_stats = stats  # type: ignore[attr-defined]
 
 
 @pytest.hookimpl(trylast=True)
@@ -1005,6 +1060,31 @@ def pytest_terminal_summary(
                 ),
                 bold=True,
             )
+
+    # Content cache stats: try aggregated (xdist), else local
+    content_stats: ContentCacheStats | None = getattr(
+        config, "content_cache_stats_aggregated", None
+    ) or getattr(config, "content_cache_stats", None)
+
+    if content_stats is not None and (
+        content_stats.hits > 0 or content_stats.misses > 0
+    ):
+        total = content_stats.hits + content_stats.misses
+        if total > 0:
+            pct = content_stats.hits * 100 // total
+            terminalreporter.write_sep(
+                "=",
+                (
+                    f" T8n content cache: {pct}% hit rate"
+                    f" ({content_stats.hits}/{total}"
+                    f" cross-fork),"
+                    f" {content_stats.hits} t8n calls saved"
+                    f" ({content_stats.misses} executed)"
+                ),
+                bold=True,
+                green=content_stats.hits > 0,
+            )
+
     stats = terminalreporter.stats
     if "passed" in stats and stats["passed"]:
         # Custom message for Phase 1 (pre-allocation group generation)
@@ -1066,6 +1146,33 @@ def _aggregate_cache_stats(node: Any) -> None:
         node.config.t8n_cache_stats_aggregated.add(
             TransitionToolCacheStats.from_dict(worker_stats)
         )
+
+
+def _aggregate_content_cache(node: Any) -> None:
+    """Aggregate content cache stats and recording from an xdist worker."""
+    worker_output = getattr(node, "workeroutput", {})
+
+    # Aggregate stats
+    worker_stats = worker_output.get("content_cache_stats")
+    if worker_stats and hasattr(
+        node.config, "content_cache_stats_aggregated"
+    ):
+        node.config.content_cache_stats_aggregated.add(
+            ContentCacheStats.from_dict(worker_stats)
+        )
+
+    # Merge recording data into master manifest
+    worker_recording = worker_output.get("content_cache_recording")
+    if worker_recording and hasattr(
+        node.config, "content_cache_manifest"
+    ):
+        manifest: ContentCacheManifest = (
+            node.config.content_cache_manifest
+        )
+        for content_key, fork_hashes in worker_recording.items():
+            if content_key not in manifest._recording:
+                manifest._recording[content_key] = {}
+            manifest._recording[content_key].update(fork_hashes)
 
 
 def pytest_metadata(metadata: Any) -> None:
@@ -1212,6 +1319,34 @@ def get_t8n_cache_key(request: pytest.FixtureRequest) -> str | None:
     return None
 
 
+import re
+
+_FORK_PARAM_RE = re.compile(r"fork_[A-Za-z0-9]+(-|])")
+
+
+def _get_content_key_prefix(request: pytest.FixtureRequest) -> str | None:
+    """Get a fork-independent test identity for content cache keying.
+
+    Strip only the fork parameter from the node ID (keep the format)
+    so that the same test with different forks shares the same prefix
+    but different formats get different prefixes.
+
+    Example:
+        'test.py::test[fork_Osaka-typed_transaction_0-state_test]'
+        -> 'test.py::test[typed_transaction_0-state_test]'
+    """
+    node_id = _strip_xdist_group_suffix(request.node.nodeid)
+    # Strip fork parameter: 'fork_<Name>-' or 'fork_<Name>]'
+    result = _FORK_PARAM_RE.sub(
+        lambda m: "]" if m.group(1) == "]" else "", node_id
+    )
+    # Clean up stray dashes: leading '[- ' or trailing '-]'
+    result = result.replace("[-", "[").replace("-]", "]")
+    # Remove empty brackets
+    result = result.replace("[]", "")
+    return result
+
+
 @pytest.fixture(autouse=True, scope="session")
 def transition_tool_cache_stats(
     request: pytest.FixtureRequest,
@@ -1248,6 +1383,13 @@ def t8n(
     session_t8n.reset_traces()
     session_t8n.call_counter = 0
     session_t8n.debug_dump_dir = dump_dir_parameter_level
+    # Set test path for content cache invalidation
+    test_path = str(request.node.fspath) if request.node.fspath else None
+    session_t8n.set_current_test_path(test_path)
+    # Set fork-independent content key prefix for cross-fork reuse
+    session_t8n.set_content_key_prefix(
+        _get_content_key_prefix(request)
+    )
     # TODO: Configure the transition tool to count opcodes only when required.
     session_t8n.reset_opcode_count()
     yield session_t8n
@@ -2005,11 +2147,35 @@ def pytest_collection_modifyitems(
         # IMPORTANT: Use hash for group name because loadgroup's _split_scope
         # uses rfind("]") to detect group suffix, and our base_nodeid contains
         # "]" characters which would break the detection.
+        #
+        # When content cache has equivalences, strip BOTH fork and format so
+        # all fork×format variants of the same test land on one worker. This
+        # gives cache locality for both the t8n output cache (cross-format)
+        # and the content cache (cross-fork).
+        has_content_cache = getattr(
+            config, "content_cache_manifest", None
+        ) is not None and getattr(
+            config, "content_cache_manifest"
+        ).has_equivalences
+
         for item in items:
             if not item.get_closest_marker("xdist_group"):
                 base_nodeid = item_base_nodeids[id(item)]
+                if has_content_cache:
+                    # Strip fork from base_nodeid (format already stripped)
+                    group_id = _FORK_PARAM_RE.sub(
+                        lambda m: "]" if m.group(1) == "]" else "",
+                        base_nodeid,
+                    )
+                    group_id = (
+                        group_id.replace("[-", "[")
+                        .replace("-]", "]")
+                        .replace("[]", "")
+                    )
+                else:
+                    group_id = base_nodeid
                 h = hashlib.md5(
-                    base_nodeid.encode(), usedforsecurity=False
+                    group_id.encode(), usedforsecurity=False
                 ).hexdigest()[:8]
                 group_name = f"t8n-cache-{h}"
                 item.add_marker(pytest.mark.xdist_group(name=group_name))
@@ -2156,6 +2322,19 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
             fc = session.config.fixture_collector
             fc.all_fixtures.clear()
             fc._fixtures_to_verify.clear()
+        # Forward content cache stats to controller
+        if hasattr(session.config, "content_cache_stats"):
+            session.config.workeroutput[  # type: ignore[attr-defined]
+                "content_cache_stats"
+            ] = session.config.content_cache_stats.to_dict()
+        # Forward content cache recording data for manifest generation
+        if hasattr(session.config, "content_cache_manifest"):
+            manifest: ContentCacheManifest = (
+                session.config.content_cache_manifest
+            )
+            session.config.workeroutput[  # type: ignore[attr-defined]
+                "content_cache_recording"
+            ] = manifest._recording
         gc.collect()
         # Store timing logs for master to print when this worker finishes
         session.config.workeroutput["timing_logs"] = worker_timing_logs  # type: ignore[attr-defined] # noqa: E501
@@ -2209,6 +2388,9 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
                 f"merge_partial_indexes: done in {time.time() - t0:.1f}s"
             )
 
+    # Save content cache manifest (master only)
+    _save_content_cache_manifest(session.config, _log_timing)
+
     # Create tarball of the output directory if the output is a tarball.
     if fixture_output.is_tarball:
         _log_timing("create_tarball: starting...")
@@ -2219,6 +2401,37 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     _log_timing("Finalization (master): COMPLETE")
 
 
+def _save_content_cache_manifest(
+    config: pytest.Config,
+    log_fn: Any = None,
+) -> None:
+    """Save the content cache manifest on the master node.
+
+    Only saves when --regenerate-t8n-cache was used, so the use run
+    does not overwrite a good manifest with partial recording data.
+    """
+    if not config.getoption("regenerate_t8n_cache", False):
+        return
+
+    manifest: ContentCacheManifest | None = getattr(
+        config, "content_cache_manifest", None
+    )
+    manifest_path: Path | None = getattr(
+        config, "content_cache_manifest_path", None
+    )
+    if manifest is None or manifest_path is None:
+        return
+
+    if log_fn:
+        log_fn("Saving content cache manifest...")
+    t0 = time.time()
+    manifest.save(manifest_path)
+    if log_fn:
+        log_fn(
+            f"Content cache manifest saved in {time.time() - t0:.1f}s"
+        )
+
+
 def pytest_testnodedown(node: Any, error: Any) -> None:
     """
     Called on master when a worker node finishes.
@@ -2227,6 +2440,7 @@ def pytest_testnodedown(node: Any, error: Any) -> None:
     """
     del error
     _aggregate_cache_stats(node)
+    _aggregate_content_cache(node)
     logger = logging.getLogger("fill.sessionfinish")
     worker_id = getattr(node, "workerinput", {}).get("workerid", "unknown")
     timing_logs = getattr(node, "workeroutput", {}).get("timing_logs", [])

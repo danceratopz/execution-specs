@@ -2,6 +2,7 @@
 
 import contextlib
 import cProfile
+import hashlib
 import json
 import os
 import shutil
@@ -54,6 +55,7 @@ from .cli_types import (
     TransitionToolOutput,
     TransitionToolRequest,
 )
+from .content_cache import ContentCacheManifest, ContentCacheStats
 from .ethereum_cli import EthereumCLI
 from .file_utils import dump_files_to_directory
 
@@ -189,6 +191,12 @@ class TransitionTool(EthereumCLI):
     server_url: str | None = None
     process: Optional[subprocess.Popen] = None
     output_cache: OutputCache | None = None
+    content_cache: Dict[str, Dict[str, TransitionToolOutput]] | None = None
+    content_manifest: ContentCacheManifest | None = None
+    content_cache_stats: ContentCacheStats | None = None
+    _content_recording: bool = False
+    _content_key_prefix: str | None = None
+    _current_test_path: str | None = None
     debug_dump_dir: Path | None = None
     call_counter: int = 0
     opcode_count: OpcodeCount | None = None
@@ -297,6 +305,54 @@ class TransitionTool(EthereumCLI):
         Reset the opcode count to zero.
         """
         self.opcode_count = OpcodeCount({})
+
+    def setup_content_cache(
+        self,
+        manifest: ContentCacheManifest,
+        stats: ContentCacheStats,
+        *,
+        recording: bool = False,
+    ) -> None:
+        """Initialize the cross-fork content cache."""
+        self.content_manifest = manifest
+        self.content_cache_stats = stats
+        self.content_cache = {}
+        self._content_recording = recording
+
+    def set_current_test_path(self, test_path: str | None) -> None:
+        """Set the current test path for content cache invalidation."""
+        self._current_test_path = test_path
+
+    def set_content_key_prefix(self, prefix: str | None) -> None:
+        """Set a fork-independent test identity for content caching.
+
+        The prefix is combined with the call counter to form content
+        keys that are identical across forks for the same test.
+        """
+        self._content_key_prefix = prefix
+
+    def _content_key(self, call_id: int) -> str | None:
+        """Return content key for the current t8n call, or None."""
+        if self._content_key_prefix is None:
+            return None
+        return f"{self._content_key_prefix}:{call_id}"
+
+    def _output_hash(self, result: TransitionToolOutput) -> str:
+        """Compute a hash of t8n output for equivalence recording.
+
+        Hash the full Result (including fork-specific metadata like
+        withdrawalsRoot, currentBaseFee, etc.) plus alloc. This ensures
+        only forks with truly identical t8n output are grouped, so
+        cached results can be reused directly without missing fields.
+        """
+        result_json = result.result.model_dump_json(**model_dump_config)
+        alloc_str = (
+            result.alloc.raw
+            if hasattr(result.alloc, "raw")
+            else str(result.alloc)
+        )
+        combined = result_json + str(alloc_str)
+        return hashlib.sha256(combined.encode()).hexdigest()
 
     @dataclass
     class TransitionToolData:
@@ -939,6 +995,34 @@ class TransitionTool(EthereumCLI):
             cached_result = self.output_cache.get(current_call_id)
             if cached_result is not None:
                 return self.process_result(cached_result)
+
+        # Cross-fork content cache: check if we can reuse a result
+        content_key = self._content_key(current_call_id)
+        fork_name = transition_tool_data.fork_name
+        if (
+            content_key is not None
+            and self.content_cache is not None
+            and self.content_manifest is not None
+            and self.content_cache_stats is not None
+            and content_key in self.content_cache
+        ):
+            # Check if any already-stored fork is equivalent
+            for stored_fork, stored_result in (
+                self.content_cache[content_key].items()
+            ):
+                if self.content_manifest.are_equivalent(
+                    content_key,
+                    fork_name,
+                    stored_fork,
+                    test_path=self._current_test_path,
+                ):
+                    self.content_cache_stats.hits += 1
+                    if self.output_cache is not None:
+                        self.output_cache.set(
+                            current_call_id, stored_result
+                        )
+                    return self.process_result(stored_result)
+
         debug_output_path = self.get_next_transition_tool_output_path(
             current_call_id
         )
@@ -956,4 +1040,23 @@ class TransitionTool(EthereumCLI):
             )
         if self.output_cache is not None:
             self.output_cache.set(current_call_id, result)
+
+        # Store in content cache and record for manifest generation
+        if (
+            content_key is not None
+            and self.content_cache is not None
+            and self.content_cache_stats is not None
+        ):
+            self.content_cache.setdefault(content_key, {})[
+                fork_name
+            ] = result
+            self.content_cache_stats.misses += 1
+
+            # Record for manifest generation (generate mode only)
+            if self._content_recording and self.content_manifest is not None:
+                out_hash = self._output_hash(result)
+                self.content_manifest.record(
+                    content_key, fork_name, out_hash
+                )
+
         return self.process_result(result)

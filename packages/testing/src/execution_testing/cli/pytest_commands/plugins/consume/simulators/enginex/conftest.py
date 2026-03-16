@@ -124,14 +124,20 @@ def test_suite_description() -> str:
 
 @pytest.fixture(scope="function", autouse=True)
 def _per_test_reporting(
-    hive_test: HiveTest,
     client: Client,
+    hive_test: HiveTest,
 ) -> None:
     """
     Register a test for execution against a multi-test client.
 
-    This activates log segment capturing in the Hive backend for
-    correct client log reporting in the multi-test client case.
+    Activate log segment capturing in the Hive backend for correct
+    client log reporting in the multi-test client case.
+
+    Parameter order matters: `client` listed before `hive_test`
+    ensures pytest sets up `client` first and tears it down last.
+    This guarantees `hive_test` teardown (`test.end()`) runs while
+    the hive node still exists, before `client` teardown calls
+    `mark_test_completed` / `client.stop()`.
     """
     hive_test.register_multi_test_client(client)
 
@@ -162,7 +168,6 @@ def client(
     if resolved_client is not None:
         logger.info(f"♻️  Reusing client for group {group_identifier}")
     else:
-        # Start new client; calculate genesis
         genesis_bytes = json.dumps(client_genesis).encode("utf-8")
         buffered_genesis = io.BufferedReader(
             cast(io.RawIOBase, io.BytesIO(genesis_bytes))
@@ -181,9 +186,9 @@ def client(
             )
 
         assert resolved_client is not None, (
-            f"Unable to connect to client ({client_type.name}) via "
-            "Hive. Check the client or Hive server logs for more "
-            "information."
+            f"Unable to connect to client ({client_type.name}) "
+            "via Hive. Check the client or Hive server logs for "
+            "more information."
         )
 
         logger.info(

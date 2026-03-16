@@ -57,6 +57,7 @@ from execution_testing.fixtures import (
     merge_partial_fixture_files,
     strip_fixture_format_from_node,
 )
+from execution_testing.fixtures.hive import generate_hive_files
 from execution_testing.fixtures.pre_alloc_groups import (
     _get_worker_id,
     merge_partial_group_files,
@@ -2144,6 +2145,9 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
             _log_timing(
                 f"Phase 1 (master): merge done in {time.time() - t0:.1f}s"
             )
+
+            hive_folder = fixture_output.hive_folder_path
+            generate_hive_files(pre_alloc_folder, hive_folder)
         else:
             # Workers: clear in-memory state to reduce memory pressure while
             # waiting for other workers to finish

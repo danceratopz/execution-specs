@@ -15,6 +15,7 @@ Test fixtures for use by clients are available for each release on the [Github r
 
 #### `fill`
 
+- ✨ Generate `hive/{hash}.json` a "generic" gensesis file format that can be consumed by hive's mapper ([#2511](https://github.com/ethereum/execution-specs/pull/2511)).
 - ✨ Allow command to customize `--chain-id` used for filling ([#2016](https://github.com/ethereum/execution-specs/pull/2016)).
 
 #### `consume`

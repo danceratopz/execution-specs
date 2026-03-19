@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stRevertTest/LoopDelegateCallsDepthThenRevertFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Berlin")
 @pytest.mark.pre_alloc_mutable
 def test_loop_delegate_calls_depth_then_revert(
     state_test: StateTestFiller,

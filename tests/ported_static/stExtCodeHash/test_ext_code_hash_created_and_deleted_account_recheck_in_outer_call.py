@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stExtCodeHash/extCodeHashCreatedAndDeletedAccountRecheckInOuterCallFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("ConstantinopleFix")
 @pytest.mark.pre_alloc_mutable
 def test_ext_code_hash_created_and_deleted_account_recheck_in_outer_call(
     state_test: StateTestFiller,

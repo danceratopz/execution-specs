@@ -24,7 +24,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stArgsZeroOneBalance/smodNonConstFiller.yml"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.parametrize(
     "tx_value, expected_post",
     [

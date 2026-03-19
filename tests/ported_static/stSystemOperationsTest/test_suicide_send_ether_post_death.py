@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stSystemOperationsTest/suicideSendEtherPostDeathFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_suicide_send_ether_post_death(
     state_test: StateTestFiller,

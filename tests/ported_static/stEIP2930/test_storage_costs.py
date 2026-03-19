@@ -26,7 +26,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stEIP2930/storageCostsFiller.yml"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Berlin")
 @pytest.mark.parametrize(
     "tx_data_hex, tx_access_list, expected_post",
     [

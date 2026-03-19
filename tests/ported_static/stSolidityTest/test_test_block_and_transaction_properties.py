@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stSolidityTest/TestBlockAndTransactionPropertiesFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_test_block_and_transaction_properties(
     state_test: StateTestFiller,

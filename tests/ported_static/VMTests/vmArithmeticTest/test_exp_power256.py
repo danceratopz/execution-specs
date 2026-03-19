@@ -26,7 +26,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/VMTests/vmArithmeticTest/expPower256Filler.yml",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_exp_power256(
     state_test: StateTestFiller,

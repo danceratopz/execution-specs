@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stCallCreateCallCodeTest/callOutput3partialFailFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_call_output3partial_fail(
     state_test: StateTestFiller,

@@ -24,7 +24,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stMemoryTest/calldatacopy_dejavu2Filler.json"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_calldatacopy_dejavu2(
     state_test: StateTestFiller,

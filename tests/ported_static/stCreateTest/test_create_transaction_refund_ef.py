@@ -26,7 +26,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stCreateTest/CreateTransactionRefundEFFiller.yml",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("London")
 @pytest.mark.pre_alloc_mutable
 def test_create_transaction_refund_ef(
     state_test: StateTestFiller,

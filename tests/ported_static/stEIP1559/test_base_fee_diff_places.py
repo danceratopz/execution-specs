@@ -24,7 +24,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stEIP1559/baseFeeDiffPlacesFiller.yml"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("London")
 @pytest.mark.valid_until("Prague")
 @pytest.mark.parametrize(
     "tx_data_hex, expected_post",

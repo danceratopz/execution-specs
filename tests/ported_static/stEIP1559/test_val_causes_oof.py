@@ -25,7 +25,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stEIP1559/valCausesOOFFiller.yml"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("London")
 @pytest.mark.parametrize(
     "tx_data_hex, tx_gas_limit, tx_value, tx_error, expected_post",
     [

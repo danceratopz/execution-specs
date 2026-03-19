@@ -26,7 +26,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stRevertTest/RevertPrefoundEmptyCall_ParisFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_revert_prefound_empty_call_paris(
     state_test: StateTestFiller,

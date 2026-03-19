@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stCreateTest/CREATE_EmptyContractWithBalanceFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Shanghai")
 @pytest.mark.pre_alloc_mutable
 def test_create_empty_contract_with_balance(
     state_test: StateTestFiller,

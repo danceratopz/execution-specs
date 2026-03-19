@@ -24,7 +24,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stCreate2/CREATE2_HighNonceFiller.yml"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("ConstantinopleFix")
 @pytest.mark.pre_alloc_mutable
 def test_create2_high_nonce(
     state_test: StateTestFiller,

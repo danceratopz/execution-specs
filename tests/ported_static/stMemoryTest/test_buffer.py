@@ -24,7 +24,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stMemoryTest/bufferFiller.yml"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("ConstantinopleFix")
 @pytest.mark.parametrize(
     "tx_data_hex, expected_post",
     [

@@ -28,7 +28,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stTransactionTest/NoSrcAccountCreate1559Filler.yml",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("London")
 @pytest.mark.parametrize(
     "tx_gas_limit, tx_value, tx_access_list, tx_error",
     [

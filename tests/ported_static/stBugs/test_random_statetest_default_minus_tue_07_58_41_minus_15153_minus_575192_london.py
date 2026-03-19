@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stBugs/randomStatetestDEFAULT-Tue_07_58_41-15153-575192_londonFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("ConstantinopleFix")
 @pytest.mark.pre_alloc_mutable
 def test_random_statetest_default_minus_tue_07_58_41_minus_15153_minus_575192_london(  # noqa: E501
     state_test: StateTestFiller,

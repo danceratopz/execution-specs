@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stStaticCall/static_log0_nonEmptyMem_logMemSize1Filler.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 @pytest.mark.slow
 def test_static_log0_non_empty_mem_log_mem_size1(

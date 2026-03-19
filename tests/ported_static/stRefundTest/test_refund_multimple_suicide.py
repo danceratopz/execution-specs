@@ -26,7 +26,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stRefundTest/refund_multimpleSuicideFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_refund_multimple_suicide(
     state_test: StateTestFiller,

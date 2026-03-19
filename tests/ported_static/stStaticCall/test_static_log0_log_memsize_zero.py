@@ -26,7 +26,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stStaticCall/static_log0_logMemsizeZeroFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 @pytest.mark.slow
 def test_static_log0_log_memsize_zero(

@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/Shanghai/stEIP3860_limitmeterinitcode/creationTxInitCodeSizeLimitFiller.yml",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Shanghai")
 @pytest.mark.valid_until("Cancun")
 @pytest.mark.parametrize(
     "tx_data_hex, tx_error, expected_post",

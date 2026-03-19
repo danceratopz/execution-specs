@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stMemExpandingEIP150Calls/NewGasPriceForCodesWithMemExpandingCallsFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Berlin")
 @pytest.mark.pre_alloc_mutable
 def test_new_gas_price_for_codes_with_mem_expanding_calls(
     state_test: StateTestFiller,

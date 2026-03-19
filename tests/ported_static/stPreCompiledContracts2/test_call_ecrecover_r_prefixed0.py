@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stPreCompiledContracts2/CallEcrecoverR_prefixed0Filler.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_call_ecrecover_r_prefixed0(
     state_test: StateTestFiller,

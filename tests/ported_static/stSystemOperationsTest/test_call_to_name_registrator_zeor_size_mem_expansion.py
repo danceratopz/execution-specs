@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stSystemOperationsTest/CallToNameRegistratorZeorSizeMemExpansionFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.parametrize(
     "tx_gas_limit, expected_post",
     [

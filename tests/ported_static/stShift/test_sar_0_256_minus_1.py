@@ -24,7 +24,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stShift/sar_0_256-1Filler.json"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("ConstantinopleFix")
 @pytest.mark.pre_alloc_mutable
 def test_sar_0_256_minus_1(
     state_test: StateTestFiller,

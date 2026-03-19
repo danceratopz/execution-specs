@@ -25,7 +25,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stWalletTest/multiOwnedIsOwnerFalseFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_multi_owned_is_owner_false(
     state_test: StateTestFiller,

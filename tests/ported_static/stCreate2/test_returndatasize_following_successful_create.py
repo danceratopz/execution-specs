@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stCreate2/returndatasize_following_successful_createFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("ConstantinopleFix")
 @pytest.mark.pre_alloc_mutable
 def test_returndatasize_following_successful_create(
     state_test: StateTestFiller,

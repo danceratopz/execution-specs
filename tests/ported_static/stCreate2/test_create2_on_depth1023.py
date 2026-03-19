@@ -24,7 +24,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stCreate2/Create2OnDepth1023Filler.json"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("ConstantinopleFix")
 @pytest.mark.valid_until("Prague")
 @pytest.mark.pre_alloc_mutable
 def test_create2_on_depth1023(

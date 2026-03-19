@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stReturnDataTest/call_outsize_then_create_successful_then_returndatasizeFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_call_outsize_then_create_successful_then_returndatasize(
     state_test: StateTestFiller,

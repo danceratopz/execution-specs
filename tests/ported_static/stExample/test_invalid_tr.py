@@ -25,7 +25,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stExample/invalidTrFiller.json"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Frontier")
 @pytest.mark.pre_alloc_mutable
 @pytest.mark.exception_test
 def test_invalid_tr(

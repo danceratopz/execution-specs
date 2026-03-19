@@ -26,7 +26,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stEIP158Specific/CALL_OneVCallSuicide2Filler.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Berlin")
 @pytest.mark.pre_alloc_mutable
 def test_call_one_v_call_suicide2(
     state_test: StateTestFiller,

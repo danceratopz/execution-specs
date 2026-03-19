@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stCallCreateCallCodeTest/Call1024BalanceTooLowFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.valid_until("Prague")
 @pytest.mark.pre_alloc_mutable
 def test_call1024_balance_too_low(

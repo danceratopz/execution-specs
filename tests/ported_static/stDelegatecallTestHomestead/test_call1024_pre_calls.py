@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stDelegatecallTestHomestead/Call1024PreCallsFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Berlin")
 @pytest.mark.valid_until("Prague")
 @pytest.mark.parametrize(
     "tx_gas_limit, expected_post",

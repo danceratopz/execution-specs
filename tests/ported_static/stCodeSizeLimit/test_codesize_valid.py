@@ -23,7 +23,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stCodeSizeLimit/codesizeValidFiller.json"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.parametrize(
     "tx_data_hex, expected_post",
     [

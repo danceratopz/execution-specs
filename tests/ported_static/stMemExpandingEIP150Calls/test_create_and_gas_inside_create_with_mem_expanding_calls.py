@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stMemExpandingEIP150Calls/CreateAndGasInsideCreateWithMemExpandingCallsFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Shanghai")
 @pytest.mark.pre_alloc_mutable
 def test_create_and_gas_inside_create_with_mem_expanding_calls(
     state_test: StateTestFiller,

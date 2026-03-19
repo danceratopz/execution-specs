@@ -23,7 +23,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stWalletTest/multiOwnedIsOwnerTrueFiller.json"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_multi_owned_is_owner_true(
     state_test: StateTestFiller,

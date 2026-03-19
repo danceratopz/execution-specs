@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stPreCompiledContracts2/CALLCODEEcrecover0_Gas2999Filler.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_callcode_ecrecover0_gas2999(
     state_test: StateTestFiller,

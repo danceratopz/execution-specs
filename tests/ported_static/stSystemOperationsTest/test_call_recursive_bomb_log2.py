@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stSystemOperationsTest/CallRecursiveBombLog2Filler.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Berlin")
 @pytest.mark.valid_until("Prague")
 @pytest.mark.pre_alloc_mutable
 def test_call_recursive_bomb_log2(

@@ -25,7 +25,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stEIP2930/coinbaseT01Filler.yml"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Shanghai")
 @pytest.mark.parametrize(
     "tx_access_list, expected_post",
     [

@@ -32,7 +32,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stCreateTest/CreateAddressWarmAfterFailFiller.yml",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("London")
 @pytest.mark.parametrize(
     "tx_data_hex, tx_value, expected_post",
     [

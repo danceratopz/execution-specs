@@ -26,7 +26,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stWalletTest/walletExecuteOverDailyLimitOnlyOneOwnerNewFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_wallet_execute_over_daily_limit_only_one_owner_new(
     state_test: StateTestFiller,

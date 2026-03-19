@@ -25,7 +25,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stWalletTest/dayLimitSetDailyLimitNoDataFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_day_limit_set_daily_limit_no_data(
     state_test: StateTestFiller,

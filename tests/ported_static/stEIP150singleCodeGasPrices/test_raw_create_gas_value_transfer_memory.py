@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stEIP150singleCodeGasPrices/RawCreateGasValueTransferMemoryFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Shanghai")
 @pytest.mark.pre_alloc_mutable
 def test_raw_create_gas_value_transfer_memory(
     state_test: StateTestFiller,

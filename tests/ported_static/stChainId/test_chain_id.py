@@ -24,7 +24,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stChainId/chainIdFiller.json"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Istanbul")
 @pytest.mark.pre_alloc_mutable
 def test_chain_id(
     state_test: StateTestFiller,

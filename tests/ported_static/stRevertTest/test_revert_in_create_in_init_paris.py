@@ -25,7 +25,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stRevertTest/RevertInCreateInInit_ParisFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_revert_in_create_in_init_paris(
     state_test: StateTestFiller,

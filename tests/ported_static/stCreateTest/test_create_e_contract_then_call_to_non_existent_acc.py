@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stCreateTest/CREATE_EContract_ThenCALLToNonExistentAccFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Shanghai")
 @pytest.mark.pre_alloc_mutable
 def test_create_e_contract_then_call_to_non_existent_acc(
     state_test: StateTestFiller,

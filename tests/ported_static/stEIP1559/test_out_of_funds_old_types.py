@@ -25,7 +25,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 @pytest.mark.ported_from(
     ["tests/static/state_tests/stEIP1559/outOfFundsOldTypesFiller.yml"],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Berlin")
 @pytest.mark.parametrize(
     "tx_data_hex, tx_gas_limit, tx_value, tx_access_list, tx_error, expected_post",  # noqa: E501
     [

@@ -26,7 +26,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stNonZeroCallsTest/NonZeroValue_TransactionCALL_ToOneStorageKey_ParisFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.pre_alloc_mutable
 def test_non_zero_value_transaction_call_to_one_storage_key_paris(
     state_test: StateTestFiller,

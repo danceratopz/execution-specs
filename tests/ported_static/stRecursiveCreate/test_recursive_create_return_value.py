@@ -27,7 +27,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stRecursiveCreate/recursiveCreateReturnValueFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Berlin")
 @pytest.mark.valid_until("Prague")
 @pytest.mark.pre_alloc_mutable
 def test_recursive_create_return_value(

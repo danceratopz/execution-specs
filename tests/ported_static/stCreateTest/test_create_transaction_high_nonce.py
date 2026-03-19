@@ -28,7 +28,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stCreateTest/CreateTransactionHighNonceFiller.yml",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Frontier")
 @pytest.mark.parametrize(
     "tx_value",
     [

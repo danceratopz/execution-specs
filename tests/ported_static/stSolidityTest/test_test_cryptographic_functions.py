@@ -26,7 +26,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stSolidityTest/TestCryptographicFunctionsFiller.json",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("Byzantium")
 @pytest.mark.valid_until("Prague")
 @pytest.mark.pre_alloc_mutable
 def test_test_cryptographic_functions(

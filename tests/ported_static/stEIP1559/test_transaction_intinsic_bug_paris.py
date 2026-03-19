@@ -26,7 +26,7 @@ REFERENCE_SPEC_VERSION = "N/A"
         "tests/static/state_tests/stEIP1559/transactionIntinsicBug_ParisFiller.yml",  # noqa: E501
     ],
 )
-@pytest.mark.valid_from("Cancun")
+@pytest.mark.valid_from("London")
 @pytest.mark.pre_alloc_mutable
 @pytest.mark.exception_test
 def test_transaction_intinsic_bug_paris(

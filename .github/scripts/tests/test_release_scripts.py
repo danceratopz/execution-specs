@@ -63,25 +63,28 @@ FORK_RANGES = [
 class TestGenerateBuildMatrixCLI:
     """CLI-level tests exercising real `.github/configs/feature.yaml`."""
 
-    def test_mainnet_multi_range_unsplit_legacy(self):
-        """--until=BPO2 without splits emits one entry per fork range."""
+    def test_mainnet_multi_range_splits(self):
+        """--until=BPO2 + splits>=2: per-range phase 1, per-group phase 2."""
         result = run_script(BUILD_MATRIX_SCRIPT, "mainnet")
         assert result.returncode == 0
         out = parse_matrix_output(result.stdout)
         matrix = json.loads(out["build_matrix"])
         pre_alloc = json.loads(out["pre_alloc_matrix"])
-        assert len(matrix) > 1
-        assert pre_alloc == []
-        assert out["pre_alloc_labels"] == ""
+        assert len(pre_alloc) > 1
+        assert all(e["from_fork"] and e["until_fork"] for e in pre_alloc)
+        assert out["pre_alloc_labels"] != ""
         assert out["feature_name"] == "mainnet"
         assert out["combine_labels"] != ""
         assert all(e["label"] for e in matrix)
-        assert all(e["from_fork"] and e["until_fork"] for e in matrix)
-        assert all(e["splits"] == 1 and e["group"] == 1 for e in matrix)
+        assert all(
+            e["from_fork"] == "" and e["until_fork"] == "" for e in matrix
+        )
+        assert all(e["splits"] >= 2 for e in matrix)
+        assert [e["group"] for e in matrix] == list(range(1, len(matrix) + 1))
 
     def test_single_fork_unsplit_legacy(self):
         """--fork=X without splits emits one unsplit entry."""
-        result = run_script(BUILD_MATRIX_SCRIPT, "benchmark")
+        result = run_script(BUILD_MATRIX_SCRIPT, "benchmark_fast")
         assert result.returncode == 0
         out = parse_matrix_output(result.stdout)
         matrix = json.loads(out["build_matrix"])

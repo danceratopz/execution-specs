@@ -1,0 +1,80 @@
+name: Generate Pre-Alloc Groups
+description: |
+  Run phase 1 of the grouped-split fill flow.
+
+  Executes `fill --generate-pre-alloc-groups` over either a single fork
+  (`--fork=X` features, empty `from_fork`/`until_fork`) or a fork range
+  (`--until=X` features, both set) and uploads the resulting
+  `fixtures_<release>/` directory as `pre-alloc-groups__<label>`.
+  Phase-2 runners download that artifact before fill so every runner
+  shares the same pre-alloc partition.
+inputs:
+  release_name:
+    description: "Name of the fixture release (feature name)"
+    required: true
+  label:
+    description: "Artifact label (fork-range label or fork name)"
+    required: true
+  from_fork:
+    description: "Fill from this fork (inclusive). Empty for --fork=X features."
+    default: ""
+  until_fork:
+    description: "Fill until this fork (inclusive). Empty for --fork=X features."
+    default: ""
+runs:
+  using: "composite"
+  steps:
+    - uses: ./.github/actions/setup-uv
+      with:
+        enable-cache: "false"
+    - uses: ./.github/actions/setup-env
+    - name: Install EEST
+      shell: bash
+      run: uv sync --no-progress
+    - name: Extract fixture release properties from config
+      id: properties
+      shell: bash
+      run: |
+        uv run -q .github/scripts/get_release_props.py ${{ inputs.release_name }} >> "$GITHUB_OUTPUT"
+    - uses: ./.github/actions/build-evm-base
+      id: evm-builder
+      with:
+        type: ${{ steps.properties.outputs.evm-type }}
+    - name: Generate pre-alloc groups
+      shell: bash
+      env:
+        FILL_PARAMS: ${{ steps.properties.outputs.fill-params }}
+        X_DIST: ${{ steps.evm-builder.outputs.x-dist }}
+        EVM_IMPL: ${{ steps.evm-builder.outputs.impl }}
+        EVM_BIN: ${{ steps.evm-builder.outputs.evm-bin }}
+        RELEASE_NAME: ${{ inputs.release_name }}
+        FROM_FORK: ${{ inputs.from_fork }}
+        UNTIL_FORK: ${{ inputs.until_fork }}
+      run: |
+        RANGE_ARGS=""
+        if [ -n "$FROM_FORK" ]; then
+          RANGE_ARGS="--from=$FROM_FORK --until=$UNTIL_FORK"
+        fi
+        OUTPUT_ARG="--output=fixtures_${RELEASE_NAME}"
+        EVM_ARG=""
+        if [ "$EVM_IMPL" != "eels" ]; then
+          EVM_ARG="--evm-bin=$EVM_BIN"
+        fi
+        # Exit code 5 (NO_TESTS_COLLECTED) is tolerable for fork ranges
+        # with no tests; any other nonzero exit is a real error.
+        set +e
+        uv run fill -n "$X_DIST" $EVM_ARG $FILL_PARAMS \
+          --generate-pre-alloc-groups $RANGE_ARGS $OUTPUT_ARG \
+          --build-name "$RELEASE_NAME" --no-html -qq
+        EXIT_CODE=$?
+        set -e
+        if [ "$EXIT_CODE" -ne 0 ] && [ "$EXIT_CODE" -ne 5 ]; then
+          exit "$EXIT_CODE"
+        fi
+    - name: Upload pre-alloc groups
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+      with:
+        name: pre-alloc-groups__${{ inputs.label }}
+        path: fixtures_${{ inputs.release_name }}/
+        retention-days: 1
+        if-no-files-found: ignore

@@ -5,6 +5,7 @@ Each test invokes the script via ``uv run`` to validate the actual CLI
 interface, matching how GitHub Actions calls them.
 """
 
+import importlib.util
 import json
 import subprocess
 import tarfile
@@ -38,45 +39,59 @@ def parse_matrix_output(stdout: str) -> dict[str, str]:
     }
 
 
-class TestGenerateBuildMatrix:
-    """Test generate_build_matrix.py."""
+_SPEC = importlib.util.spec_from_file_location(
+    "generate_build_matrix", BUILD_MATRIX_SCRIPT
+)
+assert _SPEC is not None and _SPEC.loader is not None
+gbm = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(gbm)
 
-    def test_split_feature_produces_entries_per_range(self):
-        """Verify a split feature expands into one entry per range."""
+
+FORK_RANGES = [
+    {"label": "pre-cancun", "from": "Frontier", "until": "Shanghai"},
+    {"label": "cancun", "from": "Cancun", "until": "Cancun"},
+    {"label": "prague", "from": "Prague", "until": "Prague"},
+    {"label": "osaka", "from": "Osaka", "until": "Osaka"},
+    {"label": "bpo", "from": "BPO1", "until": "BPO2"},
+    {"label": "amsterdam", "from": "Amsterdam", "until": "Amsterdam"},
+]
+
+
+class TestGenerateBuildMatrixCLI:
+    """CLI-level tests exercising real `.github/configs/feature.yaml`."""
+
+    def test_mainnet_multi_range_unsplit_legacy(self):
+        """--until=BPO2 without splits emits one entry per fork range."""
         result = run_script(BUILD_MATRIX_SCRIPT, "mainnet")
         assert result.returncode == 0
         out = parse_matrix_output(result.stdout)
         matrix = json.loads(out["build_matrix"])
+        pre_alloc = json.loads(out["pre_alloc_matrix"])
         assert len(matrix) > 1
+        assert pre_alloc == []
+        assert out["pre_alloc_labels"] == ""
         assert out["feature_name"] == "mainnet"
         assert out["combine_labels"] != ""
-        labels = [e["label"] for e in matrix]
-        assert all(lbl != "" for lbl in labels)
-        assert all(e["from_fork"] != "" for e in matrix)
-        assert all(e["until_fork"] != "" for e in matrix)
+        assert all(e["label"] for e in matrix)
+        assert all(e["from_fork"] and e["until_fork"] for e in matrix)
+        assert all(e["splits"] == 1 and e["group"] == 1 for e in matrix)
 
-    def test_unsplit_feature_produces_single_entry(self):
-        """Verify a feature without fork-ranges produces one entry."""
+    def test_single_fork_unsplit_legacy(self):
+        """--fork=X without splits emits one unsplit entry."""
         result = run_script(BUILD_MATRIX_SCRIPT, "benchmark")
         assert result.returncode == 0
         out = parse_matrix_output(result.stdout)
         matrix = json.loads(out["build_matrix"])
+        pre_alloc = json.loads(out["pre_alloc_matrix"])
         assert len(matrix) == 1
-        assert out["feature_name"] == "benchmark"
+        assert pre_alloc == []
         assert out["combine_labels"] == ""
+        assert out["pre_alloc_labels"] == ""
         assert matrix[0]["label"] == ""
         assert matrix[0]["from_fork"] == ""
         assert matrix[0]["until_fork"] == ""
-
-    def test_feature_only_can_be_requested_explicitly(self):
-        """Verify feature_only entries work when named directly."""
-        result = run_script(BUILD_MATRIX_SCRIPT, "bal")
-        assert result.returncode == 0
-        out = parse_matrix_output(result.stdout)
-        matrix = json.loads(out["build_matrix"])
-        assert len(matrix) == 1
-        assert matrix[0]["feature"] == "bal"
-        assert out["combine_labels"] == ""
+        assert matrix[0]["splits"] == 1
+        assert matrix[0]["group"] == 1
 
     def test_unknown_feature_fails(self):
         """Verify error exit for unknown feature name."""
@@ -95,10 +110,89 @@ class TestGenerateBuildMatrix:
         result = run_script(BUILD_MATRIX_SCRIPT, "mainnet")
         assert result.returncode == 0
         lines = result.stdout.strip().splitlines()
-        assert len(lines) == 3
-        assert lines[0].startswith("build_matrix=")
-        assert lines[1].startswith("feature_name=")
-        assert lines[2].startswith("combine_labels=")
+        expected = [
+            "build_matrix=",
+            "pre_alloc_matrix=",
+            "pre_alloc_labels=",
+            "feature_name=",
+            "combine_labels=",
+        ]
+        assert len(lines) == len(expected)
+        for line, prefix in zip(lines, expected, strict=True):
+            assert line.startswith(prefix)
+
+
+class TestBuildMatrixShapes:
+    """Unit tests over ``build_matrix()`` covering every split shape."""
+
+    def test_until_multi_range_splits(self):
+        """--until=X + splits>=2: per-range phase 1, per-group phase 2."""
+        feature = {"fill-params": "--until=Osaka", "splits": 4}
+        result = gbm.build_matrix(feature, "mainnet", FORK_RANGES)
+        assert len(result["pre_alloc_matrix"]) == 4
+        assert [e["label"] for e in result["pre_alloc_matrix"]] == [
+            "pre-cancun",
+            "cancun",
+            "prague",
+            "osaka",
+        ]
+        assert result["pre_alloc_labels"] == ("pre-cancun cancun prague osaka")
+        assert len(result["build_matrix"]) == 4
+        assert [e["group"] for e in result["build_matrix"]] == [1, 2, 3, 4]
+        assert all(e["splits"] == 4 for e in result["build_matrix"])
+        assert all(
+            e["from_fork"] == "" and e["until_fork"] == ""
+            for e in result["build_matrix"]
+        )
+        assert result["combine_labels"] == "1 2 3 4"
+
+    def test_single_fork_splits(self):
+        """--fork=X + splits>=2: single phase 1, per-group phase 2."""
+        feature = {"fill-params": "--fork=Osaka", "splits": 3}
+        result = gbm.build_matrix(feature, "benchmark", FORK_RANGES)
+        assert len(result["pre_alloc_matrix"]) == 1
+        assert result["pre_alloc_matrix"][0]["label"] == "osaka"
+        assert result["pre_alloc_matrix"][0]["from_fork"] == ""
+        assert result["pre_alloc_matrix"][0]["until_fork"] == ""
+        assert result["pre_alloc_labels"] == "osaka"
+        assert len(result["build_matrix"]) == 3
+        assert [e["group"] for e in result["build_matrix"]] == [1, 2, 3]
+        assert result["combine_labels"] == "1 2 3"
+
+    def test_single_fork_single_split_legacy(self):
+        """--fork=X + splits=1: single unsplit entry, no phase 1."""
+        feature = {"fill-params": "--fork=Amsterdam", "splits": 1}
+        result = gbm.build_matrix(feature, "bal", FORK_RANGES)
+        assert result["pre_alloc_matrix"] == []
+        assert result["pre_alloc_labels"] == ""
+        assert len(result["build_matrix"]) == 1
+        entry = result["build_matrix"][0]
+        assert entry == {
+            "feature": "bal",
+            "label": "",
+            "from_fork": "",
+            "until_fork": "",
+            "splits": 1,
+            "group": 1,
+        }
+        assert result["combine_labels"] == ""
+
+    def test_until_clamps_to_final_range(self):
+        """Ranges beyond --until are clamped and dropped."""
+        feature = {"fill-params": "--until=Cancun", "splits": 2}
+        result = gbm.build_matrix(feature, "mainnet", FORK_RANGES)
+        assert [e["label"] for e in result["pre_alloc_matrix"]] == [
+            "pre-cancun",
+            "cancun",
+        ]
+
+    def test_splits_default_is_one(self):
+        """A feature without an explicit splits field falls back to 1."""
+        feature = {"fill-params": "--fork=Osaka"}
+        result = gbm.build_matrix(feature, "benchmark", FORK_RANGES)
+        assert result["pre_alloc_matrix"] == []
+        assert len(result["build_matrix"]) == 1
+        assert result["build_matrix"][0]["splits"] == 1
 
 
 class TestCreateReleaseTarball:

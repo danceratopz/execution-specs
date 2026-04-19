@@ -11,8 +11,20 @@ inputs:
     description: "Fill until this fork (inclusive). Empty for unsplit builds."
     default: ""
   split_label:
-    description: "Label for this fork-range split. Empty for unsplit builds."
+    description: "Label for this split artifact. Empty for unsplit builds."
     default: ""
+  splits:
+    description: "Total number of grouped-split groups (>=2 enables grouped-split)."
+    default: "1"
+  group:
+    description: "1-based group index when splits>=2."
+    default: "1"
+  use_pre_alloc_groups:
+    description: "Pass --use-pre-alloc-groups when 'true'."
+    default: "false"
+  store_durations:
+    description: "Pass --store-durations (and upload durations__<label>) when 'true'."
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -26,9 +38,11 @@ runs:
     - name: Extract fixture release properties from config
       id: properties
       shell: bash
+      env:
+        RELEASE_NAME: ${{ inputs.release_name }}
       run: |
-        echo "release_name=${{ inputs.release_name }}"
-        uv run -q .github/scripts/get_release_props.py ${{ inputs.release_name }} >> "$GITHUB_OUTPUT"
+        echo "release_name=${RELEASE_NAME}"
+        uv run -q .github/scripts/get_release_props.py "${RELEASE_NAME}" >> "$GITHUB_OUTPUT"
     - uses: ./.github/actions/build-evm-base
       id: evm-builder
       with:
@@ -39,24 +53,59 @@ runs:
       run: sudo apt-get install -y pigz
     - name: Generate fixtures using fill
       shell: bash
+      env:
+        RELEASE_NAME: ${{ inputs.release_name }}
+        SPLIT_LABEL: ${{ inputs.split_label }}
+        FROM_FORK: ${{ inputs.from_fork }}
+        UNTIL_FORK: ${{ inputs.until_fork }}
+        SPLITS: ${{ inputs.splits }}
+        GROUP: ${{ inputs.group }}
+        USE_PRE_ALLOC_GROUPS: ${{ inputs.use_pre_alloc_groups }}
+        STORE_DURATIONS: ${{ inputs.store_durations }}
+        FILL_PARAMS: ${{ steps.properties.outputs.fill-params }}
+        X_DIST: ${{ steps.evm-builder.outputs.x-dist }}
+        EVM_IMPL: ${{ steps.evm-builder.outputs.impl }}
+        EVM_BIN: ${{ steps.evm-builder.outputs.evm-bin }}
       run: |
-        IS_SPLIT="${{ inputs.split_label }}"
-
-        if [ -n "$IS_SPLIT" ]; then
-          OUTPUT_ARG="--output=fixtures_${{ inputs.release_name }}"
-          FORK_ARGS="--from=${{ inputs.from_fork }} --until=${{ inputs.until_fork }}"
+        if [ -n "$SPLIT_LABEL" ]; then
+          OUTPUT_ARG="--output=fixtures_${RELEASE_NAME}"
         else
-          OUTPUT_ARG="--output=fixtures_${{ inputs.release_name }}.tar.gz"
-          FORK_ARGS=""
+          OUTPUT_ARG="--output=fixtures_${RELEASE_NAME}.tar.gz"
         fi
 
-        # Allow exit code 5 (NO_TESTS_COLLECTED) for fork ranges with no tests.
-        EXIT_CODE=0
-        if [ "${{ steps.evm-builder.outputs.impl }}" = "eels" ]; then
-          uv run fill -n ${{ steps.evm-builder.outputs.x-dist }} ${{ steps.properties.outputs.fill-params }} $FORK_ARGS $OUTPUT_ARG --build-name ${{ inputs.release_name }} --no-html --durations=100 --log-level=DEBUG || EXIT_CODE=$?
-        else
-          uv run fill -n ${{ steps.evm-builder.outputs.x-dist }} --evm-bin=${{ steps.evm-builder.outputs.evm-bin }} ${{ steps.properties.outputs.fill-params }} $FORK_ARGS $OUTPUT_ARG --build-name ${{ inputs.release_name }} --no-html --durations=100 --log-level=DEBUG || EXIT_CODE=$?
+        FORK_ARGS=""
+        if [ -n "$FROM_FORK" ]; then
+          FORK_ARGS="--from=$FROM_FORK --until=$UNTIL_FORK"
         fi
+
+        SPLIT_ARGS=""
+        if [ "$SPLITS" -ge 2 ]; then
+          SPLIT_ARGS="--grouped-split --splits=$SPLITS --group=$GROUP --durations-path=.test_durations"
+        fi
+
+        EXTRA_ARGS=""
+        if [ "$USE_PRE_ALLOC_GROUPS" = "true" ]; then
+          EXTRA_ARGS="$EXTRA_ARGS --use-pre-alloc-groups"
+        fi
+        if [ "$STORE_DURATIONS" = "true" ]; then
+          EXTRA_ARGS="$EXTRA_ARGS --store-durations"
+        fi
+
+        EVM_ARG=""
+        if [ "$EVM_IMPL" != "eels" ]; then
+          EVM_ARG="--evm-bin=$EVM_BIN"
+        fi
+
+        # Exit code 5 (NO_TESTS_COLLECTED) is tolerable for fork ranges
+        # or grouped-split groups that end up empty; any other nonzero
+        # exit is a real error.
+        set +e
+        uv run fill -n "$X_DIST" $EVM_ARG $FILL_PARAMS $FORK_ARGS \
+          $SPLIT_ARGS $EXTRA_ARGS $OUTPUT_ARG \
+          --build-name "$RELEASE_NAME" --no-html \
+          --durations=100 --log-level=DEBUG
+        EXIT_CODE=$?
+        set -e
         if [ "$EXIT_CODE" -ne 0 ] && [ "$EXIT_CODE" -ne 5 ]; then
           exit "$EXIT_CODE"
         fi
@@ -84,4 +133,12 @@ runs:
         name: fixtures__${{ inputs.split_label }}
         include-hidden-files: true
         path: fixtures_${{ inputs.release_name }}/
+        if-no-files-found: ignore
+    - name: Upload per-split durations
+      if: inputs.store_durations == 'true' && inputs.split_label != ''
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+      with:
+        name: durations__${{ inputs.split_label }}
+        include-hidden-files: true
+        path: .test_durations
         if-no-files-found: ignore

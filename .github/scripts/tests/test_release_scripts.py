@@ -19,6 +19,7 @@ BUILD_MATRIX_SCRIPT = SCRIPTS_DIR / "generate_build_matrix.py"
 TARBALL_SCRIPT = SCRIPTS_DIR / "create_release_tarball.py"
 MERGE_INDEX_SCRIPT = SCRIPTS_DIR / "merge_index_files.py"
 DOWNLOAD_DURATIONS_SCRIPT = SCRIPTS_DIR / "download_latest_durations.py"
+FAN_IN_FIXTURES_SCRIPT = SCRIPTS_DIR / "fan_in_fixtures.py"
 
 
 def run_script(script: Path, *args: str) -> subprocess.CompletedProcess:
@@ -517,5 +518,155 @@ class TestDownloadLatestDurations:
     def test_no_args_fails(self):
         """Verify error when no feature arg provided."""
         result = run_script(DOWNLOAD_DURATIONS_SCRIPT)
+        assert result.returncode == 1
+        assert "Usage" in result.stderr
+
+
+def _run_fan_in(*args: str) -> subprocess.CompletedProcess:
+    """Run fan_in_fixtures.py via uv run python."""
+    return subprocess.run(
+        ["uv", "run", "python", str(FAN_IN_FIXTURES_SCRIPT), *args],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+    )
+
+
+def _write_split(
+    root: Path,
+    *,
+    label: str,
+    fork: str,
+    test_id: str,
+    fixture_format: str,
+    relpath: str,
+    fixture_hash: str,
+) -> Path:
+    """Create a realistic per-runner split directory; return its path."""
+    split = root / f"fixtures__{label}"
+    fixture_dir = split / Path(relpath).parent
+    fixture_dir.mkdir(parents=True, exist_ok=True)
+    (split / relpath).write_text(json.dumps({"test": test_id, "fork": fork}))
+    meta = split / ".meta"
+    meta.mkdir(parents=True, exist_ok=True)
+    (meta / "index.json").write_text(
+        json.dumps(
+            {
+                "root_hash": None,
+                "created_at": "2026-01-01T00:00:00",
+                "test_count": 1,
+                "forks": [fork],
+                "fixture_formats": [fixture_format],
+                "test_cases": [
+                    {
+                        "id": test_id,
+                        "json_path": relpath,
+                        "fixture_hash": fixture_hash,
+                        "fork": fork,
+                        "format": fixture_format,
+                    }
+                ],
+            }
+        )
+    )
+    return split
+
+
+class TestFanInFixtures:
+    """Test fan_in_fixtures.py merges split trees and indexes."""
+
+    def test_fans_in_two_splits(self, tmp_path):
+        """Union both splits' fixture files and merge their indexes."""
+        split_a = _write_split(
+            tmp_path,
+            label="1",
+            fork="Cancun",
+            test_id="test_a",
+            fixture_format="state_test",
+            relpath="state_tests/for_cancun/t.json",
+            fixture_hash="0x" + "11" * 32,
+        )
+        split_b = _write_split(
+            tmp_path,
+            label="2",
+            fork="Prague",
+            test_id="test_b",
+            fixture_format="blockchain_test",
+            relpath="blockchain_tests/for_prague/t.json",
+            fixture_hash="0x" + "22" * 32,
+        )
+        combined = tmp_path / "combined"
+
+        result = _run_fan_in(
+            str(combined),
+            str(split_a),
+            str(split_b),
+        )
+        assert result.returncode == 0
+
+        assert (combined / "state_tests/for_cancun/t.json").exists()
+        assert (combined / "blockchain_tests/for_prague/t.json").exists()
+
+        merged_index = combined / ".meta" / "index.json"
+        assert merged_index.exists()
+        merged = json.loads(merged_index.read_text())
+        assert merged["test_count"] == 2
+        assert {c["id"] for c in merged["test_cases"]} == {
+            "test_a",
+            "test_b",
+        }
+        assert merged["root_hash"] is not None
+
+    def test_merges_shared_subdir_without_collision(self, tmp_path):
+        """Two splits writing to the same subdir coexist after fan-in."""
+        split_a = _write_split(
+            tmp_path,
+            label="1",
+            fork="Cancun",
+            test_id="test_a",
+            fixture_format="state_test",
+            relpath="state_tests/shared/a.json",
+            fixture_hash="0x" + "33" * 32,
+        )
+        split_b = _write_split(
+            tmp_path,
+            label="2",
+            fork="Cancun",
+            test_id="test_b",
+            fixture_format="state_test",
+            relpath="state_tests/shared/b.json",
+            fixture_hash="0x" + "44" * 32,
+        )
+        combined = tmp_path / "combined"
+
+        result = _run_fan_in(str(combined), str(split_a), str(split_b))
+        assert result.returncode == 0
+
+        assert (combined / "state_tests/shared/a.json").exists()
+        assert (combined / "state_tests/shared/b.json").exists()
+
+    def test_skips_missing_split(self, tmp_path):
+        """Nonexistent split path is skipped with a notice."""
+        split_a = _write_split(
+            tmp_path,
+            label="1",
+            fork="Cancun",
+            test_id="test_a",
+            fixture_format="state_test",
+            relpath="state_tests/for_cancun/t.json",
+            fixture_hash="0x" + "55" * 32,
+        )
+        combined = tmp_path / "combined"
+        missing = tmp_path / "fixtures__nope"
+
+        result = _run_fan_in(str(combined), str(split_a), str(missing))
+        assert result.returncode == 0
+        assert "Skipping missing split dir" in result.stdout
+        merged = json.loads((combined / ".meta" / "index.json").read_text())
+        assert merged["test_count"] == 1
+
+    def test_no_args_fails(self):
+        """Verify error when arguments are missing."""
+        result = _run_fan_in()
         assert result.returncode == 1
         assert "Usage" in result.stderr

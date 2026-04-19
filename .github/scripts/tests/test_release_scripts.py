@@ -7,6 +7,7 @@ interface, matching how GitHub Actions calls them.
 
 import importlib.util
 import json
+import os
 import subprocess
 import tarfile
 from pathlib import Path
@@ -17,6 +18,7 @@ REPO_ROOT = SCRIPTS_DIR.parent.parent
 BUILD_MATRIX_SCRIPT = SCRIPTS_DIR / "generate_build_matrix.py"
 TARBALL_SCRIPT = SCRIPTS_DIR / "create_release_tarball.py"
 MERGE_INDEX_SCRIPT = SCRIPTS_DIR / "merge_index_files.py"
+DOWNLOAD_DURATIONS_SCRIPT = SCRIPTS_DIR / "download_latest_durations.py"
 
 
 def run_script(script: Path, *args: str) -> subprocess.CompletedProcess:
@@ -376,5 +378,144 @@ class TestMergeIndexFiles:
     def test_no_args_fails(self):
         """Verify error when no arguments provided."""
         result = _run_merge_script()
+        assert result.returncode == 1
+        assert "Usage" in result.stderr
+
+
+FAKE_GH_SOURCE = '''#!/usr/bin/env python3
+"""Fake `gh` CLI stub driven by files in $GH_FAKE_STATE_DIR."""
+
+import os
+import sys
+from pathlib import Path
+
+state = Path(os.environ["GH_FAKE_STATE_DIR"])
+
+if sys.argv[1] == "api":
+    rc = int((state / "api_rc.txt").read_text())
+    if rc == 0:
+        sys.stdout.write((state / "api_payload.txt").read_text())
+    else:
+        sys.stderr.write("gh api failed\\n")
+    sys.exit(rc)
+
+if sys.argv[1:3] == ["run", "download"]:
+    rc = int((state / "download_rc.txt").read_text())
+    creates = (state / "download_creates_file.txt").read_text() == "1"
+    if rc == 0 and creates:
+        dir_idx = sys.argv.index("--dir")
+        target = Path(sys.argv[dir_idx + 1])
+        (target / ".test_durations").write_text("{}")
+    if rc != 0:
+        sys.stderr.write("gh run download failed\\n")
+    sys.exit(rc)
+
+sys.exit(2)
+'''
+
+
+class TestDownloadLatestDurations:
+    """Exercise download_latest_durations.py via fake `gh` on PATH."""
+
+    def _setup(
+        self,
+        tmp_path,
+        *,
+        api_payload='{"artifacts": []}',
+        api_rc=0,
+        download_rc=0,
+        download_creates_file=False,
+    ):
+        """Create fake gh + state dir. Return (bin_dir, state, cwd)."""
+        bin_dir = tmp_path / "bin"
+        bin_dir.mkdir()
+        state = tmp_path / "state"
+        state.mkdir()
+        cwd = tmp_path / "work"
+        cwd.mkdir()
+
+        (state / "api_payload.txt").write_text(api_payload)
+        (state / "api_rc.txt").write_text(str(api_rc))
+        (state / "download_rc.txt").write_text(str(download_rc))
+        (state / "download_creates_file.txt").write_text(
+            "1" if download_creates_file else "0"
+        )
+
+        gh = bin_dir / "gh"
+        gh.write_text(FAKE_GH_SOURCE)
+        gh.chmod(0o755)
+        return bin_dir, state, cwd
+
+    def _run(self, tmp_path, bin_dir, state, cwd, *, repo="owner/repo"):
+        """Run the script with fake gh on PATH; return (result, summary)."""
+        summary = tmp_path / "step_summary.md"
+        summary.write_text("")
+        env = {k: v for k, v in os.environ.items() if k != "GITHUB_REPOSITORY"}
+        env["PATH"] = f"{bin_dir}{os.pathsep}{env['PATH']}"
+        env["GH_FAKE_STATE_DIR"] = str(state)
+        env["GITHUB_STEP_SUMMARY"] = str(summary)
+        if repo is not None:
+            env["GITHUB_REPOSITORY"] = repo
+        result = subprocess.run(
+            [
+                "uv",
+                "run",
+                "-q",
+                str(DOWNLOAD_DURATIONS_SCRIPT),
+                "mainnet",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=cwd,
+            env=env,
+        )
+        return result, summary
+
+    def test_no_prior_artifact_warns(self, tmp_path):
+        """Empty artifact list emits warning; no .test_durations created."""
+        bin_dir, state, cwd = self._setup(tmp_path)
+        result, summary = self._run(tmp_path, bin_dir, state, cwd)
+
+        assert result.returncode == 0
+        assert "::warning::" in result.stderr
+        assert not (cwd / ".test_durations").exists()
+        assert "No previous" in summary.read_text()
+
+    def test_successful_download_populates_file(self, tmp_path):
+        """Matching artifact => .test_durations downloaded; summary set."""
+        payload = json.dumps({"artifacts": [{"workflow_run": {"id": 4242}}]})
+        bin_dir, state, cwd = self._setup(
+            tmp_path,
+            api_payload=payload,
+            download_creates_file=True,
+        )
+        result, summary = self._run(tmp_path, bin_dir, state, cwd)
+
+        assert result.returncode == 0
+        assert (cwd / ".test_durations").exists()
+        text = summary.read_text()
+        assert "Downloaded" in text
+        assert "4242" in text
+
+    def test_gh_api_failure_warns(self, tmp_path):
+        """Nonzero gh api exit => warning + clean exit."""
+        bin_dir, state, cwd = self._setup(tmp_path, api_rc=1)
+        result, _ = self._run(tmp_path, bin_dir, state, cwd)
+
+        assert result.returncode == 0
+        assert "::warning::" in result.stderr
+        assert not (cwd / ".test_durations").exists()
+
+    def test_missing_repo_env_errors(self, tmp_path):
+        """Missing GITHUB_REPOSITORY => nonzero exit."""
+        bin_dir, state, cwd = self._setup(tmp_path)
+        result, _ = self._run(tmp_path, bin_dir, state, cwd, repo=None)
+
+        assert result.returncode == 1
+        assert "GITHUB_REPOSITORY" in result.stderr
+
+    def test_no_args_fails(self):
+        """Verify error when no feature arg provided."""
+        result = run_script(DOWNLOAD_DURATIONS_SCRIPT)
         assert result.returncode == 1
         assert "Usage" in result.stderr

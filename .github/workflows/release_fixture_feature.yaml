@@ -5,12 +5,19 @@ on:
     tags:
       - "tests-*@v*"
   workflow_dispatch:
+    inputs:
+      feature_name:
+        description: "Feature to build (e.g. mainnet). Required for dispatch."
+        required: true
+        type: string
 
 jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
       build_matrix: ${{ steps.matrix.outputs.build_matrix }}
+      pre_alloc_matrix: ${{ steps.matrix.outputs.pre_alloc_matrix }}
+      pre_alloc_labels: ${{ steps.matrix.outputs.pre_alloc_labels }}
       feature_name: ${{ steps.matrix.outputs.feature_name }}
       combine_labels: ${{ steps.matrix.outputs.combine_labels }}
     steps:
@@ -18,18 +25,64 @@ jobs:
         with:
           submodules: false
       - uses: ./.github/actions/setup-uv
-
       - name: Generate build matrix
         id: matrix
         shell: bash
+        env:
+          FEATURE_INPUT: ${{ inputs.feature_name }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          FEATURE_PREFIX="${GITHUB_REF_NAME//@*/}"
-          FEATURE_NAME="${FEATURE_PREFIX#tests-}"
+          if [ -n "$FEATURE_INPUT" ]; then
+            FEATURE_NAME="$FEATURE_INPUT"
+          else
+            FEATURE_PREFIX="${REF_NAME%@*}"
+            FEATURE_NAME="${FEATURE_PREFIX#tests-}"
+          fi
           uv run -q .github/scripts/generate_build_matrix.py "$FEATURE_NAME" >> "$GITHUB_OUTPUT"
+
+  generate-pre-alloc:
+    name: pre-alloc (${{ matrix.label }})
+    needs: setup
+    if: needs.setup.outputs.pre_alloc_matrix != '[]'
+    runs-on: [self-hosted-ghr, size-gigachungus-x64]
+    timeout-minutes: 120
+    strategy:
+      fail-fast: true
+      matrix:
+        include: ${{ fromJson(needs.setup.outputs.pre_alloc_matrix) }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          submodules: true
+      - name: Fetch lllc
+        uses: ./.github/actions/fetch-binary
+        with:
+          version: v1.0.0
+          repo_owner: felix314159
+          repo_name: lllc-custom
+          remote_name: lllc
+          binary_name: lllc
+          expected_sha256: 865a0d5379acb3b5471337b5dcf686a2dd71587c6b65b9da6c963de627e0b300
+      - name: Fetch Solidity
+        uses: ./.github/actions/fetch-binary
+        with:
+          version: v0.8.24
+          repo_owner: ethereum
+          repo_name: solidity
+          remote_name: solc-static-linux
+          binary_name: solc
+          expected_sha256: fb03a29a517452b9f12bcf459ef37d0a543765bb3bbc911e70a87d6a37c30d5f
+      - uses: ./.github/actions/generate-pre-alloc
+        with:
+          release_name: ${{ matrix.feature }}
+          label: ${{ matrix.label }}
+          from_fork: ${{ matrix.from_fork }}
+          until_fork: ${{ matrix.until_fork }}
 
   build:
     name: fill (${{ matrix.label || matrix.feature }})
-    needs: setup
+    needs: [setup, generate-pre-alloc]
+    if: always() && needs.setup.result == 'success' && (needs.generate-pre-alloc.result == 'success' || needs.generate-pre-alloc.result == 'skipped')
     runs-on: [self-hosted-ghr, size-gigachungus-x64]
     timeout-minutes: 1440
     strategy:
@@ -40,7 +93,6 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           submodules: true
-
       - name: Fetch lllc
         uses: ./.github/actions/fetch-binary
         with:
@@ -50,7 +102,6 @@ jobs:
           remote_name: lllc
           binary_name: lllc
           expected_sha256: 865a0d5379acb3b5471337b5dcf686a2dd71587c6b65b9da6c963de627e0b300
-
       - name: Fetch Solidity
         uses: ./.github/actions/fetch-binary
         with:
@@ -61,12 +112,53 @@ jobs:
           binary_name: solc
           expected_sha256: fb03a29a517452b9f12bcf459ef37d0a543765bb3bbc911e70a87d6a37c30d5f
 
+      - uses: ./.github/actions/setup-uv
+        if: matrix.splits >= 2
+        with:
+          enable-cache: "false"
+
+      - name: Download pre-alloc groups
+        if: matrix.splits >= 2 && needs.setup.outputs.pre_alloc_labels != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.run_id }}
+          LABELS: ${{ needs.setup.outputs.pre_alloc_labels }}
+          DIR: fixtures_${{ matrix.feature }}
+        run: |
+          mkdir -p "$DIR"
+          for label in $LABELS; do
+            echo "Downloading pre-alloc-groups__${label}"
+            gh run download "$RUN_ID" -n "pre-alloc-groups__${label}" --dir "$DIR"
+          done
+
+      - name: Download latest durations
+        if: matrix.splits >= 2
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          FEATURE: ${{ matrix.feature }}
+        run: uv run -q .github/scripts/download_latest_durations.py "$FEATURE"
+
+      - name: Normalize durations (strip xdist suffixes)
+        if: matrix.splits >= 2
+        shell: bash
+        run: |
+          if [ -f .test_durations ]; then
+            uv run python .github/scripts/normalize_durations.py
+          fi
+
       - uses: ./.github/actions/build-fixtures
         with:
           release_name: ${{ matrix.feature }}
           from_fork: ${{ matrix.from_fork }}
           until_fork: ${{ matrix.until_fork }}
           split_label: ${{ matrix.label }}
+          splits: ${{ matrix.splits }}
+          group: ${{ matrix.group }}
+          use_pre_alloc_groups: ${{ needs.setup.outputs.pre_alloc_labels != '' && 'true' || 'false' }}
+          store_durations: ${{ matrix.splits >= 2 && 'true' || 'false' }}
 
   combine:
     name: combine (${{ needs.setup.outputs.feature_name }})
@@ -80,46 +172,100 @@ jobs:
       - uses: ./.github/actions/setup-uv
       - name: Install pigz
         run: sudo apt-get install -y pigz
-      - name: Download and merge split artifacts
+
+      - name: Download split fixture artifacts
         shell: bash
-        run: |
-          mkdir -p combined
-          for label in ${{ needs.setup.outputs.combine_labels }}; do
-            echo "Downloading: fixtures__${label}"
-            if gh run download ${{ github.run_id }} -n "fixtures__${label}" --dir "split_artifacts/fixtures__${label}"; then
-              cp -r "split_artifacts/fixtures__${label}"/* combined/
-            else
-              echo "No artifact for ${label} (no tests collected, skipping)"
-            fi
-          done
-          echo "Combined directory contents:"
-          find combined -maxdepth 3 -type d | head -30 || true
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Merge split index files
+          RUN_ID: ${{ github.run_id }}
+          LABELS: ${{ needs.setup.outputs.combine_labels }}
+        run: |
+          for label in $LABELS; do
+            echo "Downloading fixtures__${label}"
+            gh run download "$RUN_ID" -n "fixtures__${label}" --dir "split_artifacts/fixtures__${label}" || true
+          done
+
+      - name: Fan in split fixtures
         shell: bash
+        env:
+          LABELS: ${{ needs.setup.outputs.combine_labels }}
         run: |
           SPLIT_DIRS=()
-          for label in ${{ needs.setup.outputs.combine_labels }}; do
+          for label in $LABELS; do
             dir="split_artifacts/fixtures__${label}"
             if [ -d "$dir" ]; then
               SPLIT_DIRS+=("$dir")
             fi
           done
           if [ ${#SPLIT_DIRS[@]} -gt 0 ]; then
-            uv run python .github/scripts/merge_index_files.py combined/.meta/index.json "${SPLIT_DIRS[@]}"
+            uv run python .github/scripts/fan_in_fixtures.py combined "${SPLIT_DIRS[@]}"
           fi
+
+      - name: Download split durations
+        if: needs.setup.outputs.pre_alloc_labels != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.run_id }}
+          LABELS: ${{ needs.setup.outputs.combine_labels }}
+        run: |
+          for label in $LABELS; do
+            echo "Downloading durations__${label}"
+            gh run download "$RUN_ID" -n "durations__${label}" --dir "durations_artifacts/${label}" || true
+          done
+
+      - name: Merge split durations
+        if: needs.setup.outputs.pre_alloc_labels != ''
+        shell: bash
+        env:
+          LABELS: ${{ needs.setup.outputs.combine_labels }}
+        run: |
+          FILES=()
+          for label in $LABELS; do
+            f="durations_artifacts/${label}/.test_durations"
+            if [ -f "$f" ]; then
+              FILES+=("$f")
+            fi
+          done
+          if [ ${#FILES[@]} -gt 0 ]; then
+            uv run python .github/scripts/merge_durations_files.py .test_durations "${FILES[@]}"
+          fi
+
+      - name: Upload merged durations
+        if: needs.setup.outputs.pre_alloc_labels != '' && hashFiles('.test_durations') != ''
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: durations_${{ needs.setup.outputs.feature_name }}
+          include-hidden-files: true
+          path: .test_durations
+
       - name: Free disk space
-        run: rm -rf split_artifacts/
+        run: rm -rf split_artifacts/ durations_artifacts/
+
       - name: Create release tarball
         shell: bash
-        run: |
-          uv run -q .github/scripts/create_release_tarball.py combined fixtures_${{ needs.setup.outputs.feature_name }}.tar.gz
+        env:
+          FEATURE_NAME: ${{ needs.setup.outputs.feature_name }}
+        run: uv run -q .github/scripts/create_release_tarball.py combined "fixtures_${FEATURE_NAME}.tar.gz"
+
       - name: Upload combined fixture tarball
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: fixtures_${{ needs.setup.outputs.feature_name }}
           path: fixtures_${{ needs.setup.outputs.feature_name }}.tar.gz
+
+      - name: Generate Benchmark Genesis Files
+        if: contains(needs.setup.outputs.feature_name, 'benchmark')
+        uses: ./.github/actions/build-benchmark-genesis
+        with:
+          fixtures_path: fixtures_${{ needs.setup.outputs.feature_name }}.tar.gz
+
+      - name: Upload Benchmark Genesis Artifact
+        if: contains(needs.setup.outputs.feature_name, 'benchmark')
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: benchmark_genesis_${{ needs.setup.outputs.feature_name }}
+          path: benchmark_genesis.tar.gz
 
   release:
     runs-on: ubuntu-latest
@@ -135,14 +281,20 @@ jobs:
 
       - name: Download release artifacts
         shell: bash
-        run: |
-          gh run download ${{ github.run_id }} -p "fixtures_*" --dir ./artifacts
-          rm -rf ./artifacts/fixtures__*/
-          gh run download ${{ github.run_id }} -p "benchmark_genesis_*" --dir ./artifacts || true
         env:
           GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          gh run download "$RUN_ID" -p "fixtures_*" --dir ./artifacts
+          rm -rf ./artifacts/fixtures__*/
+          gh run download "$RUN_ID" -p "benchmark_genesis_*" --dir ./artifacts || true
 
       - name: Draft release on EELS (canonical)
+        shell: bash
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+          FEATURE_NAME: ${{ needs.setup.outputs.feature_name }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           FEATURE_PREFIX="${TAG_NAME%%@*}"
           PREV_TAG=$(
@@ -159,12 +311,13 @@ jobs:
             RELEASE_ARGS+=(--notes-start-tag "$PREV_TAG")
           fi
           gh release create "$TAG_NAME" "${RELEASE_ARGS[@]}" ./artifacts/**/*.tar.gz
+
+      - name: Draft release on EEST (mirror)
+        shell: bash
         env:
           TAG_NAME: ${{ github.ref_name }}
           FEATURE_NAME: ${{ needs.setup.outputs.feature_name }}
-          GH_TOKEN: ${{ github.token }}
-
-      - name: Draft release on EEST (mirror)
+          GH_TOKEN: ${{ secrets.EEST_RELEASE_TOKEN }}
         run: |
           EEST_TAG="${TAG_NAME#tests-}"
           RELEASE_ARGS=(--repo ethereum/execution-spec-tests --draft)
@@ -173,7 +326,3 @@ jobs:
           fi
           RELEASE_ARGS+=(--notes "This release is mirrored from [ethereum/execution-specs ${TAG_NAME}](https://github.com/ethereum/execution-specs/releases/tag/${TAG_NAME}).")
           gh release create "$EEST_TAG" "${RELEASE_ARGS[@]}" ./artifacts/**/*.tar.gz
-        env:
-          TAG_NAME: ${{ github.ref_name }}
-          FEATURE_NAME: ${{ needs.setup.outputs.feature_name }}
-          GH_TOKEN: ${{ secrets.EEST_RELEASE_TOKEN }}

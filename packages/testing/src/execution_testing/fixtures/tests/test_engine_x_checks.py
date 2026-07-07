@@ -114,6 +114,86 @@ def test_payload_count_drift_raises(tmp_path: Path) -> None:
     assert "payload count" in str(exc_info.value)
 
 
+def _write_fixture_with_post(
+    folder: Path,
+    fixture_dir: str,
+    test_id: str,
+    payloads: List[Dict[str, Any]],
+    post_key: str,
+    post: Dict[str, Any],
+) -> None:
+    """Write a single-fixture file carrying a post-state section."""
+    file = folder / fixture_dir / "prague" / "module" / "test_a.json"
+    file.parent.mkdir(parents=True, exist_ok=True)
+    file.write_text(
+        json.dumps({test_id: {"engineNewPayloads": payloads, post_key: post}})
+    )
+
+
+def test_value_only_drift_raises(tmp_path: Path) -> None:
+    """
+    Identical payloads with a different stored value (the state-root scrub
+    blind spot) still fail via the post-state diff comparison.
+    """
+    payload = _payload(gas_used="0x5208", state_root="0x01", block_hash="0x02")
+    address = f"0x{'aa' * 20}"
+    _write_fixture_with_post(
+        tmp_path,
+        SIBLING_FIXTURES_DIR,
+        SIBLING_ID,
+        [payload],
+        "postState",
+        {address: {"balance": "0x01", "storage": {"0x01": "0x05"}}},
+    )
+    _write_fixture_with_post(
+        tmp_path,
+        ENGINE_X_FIXTURES_DIR,
+        ENGINE_X_ID,
+        [payload],
+        "postStateDiff",
+        {address: {"balance": "0x01", "storage": {"0x01": "0x06"}}},
+    )
+
+    with pytest.raises(EngineXExecutionDriftError) as exc_info:
+        verify_engine_x_execution(tmp_path)
+
+    message = str(exc_info.value)
+    assert "postStateDiff" in message
+    assert address in message
+
+
+def test_matching_post_state_diff_passes(tmp_path: Path) -> None:
+    """A diff whose accounts (incl. a deletion) match the sibling passes."""
+    payload = _payload(gas_used="0x5208", state_root="0x01", block_hash="0x02")
+    changed = f"0x{'aa' * 20}"
+    deleted = f"0x{'bb' * 20}"
+    untouched = f"0x{'cc' * 20}"
+    _write_fixture_with_post(
+        tmp_path,
+        SIBLING_FIXTURES_DIR,
+        SIBLING_ID,
+        [payload],
+        "postState",
+        {
+            changed: {"balance": "0x02"},
+            untouched: {"balance": "0x09"},
+        },
+    )
+    _write_fixture_with_post(
+        tmp_path,
+        ENGINE_X_FIXTURES_DIR,
+        ENGINE_X_ID,
+        [payload],
+        "postStateDiff",
+        {changed: {"balance": "0x02"}, deleted: None},
+    )
+
+    summary = verify_engine_x_execution(tmp_path)
+
+    assert summary is not None
+    assert "1 Engine X fixtures execute identically" in summary
+
+
 def test_no_sibling_fixtures_skips_check(tmp_path: Path) -> None:
     """An Engine X only fill (no sibling format tree) skips the check."""
     _write_fixture(

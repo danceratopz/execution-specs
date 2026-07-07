@@ -373,6 +373,11 @@ def pack_pre_alloc_groups(folder: Path) -> None:
                 )
             )
             for test_id in merged.test_ids:
+                # Phase 2 resolves a test's group through this index, so a
+                # test id in two groups would silently pick one of them.
+                assert test_id not in test_group_index, (
+                    f"Test {test_id!r} is in more than one pre-alloc group"
+                )
                 test_group_index[test_id] = packed_hash
 
     (folder / TEST_GROUP_INDEX_FILE).write_text(

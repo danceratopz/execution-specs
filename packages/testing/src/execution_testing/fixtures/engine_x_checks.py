@@ -81,6 +81,36 @@ def _describe_mismatch(base: List[Any], packed: List[Any]) -> str:
     return "payloads differ"
 
 
+def _post_state_mismatch(
+    sibling: Dict[str, Any], fixture: Dict[str, Any]
+) -> Optional[str]:
+    """
+    Compare the Engine X post-state diff against the sibling's post-state.
+
+    Scrubbing the state-root-derived payload fields leaves one blind spot:
+    a leaked account whose state a test reads and re-stores with identical
+    gas (a non-zero to non-zero dirty write of a derived value) changes only
+    stored values, not gas, receipts, or logs. The Engine X fixture's
+    `postStateDiff` holds every account its execution changed relative to
+    the group genesis; identical execution must produce the exact same
+    accounts in the sibling's full `postState` (a deleted account appears
+    as null in the diff and is absent from the sibling's post-state, so it
+    compares equal too).
+    """
+    post_state = sibling.get("postState")
+    diff = fixture.get("postStateDiff")
+    if post_state is None or diff is None:
+        return None
+    fields = sorted(
+        address
+        for address, account in diff.items()
+        if post_state.get(address) != account
+    )
+    if fields:
+        return f"postStateDiff differs in: {', '.join(fields)}"
+    return None
+
+
 def verify_engine_x_execution(output_dir: Path) -> Optional[str]:
     """
     Verify that pre-alloc group packing did not change any test's execution.
@@ -90,7 +120,9 @@ def verify_engine_x_execution(output_dir: Path) -> Optional[str]:
     `blockchain_test_engine` sibling fixture (filled against the test's own
     pre-allocation in the same session, with an independent `t8n` execution:
     Engine X fixtures never share the transition tool output cache). All
-    payload fields except the state-root-derived ones must match exactly.
+    payload fields except the state-root-derived ones must match exactly,
+    and the fixture's post-state diff must match the sibling's post-state
+    (see `_post_state_mismatch`).
 
     Return a summary string, or ``None`` when the check cannot run (no
     Engine X fixtures, or no sibling fixtures to compare against, e.g. when
@@ -128,6 +160,10 @@ def verify_engine_x_execution(output_dir: Path) -> Optional[str]:
             packed = _scrubbed_payloads(fixture)
             if base != packed:
                 mismatches.append((test_id, _describe_mismatch(base, packed)))
+                continue
+            post_state_mismatch = _post_state_mismatch(sibling, fixture)
+            if post_state_mismatch is not None:
+                mismatches.append((test_id, post_state_mismatch))
 
     if mismatches:
         raise EngineXExecutionDriftError(mismatches, compared)

@@ -50,7 +50,7 @@ def test_ab_acalls2(
         code=Op.SSTORE(key=0x0, value=Op.ADD(Op.SLOAD(key=0x0), 0x1))
         + Op.CALL(
             gas=Op.SUB(Op.GAS, 0x186A0),
-            address=0xA890CEB693666313E0A5A1BE4F59F06C1E33F5C9,
+            address=0x1D368C4AA77054508A8C63A951333222EFB79ADA,
             value=0x1,
             args_offset=0x0,
             args_size=0x0,
@@ -77,7 +77,7 @@ def test_ab_acalls2(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0xA890CEB693666313E0A5A1BE4F59F06C1E33F5C9),  # noqa: E501
+        address=Address(0x1D368C4AA77054508A8C63A951333222EFB79ADA),  # noqa: E501
     )
 
     tx = Transaction(

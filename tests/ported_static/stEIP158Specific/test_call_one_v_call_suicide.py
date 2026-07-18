@@ -66,7 +66,7 @@ def test_call_one_v_call_suicide(
         + Op.POP(
             Op.CALL(
                 gas=0xEA60,
-                address=0x79968A94DBEDB20475585E9DD4DAE6333ADD4C01,
+                address=0xC054AB613250705B7C17C0B8019E06CB48F745E6,
                 value=0x1,
                 args_offset=0x0,
                 args_size=0x0,
@@ -78,17 +78,17 @@ def test_call_one_v_call_suicide(
         + Op.STOP,
         balance=100,
         nonce=0,
-        address=Address(0xEA04224539257FBE043981AA6058FBC1D5E21B1A),  # noqa: E501
+        address=Address(0xD88DD0A811C2657D9B83D87A790A30D310767085),  # noqa: E501
     )
     # Source: lll
     # { (SELFDESTRUCT <contract:target:0xb94f5374fce5edbc8e2a8697c15331677e6ebf0b>) }  # noqa: E501
     addr = pre.deploy_contract(  # noqa: F841
         code=Op.SELFDESTRUCT(
-            address=0xEA04224539257FBE043981AA6058FBC1D5E21B1A
+            address=0xD88DD0A811C2657D9B83D87A790A30D310767085
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0x79968A94DBEDB20475585E9DD4DAE6333ADD4C01),  # noqa: E501
+        address=Address(0xC054AB613250705B7C17C0B8019E06CB48F745E6),  # noqa: E501
     )
 
     tx = Transaction(

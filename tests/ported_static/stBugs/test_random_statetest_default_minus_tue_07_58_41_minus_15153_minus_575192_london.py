@@ -33,7 +33,7 @@ def test_random_statetest_default_minus_tue_07_58_41_minus_15153_minus_575192_lo
     pre: Alloc,
 ) -> None:
     """Test: tis is a canon example of a test found by fuzzing with EVMlab,..."""  # noqa: E501
-    coinbase = Address(0xDF5277352F687058BEC2D433F2E2D1B7F0C970AE)
+    coinbase = Address(0xD4BF06B57F5F5842401B0A091EBEEE9FF5F12328)
     sender = pre.fund_eoa(amount=0x5D8FDD3FF54298B4, nonce=28)
 
     env = Environment(
@@ -66,7 +66,7 @@ def test_random_statetest_default_minus_tue_07_58_41_minus_15153_minus_575192_lo
         )
         + Op.SSTORE(key=0x1, value=Op.EXTCODEHASH(address=0xABCDEF)),
         nonce=28,
-        address=Address(0xDF5277352F687058BEC2D433F2E2D1B7F0C970AE),  # noqa: E501
+        address=Address(0xD4BF06B57F5F5842401B0A091EBEEE9FF5F12328),  # noqa: E501
     )
 
     tx = Transaction(

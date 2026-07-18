@@ -61,7 +61,7 @@ def test_static_call_contract_to_create_contract_and_call_it_oog(
 ) -> None:
     """Test_static_call_contract_to_create_contract_and_call_it_oog."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0x82FA8C6963B633FA677B3A4C31678C4319A398AB)
     sender = pre.fund_eoa(amount=0x5F5E100)
 
     env = Environment(
@@ -99,7 +99,7 @@ def test_static_call_contract_to_create_contract_and_call_it_oog(
         + Op.STOP,
         balance=1000,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x82FA8C6963B633FA677B3A4C31678C4319A398AB),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

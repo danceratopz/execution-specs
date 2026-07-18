@@ -70,11 +70,11 @@ def test_gt(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x8D104B0252BEE32C79A4AE2715F8EB883BDFA119)
+    contract_1 = Address(0x8D104B0252BEE32C79A4AE2715F8EB883BDFA11A)
+    contract_2 = Address(0x8D104B0252BEE32C79A4AE2715F8EB883BDFA11B)
+    contract_3 = Address(0x8D104B0252BEE32C79A4AE2715F8EB883BDFA11C)
+    contract_4 = Address(0x478C3A443446416C94F2F4AC125EBC2961F96B45)
     sender = pre.fund_eoa(amount=0xBA1A9CE0BA1A9CE)
 
     env = Environment(
@@ -96,7 +96,7 @@ def test_gt(
         code=Op.SSTORE(key=0x0, value=Op.GT(Op.SUB(0x0, 0x2), 0x0)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x8D104B0252BEE32C79A4AE2715F8EB883BDFA119),  # noqa: E501
     )
     # Source: lll
     # {
@@ -106,7 +106,7 @@ def test_gt(
         code=Op.SSTORE(key=0x0, value=Op.GT(0x0, Op.SUB(0x0, 0x2))) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x8D104B0252BEE32C79A4AE2715F8EB883BDFA11A),  # noqa: E501
     )
     # Source: lll
     # {
@@ -125,7 +125,7 @@ def test_gt(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x8D104B0252BEE32C79A4AE2715F8EB883BDFA11B),  # noqa: E501
     )
     # Source: lll
     # {
@@ -144,7 +144,7 @@ def test_gt(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x8D104B0252BEE32C79A4AE2715F8EB883BDFA11C),  # noqa: E501
     )
     # Source: lll
     # {
@@ -153,7 +153,10 @@ def test_gt(
     contract_4 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x8D104B0252BEE32C79A4AE2715F8EB883BDFA119,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -163,7 +166,7 @@ def test_gt(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x478C3A443446416C94F2F4AC125EBC2961F96B45),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

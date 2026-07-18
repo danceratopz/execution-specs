@@ -100,16 +100,16 @@ def test_log1(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001006)
-    contract_7 = Address(0x0000000000000000000000000000000000001007)
-    contract_8 = Address(0x0000000000000000000000000000000000001008)
-    contract_9 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D611)
+    contract_1 = Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D612)
+    contract_2 = Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D613)
+    contract_3 = Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D614)
+    contract_4 = Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D615)
+    contract_5 = Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D616)
+    contract_6 = Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D617)
+    contract_7 = Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D618)
+    contract_8 = Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D619)
+    contract_9 = Address(0x1726EBD7775EFD85C8FEAF7AC56EEEAA2334A47E)
     sender = pre.fund_eoa(amount=0x100000000000)
 
     env = Environment(
@@ -133,7 +133,7 @@ def test_log1(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D611),  # noqa: E501
     )
     # Source: lll
     # {      ; memStartTooHigh
@@ -155,7 +155,7 @@ def test_log1(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D612),  # noqa: E501
     )
     # Source: lll
     # {        ; memSizeTooHigh
@@ -177,7 +177,7 @@ def test_log1(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D613),  # noqa: E501
     )
     # Source: lll
     # {        ; memSizeZero
@@ -195,7 +195,7 @@ def test_log1(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D614),  # noqa: E501
     )
     # Source: lll
     # {        ; nonEmptyMem
@@ -213,7 +213,7 @@ def test_log1(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D615),  # noqa: E501
     )
     # Source: lll
     # {        ; log_0_1
@@ -231,7 +231,7 @@ def test_log1(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D616),  # noqa: E501
     )
     # Source: lll
     # {        ; log_31_1
@@ -249,7 +249,7 @@ def test_log1(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001006),  # noqa: E501
+        address=Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D617),  # noqa: E501
     )
     # Source: lll
     # {        ; caller (as topic)
@@ -267,7 +267,7 @@ def test_log1(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001007),  # noqa: E501
+        address=Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D618),  # noqa: E501
     )
     # Source: lll
     # {        ; maxTopic
@@ -284,7 +284,7 @@ def test_log1(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001008),  # noqa: E501
+        address=Address(0x40DC4FAC094AC2974519D6D94D0111AE3F50D619),  # noqa: E501
     )
     # Source: lll
     # {
@@ -293,7 +293,10 @@ def test_log1(
     contract_9 = pre.deploy_contract(  # noqa: F841
         code=Op.DELEGATECALL(
             gas=Op.GAS,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x40DC4FAC094AC2974519D6D94D0111AE3F50D611,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             args_offset=0x0,
             args_size=0x0,
             ret_offset=0x0,
@@ -303,7 +306,7 @@ def test_log1(
         storage={0: 2989},
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x1726EBD7775EFD85C8FEAF7AC56EEEAA2334A47E),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

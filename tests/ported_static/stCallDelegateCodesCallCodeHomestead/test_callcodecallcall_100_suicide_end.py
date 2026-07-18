@@ -53,7 +53,7 @@ def test_callcodecallcall_100_suicide_end(
         code=Op.SSTORE(key=0x3, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x73B954EBC05BB0FF4A0F6A13A054D50AD1584099),  # noqa: E501
+        address=Address(0xD0942D9DE851063E0EC2BB77EB2EBB2AF98B1148),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (DELEGATECALL 150000 <contract:0x1000000000000000000000000000000000000001> 0 64 0 64 ) }  # noqa: E501
@@ -61,7 +61,7 @@ def test_callcodecallcall_100_suicide_end(
         code=Op.SSTORE(
             key=0x0,
             value=Op.DELEGATECALL(
-                address=0xEAF8C2AE0D01A880CEA4E1AA88DEF5EDD153D57B,
+                address=0xAA15A9978D1E44FE6C2E199F67876FE565DB23AD,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -71,7 +71,7 @@ def test_callcodecallcall_100_suicide_end(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x2B30B637F37E3F5B8CA4AB846331D0779A3F4671),  # noqa: E501
+        address=Address(0xE96E4C87F3962F93D01AC221AD4BFC6A29DF5DF1),  # noqa: E501
     )
     # Source: lll
     # {  [[ 1 ]] (CALLCODE 100000 <contract:0x1000000000000000000000000000000000000002> 0 0 64 0 64 ) }  # noqa: E501
@@ -79,7 +79,7 @@ def test_callcodecallcall_100_suicide_end(
         code=Op.SSTORE(
             key=0x1,
             value=Op.CALLCODE(
-                address=0x94C8F980AEECBB6575B12AE614A249FC3E836F21,
+                address=0xC94D40370CBFC52D2E136D73B324EDDDE422EA4E,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -90,7 +90,7 @@ def test_callcodecallcall_100_suicide_end(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0xEAF8C2AE0D01A880CEA4E1AA88DEF5EDD153D57B),  # noqa: E501
+        address=Address(0xAA15A9978D1E44FE6C2E199F67876FE565DB23AD),  # noqa: E501
     )
     # Source: lll
     # {  [[ 2 ]] (CALLCODE 50000 <contract:0x1000000000000000000000000000000000000003> 0 0 64 0 64 ) (SELFDESTRUCT <contract:0x1000000000000000000000000000000000000001>) }  # noqa: E501
@@ -98,7 +98,7 @@ def test_callcodecallcall_100_suicide_end(
         code=Op.SSTORE(
             key=0x2,
             value=Op.CALLCODE(
-                address=0x73B954EBC05BB0FF4A0F6A13A054D50AD1584099,
+                address=0xD0942D9DE851063E0EC2BB77EB2EBB2AF98B1148,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -106,11 +106,11 @@ def test_callcodecallcall_100_suicide_end(
                 ret_size=0x40,
             ),
         )
-        + Op.SELFDESTRUCT(address=0xEAF8C2AE0D01A880CEA4E1AA88DEF5EDD153D57B)
+        + Op.SELFDESTRUCT(address=0xAA15A9978D1E44FE6C2E199F67876FE565DB23AD)
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x94C8F980AEECBB6575B12AE614A249FC3E836F21),  # noqa: E501
+        address=Address(0xC94D40370CBFC52D2E136D73B324EDDDE422EA4E),  # noqa: E501
     )
 
     tx = Transaction(sender=sender, to=target, data=Bytes(""))

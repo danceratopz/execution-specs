@@ -347,8 +347,8 @@ def test_address_opcodes(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x4D9945B6F64FD3AE681529B02BD7439176A6A2B8)
+    contract_1 = Address(0x076C69E25140836C1F904957B1071753BF33CF4F)
     sender = pre.fund_eoa(amount=0xDE0B6B3A7640000)
 
     env = Environment(
@@ -522,7 +522,7 @@ def test_address_opcodes(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x4D9945B6F64FD3AE681529B02BD7439176A6A2B8),  # noqa: E501
     )
     # Source: lll
     # {
@@ -541,7 +541,7 @@ def test_address_opcodes(
         + Op.POP(
             Op.CALL(
                 gas=Op.GAS,
-                address=0x1000,
+                address=0x4D9945B6F64FD3AE681529B02BD7439176A6A2B8,
                 value=0x0,
                 args_offset=0x100,
                 args_size=0x40,
@@ -554,7 +554,7 @@ def test_address_opcodes(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x076C69E25140836C1F904957B1071753BF33CF4F),  # noqa: E501
     )
 
     # Per-opcode warm and cold cost deltas versus Cancun, derived from

@@ -151,7 +151,7 @@ def test_revert_opcode_calls(
         + Op.STOP,
         balance=1,
         nonce=0,
-        address=Address(0x93A599BDE9A3B6390AFDB06952AA5EC0B8C44F3B),  # noqa: E501
+        address=Address(0x1E650341611E6C4BCAB588F6AA2A6177456F19C7),  # noqa: E501
     )
     # Source: lll
     # { [[4]] (CALL 50000 <contract:0xc94f5374fce5edbc8e2a8697c15331677e6ebf0b> 0 0 0 0 0) [[5]] 14 }  # noqa: E501
@@ -160,7 +160,7 @@ def test_revert_opcode_calls(
             key=0x4,
             value=Op.CALL(
                 gas=inner_call_gas,
-                address=0x93A599BDE9A3B6390AFDB06952AA5EC0B8C44F3B,
+                address=0x1E650341611E6C4BCAB588F6AA2A6177456F19C7,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -181,7 +181,7 @@ def test_revert_opcode_calls(
             key=0x0,
             value=Op.CALL(
                 gas=inner_call_gas,
-                address=0x93A599BDE9A3B6390AFDB06952AA5EC0B8C44F3B,
+                address=0x1E650341611E6C4BCAB588F6AA2A6177456F19C7,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -193,7 +193,7 @@ def test_revert_opcode_calls(
         + Op.STOP,
         balance=1,
         nonce=0,
-        address=Address(0xCEB48D108C874B5B014ACDD1A2466D65A3D01DE6),  # noqa: E501
+        address=Address(0x58EB7B3641C4DAD88E970AF63623AF916249DBFB),  # noqa: E501
     )
     # Source: lll
     # { [[0]] (DELEGATECALL 50000 <contract:0xc94f5374fce5edbc8e2a8697c15331677e6ebf0b> 0 0 0 0) [[2]] 14 }  # noqa: E501
@@ -202,7 +202,7 @@ def test_revert_opcode_calls(
             key=0x0,
             value=Op.DELEGATECALL(
                 gas=inner_call_gas,
-                address=0x93A599BDE9A3B6390AFDB06952AA5EC0B8C44F3B,
+                address=0x1E650341611E6C4BCAB588F6AA2A6177456F19C7,
                 args_offset=0x0,
                 args_size=0x0,
                 ret_offset=0x0,
@@ -222,7 +222,7 @@ def test_revert_opcode_calls(
             key=0x0,
             value=Op.CALLCODE(
                 gas=inner_call_gas,
-                address=0x93A599BDE9A3B6390AFDB06952AA5EC0B8C44F3B,
+                address=0x1E650341611E6C4BCAB588F6AA2A6177456F19C7,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,

@@ -137,22 +137,22 @@ def test_signextend(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001006)
-    contract_7 = Address(0x0000000000000000000000000000000000001007)
-    contract_8 = Address(0x0000000000000000000000000000000000001008)
-    contract_9 = Address(0x0000000000000000000000000000000000001009)
-    contract_10 = Address(0x000000000000000000000000000000000000100A)
-    contract_11 = Address(0x000000000000000000000000000000000000100B)
-    contract_12 = Address(0x000000000000000000000000000000000000100C)
-    contract_13 = Address(0x000000000000000000000000000000000000100D)
-    contract_14 = Address(0x000000000000000000000000000000000000100E)
-    contract_15 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x787E0C898192EDBA21A39CEA1616825E09A7093D)
+    contract_1 = Address(0x787E0C898192EDBA21A39CEA1616825E09A7093E)
+    contract_2 = Address(0x787E0C898192EDBA21A39CEA1616825E09A7093F)
+    contract_3 = Address(0x787E0C898192EDBA21A39CEA1616825E09A70940)
+    contract_4 = Address(0x787E0C898192EDBA21A39CEA1616825E09A70941)
+    contract_5 = Address(0x787E0C898192EDBA21A39CEA1616825E09A70942)
+    contract_6 = Address(0x787E0C898192EDBA21A39CEA1616825E09A70943)
+    contract_7 = Address(0x787E0C898192EDBA21A39CEA1616825E09A70944)
+    contract_8 = Address(0x787E0C898192EDBA21A39CEA1616825E09A70945)
+    contract_9 = Address(0x787E0C898192EDBA21A39CEA1616825E09A70946)
+    contract_10 = Address(0x787E0C898192EDBA21A39CEA1616825E09A70947)
+    contract_11 = Address(0x787E0C898192EDBA21A39CEA1616825E09A70948)
+    contract_12 = Address(0x787E0C898192EDBA21A39CEA1616825E09A70949)
+    contract_13 = Address(0x787E0C898192EDBA21A39CEA1616825E09A7094A)
+    contract_14 = Address(0x787E0C898192EDBA21A39CEA1616825E09A7094B)
+    contract_15 = Address(0x8CA1F839E1F93876027C50B17CAD81D764A525ED)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -175,7 +175,7 @@ def test_signextend(
         code=Op.SSTORE(key=0x0, value=Op.SIGNEXTEND(0x50, 0x126AF4)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A7093D),  # noqa: E501
     )
     # Source: lll
     # {
@@ -185,7 +185,7 @@ def test_signextend(
         code=Op.SSTORE(key=0x0, value=Op.SIGNEXTEND(0x0, 0x0)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A7093E),  # noqa: E501
     )
     # Source: lll
     # {
@@ -203,7 +203,7 @@ def test_signextend(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A7093F),  # noqa: E501
     )
     # Source: lll
     # {
@@ -224,7 +224,7 @@ def test_signextend(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A70940),  # noqa: E501
     )
     # Source: lll
     # {
@@ -245,7 +245,7 @@ def test_signextend(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A70941),  # noqa: E501
     )
     # Source: lll
     # {
@@ -258,7 +258,7 @@ def test_signextend(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A70942),  # noqa: E501
     )
     # Source: lll
     # {
@@ -279,7 +279,7 @@ def test_signextend(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001006),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A70943),  # noqa: E501
     )
     # Source: lll
     # {  ; Extend the sign of 0x6a, which is a positive 8 bit number
@@ -289,7 +289,7 @@ def test_signextend(
         code=Op.SSTORE(key=0x0, value=Op.SIGNEXTEND(0x0, 0x122F6A)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001007),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A70944),  # noqa: E501
     )
     # Source: lll
     # {  ; Extend the sign of 0x6af4, which is a positive 16 bit number
@@ -299,7 +299,7 @@ def test_signextend(
         code=Op.SSTORE(key=0x0, value=Op.SIGNEXTEND(0x1, 0x126AF4)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001008),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A70945),  # noqa: E501
     )
     # Source: lll
     # {  ; The first two bytes are 0xfaf4, which is a negative 16 bit number
@@ -311,7 +311,7 @@ def test_signextend(
         code=Op.SSTORE(key=0x0, value=Op.SIGNEXTEND(0x1, 0x12FAF4)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001009),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A70946),  # noqa: E501
     )
     # Source: lll
     # {
@@ -324,7 +324,7 @@ def test_signextend(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100A),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A70947),  # noqa: E501
     )
     # Source: lll
     # {
@@ -335,7 +335,7 @@ def test_signextend(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100B),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A70948),  # noqa: E501
     )
     # Source: lll
     # {
@@ -345,7 +345,7 @@ def test_signextend(
         code=Op.SSTORE(key=0x0, value=Op.SIGNEXTEND(0x0, 0x122FF4)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100C),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A70949),  # noqa: E501
     )
     # Source: lll
     # {
@@ -355,7 +355,7 @@ def test_signextend(
         code=Op.SSTORE(key=0x0, value=Op.SIGNEXTEND(0x1F, 0x1)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100D),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A7094A),  # noqa: E501
     )
     # Source: lll
     # {
@@ -366,7 +366,7 @@ def test_signextend(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100E),  # noqa: E501
+        address=Address(0x787E0C898192EDBA21A39CEA1616825E09A7094B),  # noqa: E501
     )
     # Source: lll
     # {
@@ -375,7 +375,10 @@ def test_signextend(
     contract_15 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x787E0C898192EDBA21A39CEA1616825E09A7093D,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -385,7 +388,7 @@ def test_signextend(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x8CA1F839E1F93876027C50B17CAD81D764A525ED),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

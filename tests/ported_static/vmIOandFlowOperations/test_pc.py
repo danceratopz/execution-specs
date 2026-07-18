@@ -58,9 +58,9 @@ def test_pc(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x9A0A337BBA22BD443CEE283AD17F6E001D06E766)
+    contract_1 = Address(0x9A0A337BBA22BD443CEE283AD17F6E001D06E767)
+    contract_2 = Address(0xD8FDDB64993E9D85C0371558C44A0302A0D1FFC3)
     sender = pre.fund_eoa(amount=0x100000000000)
 
     env = Environment(
@@ -80,7 +80,7 @@ def test_pc(
         code=Op.SSTORE(key=0x0, value=Op.PC) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x9A0A337BBA22BD443CEE283AD17F6E001D06E766),  # noqa: E501
     )
     # Source: lll
     # {
@@ -93,7 +93,7 @@ def test_pc(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x9A0A337BBA22BD443CEE283AD17F6E001D06E767),  # noqa: E501
     )
     # Source: lll
     # {
@@ -102,7 +102,10 @@ def test_pc(
     contract_2 = pre.deploy_contract(  # noqa: F841
         code=Op.DELEGATECALL(
             gas=Op.GAS,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x9A0A337BBA22BD443CEE283AD17F6E001D06E766,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             args_offset=0x0,
             args_size=0x0,
             ret_offset=0x0,
@@ -112,7 +115,7 @@ def test_pc(
         storage={0: 2989},
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0xD8FDDB64993E9D85C0371558C44A0302A0D1FFC3),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

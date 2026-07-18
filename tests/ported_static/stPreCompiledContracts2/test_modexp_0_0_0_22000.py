@@ -70,8 +70,8 @@ def test_modexp_0_0_0_22000(
     v: int,
 ) -> None:
     """Puts the base 0, exponent 0 and modulus 0 into the MODEXP..."""
-    coinbase = Address(0x3535353535353535353535353535353535353535)
-    contract_0 = Address(0xC305C901078781C232A2A521C2AF7980F8385EE9)
+    coinbase = Address(0x70477C4B73D43C396527E41AAEAE508B771D85C5)
+    contract_0 = Address(0xF5A9E8861BA6B8B7116C189DC6B3F1E226B11BEF)
     contract_1 = Address(0x0000000000000000000000000000000000000001)
     contract_2 = Address(0x0000000000000000000000000000000000000005)
     contract_3 = Address(0x0000000000000000000000000000000000000008)
@@ -100,7 +100,7 @@ def test_modexp_0_0_0_22000(
         code="",
         balance=0x201EE,
         nonce=0,
-        address=Address(0x3535353535353535353535353535353535353535),  # noqa: E501
+        address=Address(0x70477C4B73D43C396527E41AAEAE508B771D85C5),  # noqa: E501
     )
     # Source: hex
     # 0x
@@ -259,7 +259,7 @@ def test_modexp_0_0_0_22000(
         + Op.STOP
         + Op.JUMPDEST,
         nonce=1,
-        address=Address(0xC305C901078781C232A2A521C2AF7980F8385EE9),  # noqa: E501
+        address=Address(0xF5A9E8861BA6B8B7116C189DC6B3F1E226B11BEF),  # noqa: E501
     )
 
     tx_data = [

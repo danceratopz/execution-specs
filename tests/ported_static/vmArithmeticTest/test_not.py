@@ -34,8 +34,8 @@ def test_not(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x3483CF492EAA7662788CFEFB133FD34D484D1EA0)
+    contract_1 = Address(0x4B3FF8B1E0650E04C268C47F6825FCF3733B973F)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -58,7 +58,7 @@ def test_not(
         code=Op.SSTORE(key=0x0, value=Op.NOT(0x123456789ABCDEF)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x3483CF492EAA7662788CFEFB133FD34D484D1EA0),  # noqa: E501
     )
     # Source: lll
     # {
@@ -67,7 +67,10 @@ def test_not(
     contract_1 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x3483CF492EAA7662788CFEFB133FD34D484D1EA0,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -77,7 +80,7 @@ def test_not(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x4B3FF8B1E0650E04C268C47F6825FCF3733B973F),  # noqa: E501
     )
 
     tx = Transaction(

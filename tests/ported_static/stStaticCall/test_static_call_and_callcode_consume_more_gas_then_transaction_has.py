@@ -89,7 +89,7 @@ def test_static_call_and_callcode_consume_more_gas_then_transaction_has(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0x06BB2A912C81B2C1F21EBCFAE1DFF85F345BC160),  # noqa: E501
     )
     # Source: lll
     # { (SSTORE 0 0x12) }

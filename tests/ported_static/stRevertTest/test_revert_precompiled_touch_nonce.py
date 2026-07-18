@@ -107,7 +107,7 @@ def test_revert_precompiled_touch_nonce(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0xE7C596DE24CCC387DAA5C017066AEB25EA8D2F3F),  # noqa: E501
+        address=Address(0x4954535562D734BB376069924331D04B6AC5F46D),  # noqa: E501
     )
     # Source: lll
     # { (CALL 50000 1 0 0 0 0 0) (CALL 50000 2 0 0 0 0 0) (CALL 50000 3 0 0 0 0 0) (CALL 50000 4 0 0 0 0 0) (CALL 50000 5 0 0 0 0 0) (CALL 50000 6 0 0 0 0 0) (CALL 50000 7 0 0 0 0 0) (CALL 50000 8 0 0 0 0 0) [[1]] (GAS) [[2]] (GAS) [[3]] (GAS) }  # noqa: E501
@@ -205,7 +205,7 @@ def test_revert_precompiled_touch_nonce(
         + Op.SSTORE(key=0x3, value=Op.GAS)
         + Op.STOP,
         nonce=0,
-        address=Address(0x87AAEB9E422487283B0B008EF445E32ACB9DD1AE),  # noqa: E501
+        address=Address(0xAA7D6486A46A78AB7566FAB21C878BEE695F59D2),  # noqa: E501
     )
     # Source: lll
     # { (DELEGATECALL 50000 1 0 0 0 0) (DELEGATECALL 50000 2 0 0 0 0) (DELEGATECALL 50000 3 0 0 0 0) (DELEGATECALL 50000 4 0 0 0 0) (DELEGATECALL 50000 5 0 0 0 0) (DELEGATECALL 50000 6 0 0 0 0) (DELEGATECALL 50000 7 0 0 0 0) (DELEGATECALL 50000 8 0 0 0 0) [[1]] (GAS) [[2]] (GAS) [[3]] (GAS) }  # noqa: E501
@@ -295,7 +295,7 @@ def test_revert_precompiled_touch_nonce(
         + Op.SSTORE(key=0x3, value=Op.GAS)
         + Op.STOP,
         nonce=0,
-        address=Address(0x31F52A66CF9D94C60F089A2CA9C4E784261C57FA),  # noqa: E501
+        address=Address(0x57AF94850E18CBFC0BC302F3495B28AE8C9489E1),  # noqa: E501
     )
     # Source: lll
     # { (CALLCODE 50000 1 0 0 0 0 0) (CALLCODE 50000 2 0 0 0 0 0) (CALLCODE 50000 3 0 0 0 0 0) (CALLCODE 50000 4 0 0 0 0 0) (CALLCODE 50000 5 0 0 0 0 0) (CALLCODE 50000 6 0 0 0 0 0) (CALLCODE 50000 7 0 0 0 0 0) (CALLCODE 50000 8 0 0 0 0 0) [[1]] (GAS) [[2]] (GAS) [[3]] (GAS) }  # noqa: E501
@@ -393,7 +393,7 @@ def test_revert_precompiled_touch_nonce(
         + Op.SSTORE(key=0x3, value=Op.GAS)
         + Op.STOP,
         nonce=0,
-        address=Address(0xDE1200B7ECAEA2D15B57D0F331AD5ADE8E924255),  # noqa: E501
+        address=Address(0xB188BBA6359CF1C4750956437B5E302861BA449B),  # noqa: E501
     )
     # Source: lll
     # { (STATICCALL 50000 1 0 0 0 0) (STATICCALL 50000 2 0 0 0 0) (STATICCALL 50000 3 0 0 0 0) (STATICCALL 50000 4 0 0 0 0) (STATICCALL 50000 5 0 0 0 0) (STATICCALL 50000 6 0 0 0 0) (STATICCALL 50000 7 0 0 0 0) (STATICCALL 50000 8 0 0 0 0) [[1]] (GAS) [[2]] (GAS) [[3]] (GAS) }  # noqa: E501
@@ -483,7 +483,7 @@ def test_revert_precompiled_touch_nonce(
         + Op.SSTORE(key=0x3, value=Op.GAS)
         + Op.STOP,
         nonce=0,
-        address=Address(0x10EF6D6218ADA53728683CEC4D5160C8C72159BD),  # noqa: E501
+        address=Address(0xB1C05D837A62F3C40B1080C542AD3B66EDC6510B),  # noqa: E501
     )
 
     tx_data = [

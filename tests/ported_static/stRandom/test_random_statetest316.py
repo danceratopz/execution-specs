@@ -34,7 +34,7 @@ def test_random_statetest316(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest316."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0xA803ACD97B7D4D290541BD6A726FDA0408465401)
     sender = pre.fund_eoa(amount=0xDE0B6B3A7640000)
 
     env = Environment(
@@ -80,7 +80,7 @@ def test_random_statetest316(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0xA803ACD97B7D4D290541BD6A726FDA0408465401),  # noqa: E501
     )
 
     tx = Transaction(

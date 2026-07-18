@@ -35,7 +35,7 @@ def test_call_ecrecover0_complete_return_value(
 ) -> None:
     """Test_call_ecrecover0_complete_return_value."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0x5157E5F77E65C89A2C74D6EB5E9D39EB45EDFB76)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -82,7 +82,7 @@ def test_call_ecrecover0_complete_return_value(
         + Op.STOP,
         balance=0x1312D00,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x5157E5F77E65C89A2C74D6EB5E9D39EB45EDFB76),  # noqa: E501
     )
 
     tx = Transaction(

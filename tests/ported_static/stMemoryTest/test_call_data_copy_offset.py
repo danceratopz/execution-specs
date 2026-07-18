@@ -34,7 +34,7 @@ def test_call_data_copy_offset(
     """Test_call_data_copy_offset."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
     contract_0 = Address(0xEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE)
-    contract_1 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_1 = Address(0x0A65E2DA3089CDE36E6932C1ED5F476478388F7A)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -79,7 +79,7 @@ def test_call_data_copy_offset(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=1,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x0A65E2DA3089CDE36E6932C1ED5F476478388F7A),  # noqa: E501
     )
 
     tx = Transaction(

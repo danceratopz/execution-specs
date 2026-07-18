@@ -75,7 +75,7 @@ def test_refund_call_to_suicide_twice(
             key=0x0,
             value=Op.CALL(
                 gas=Op.CALLDATALOAD(offset=0x0),
-                address=0x9DEA1AD5123F3D8B91CFC830B1C602597883E97C,
+                address=0xAB7ED7B66C97777EE1F1E0BCF503AFD5D6DDB7F4,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -85,7 +85,7 @@ def test_refund_call_to_suicide_twice(
         )
         + Op.CALL(
             gas=Op.CALLDATALOAD(offset=0x0),
-            address=0x9DEA1AD5123F3D8B91CFC830B1C602597883E97C,
+            address=0xAB7ED7B66C97777EE1F1E0BCF503AFD5D6DDB7F4,
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -108,7 +108,7 @@ def test_refund_call_to_suicide_twice(
         storage={1: 1},
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x9DEA1AD5123F3D8B91CFC830B1C602597883E97C),  # noqa: E501
+        address=Address(0xAB7ED7B66C97777EE1F1E0BCF503AFD5D6DDB7F4),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

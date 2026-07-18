@@ -35,7 +35,7 @@ def test_random_statetest73(
 ) -> None:
     """Test_random_statetest73."""
     coinbase = Address(0x945304EB96065B2A98B57A48A06AE28D285A71B5)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0x2E783CB03AAD611C38EB6B5778318281114E8E90)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -80,7 +80,7 @@ def test_random_statetest73(
             value=0x7F000000000000000000000000945304EB96065B2A98B57A48A06AE28D285A,  # noqa: E501
         ),
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x2E783CB03AAD611C38EB6B5778318281114E8E90),  # noqa: E501
     )
 
     tx = Transaction(

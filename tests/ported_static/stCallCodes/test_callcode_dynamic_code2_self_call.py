@@ -78,8 +78,8 @@ def test_callcode_dynamic_code2_self_call(
         outer_call_gas = 0x1E8480
 
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x1100000000000000000000000000000000000000)
-    contract_1 = Address(0xA000000000000000000000000000000000000000)
+    contract_0 = Address(0x532A026085AB1A21205A9DECF169E47C10C6C660)
+    contract_1 = Address(0xF0F98B5FD5FD5C4F5B1C6325E0CB6EA42B4C45E1)
     contract_2 = Address(0x1000000000000000000000000000000000000000)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
@@ -109,7 +109,7 @@ def test_callcode_dynamic_code2_self_call(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0x1100000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x532A026085AB1A21205A9DECF169E47C10C6C660),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 0 0x604060006040600060007313136008b64ff592819b2fa6d43f2835c452020e62) (MSTORE 32 0x0186a0f2600b5533600c55000000000000000000000000000000000000000000)  (CREATE 1 0 64) }  # noqa: E501
@@ -126,7 +126,7 @@ def test_callcode_dynamic_code2_self_call(
         + Op.STOP,
         balance=10000,
         nonce=0,
-        address=Address(0xA000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0xF0F98B5FD5FD5C4F5B1C6325E0CB6EA42B4C45E1),  # noqa: E501
     )
     # Source: lll
     # {(seq [[10]] (CREATE 0 0 (lll(seq  [[122]] (CALLCODE 100000 0x13136008b64ff592819b2fa6d43f2835c452020e 0 0 64 0 64)  (RETURN 0 (lll(seq [[0]] 1  [[20]] (ADDRESS) [[21]] (ORIGIN) [[22]] (CALLER)   )0) )  )0)   )  [[11]] (CALLCODE 100000 (SLOAD 10) 0 0 64 0 64)                   )}  # noqa: E501

@@ -52,7 +52,7 @@ def test_static_callcallcodecallcode_011_suicide_end2(
         code=Op.MSTORE(offset=0x3, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3),  # noqa: E501
+        address=Address(0x10067F6D80DB63159BD1E567ECF66A1074158CE9),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (STATICCALL 150000 <contract:0x1000000000000000000000000000000000000001> 0 64 0 64 ) [[ 1 ]] 1 }  # noqa: E501
@@ -72,7 +72,7 @@ def test_static_callcallcodecallcode_011_suicide_end2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x569CDC3B32CC3F9747BBDE39FD70FEAD591D2F0D),  # noqa: E501
+        address=Address(0x8038735DFD1057940D1BBC6930E2B23A398DE6E7),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 3 1) (CALLCODE 100000 <contract:0x1000000000000000000000000000000000000002> 0 0 64 0 64 ) }  # noqa: E501
@@ -99,7 +99,7 @@ def test_static_callcallcodecallcode_011_suicide_end2(
         + Op.POP(
             Op.CALLCODE(
                 gas=0xC350,
-                address=0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3,
+                address=0x10067F6D80DB63159BD1E567ECF66A1074158CE9,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,

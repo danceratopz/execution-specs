@@ -112,18 +112,18 @@ def test_loops_conditionals(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001006)
-    contract_7 = Address(0x0000000000000000000000000000000000001007)
-    contract_8 = Address(0x0000000000000000000000000000000000001008)
-    contract_9 = Address(0x0000000000000000000000000000000000001009)
-    contract_10 = Address(0x000000000000000000000000000000000000100A)
-    contract_11 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x4965B9644EF599CCE288F862F4221E223DF4682B)
+    contract_1 = Address(0x4965B9644EF599CCE288F862F4221E223DF4682C)
+    contract_2 = Address(0x4965B9644EF599CCE288F862F4221E223DF4682D)
+    contract_3 = Address(0x4965B9644EF599CCE288F862F4221E223DF4682E)
+    contract_4 = Address(0x4965B9644EF599CCE288F862F4221E223DF4682F)
+    contract_5 = Address(0x4965B9644EF599CCE288F862F4221E223DF46830)
+    contract_6 = Address(0x4965B9644EF599CCE288F862F4221E223DF46831)
+    contract_7 = Address(0x4965B9644EF599CCE288F862F4221E223DF46832)
+    contract_8 = Address(0x4965B9644EF599CCE288F862F4221E223DF46833)
+    contract_9 = Address(0x4965B9644EF599CCE288F862F4221E223DF46834)
+    contract_10 = Address(0x4965B9644EF599CCE288F862F4221E223DF46835)
+    contract_11 = Address(0x2252882294BA1CAC64765EA4FC347ADE6C080C94)
     sender = pre.fund_eoa(amount=0x100000000000)
 
     env = Environment(
@@ -146,7 +146,7 @@ def test_loops_conditionals(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x4965B9644EF599CCE288F862F4221E223DF4682B),  # noqa: E501
     )
     # Source: lll
     # {
@@ -159,7 +159,7 @@ def test_loops_conditionals(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x4965B9644EF599CCE288F862F4221E223DF4682C),  # noqa: E501
     )
     # Source: lll
     # {
@@ -172,7 +172,7 @@ def test_loops_conditionals(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x4965B9644EF599CCE288F862F4221E223DF4682D),  # noqa: E501
     )
     # Source: lll
     # {
@@ -185,7 +185,7 @@ def test_loops_conditionals(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x4965B9644EF599CCE288F862F4221E223DF4682E),  # noqa: E501
     )
     # Source: lll
     # {
@@ -203,7 +203,7 @@ def test_loops_conditionals(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x4965B9644EF599CCE288F862F4221E223DF4682F),  # noqa: E501
     )
     # Source: lll
     # {
@@ -221,7 +221,7 @@ def test_loops_conditionals(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x4965B9644EF599CCE288F862F4221E223DF46830),  # noqa: E501
     )
     # Source: lll
     # {
@@ -245,7 +245,7 @@ def test_loops_conditionals(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001006),  # noqa: E501
+        address=Address(0x4965B9644EF599CCE288F862F4221E223DF46831),  # noqa: E501
     )
     # Source: lll
     # {
@@ -269,7 +269,7 @@ def test_loops_conditionals(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001007),  # noqa: E501
+        address=Address(0x4965B9644EF599CCE288F862F4221E223DF46832),  # noqa: E501
     )
     # Source: lll
     # {
@@ -292,7 +292,7 @@ def test_loops_conditionals(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001008),  # noqa: E501
+        address=Address(0x4965B9644EF599CCE288F862F4221E223DF46833),  # noqa: E501
     )
     # Source: lll
     # {
@@ -324,7 +324,7 @@ def test_loops_conditionals(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001009),  # noqa: E501
+        address=Address(0x4965B9644EF599CCE288F862F4221E223DF46834),  # noqa: E501
     )
     # Source: lll
     # {
@@ -357,7 +357,7 @@ def test_loops_conditionals(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100A),  # noqa: E501
+        address=Address(0x4965B9644EF599CCE288F862F4221E223DF46835),  # noqa: E501
     )
     # Source: lll
     # {
@@ -366,7 +366,10 @@ def test_loops_conditionals(
     contract_11 = pre.deploy_contract(  # noqa: F841
         code=Op.DELEGATECALL(
             gas=Op.GAS,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x4965B9644EF599CCE288F862F4221E223DF4682B,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             args_offset=0x0,
             args_size=0x0,
             ret_offset=0x0,
@@ -376,7 +379,7 @@ def test_loops_conditionals(
         storage={0: 2989},
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x2252882294BA1CAC64765EA4FC347ADE6C080C94),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

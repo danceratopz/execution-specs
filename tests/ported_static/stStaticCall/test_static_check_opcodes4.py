@@ -92,7 +92,7 @@ def test_static_check_opcodes4(
             key=0x1,
             value=Op.STATICCALL(
                 gas=0x186A0,
-                address=0xB4B91C40F3E3A6E5576B0413572B88D535CEE7B0,
+                address=0xE2878985406313E1C7A3603B9821E28B8F760155,
                 args_offset=0x0,
                 args_size=0x0,
                 ret_offset=0x0,
@@ -146,7 +146,7 @@ def test_static_check_opcodes4(
         + Op.JUMPI(
             pc=0x74,
             condition=Op.EQ(
-                0xB4B91C40F3E3A6E5576B0413572B88D535CEE7B0, Op.ADDRESS
+                0xE2878985406313E1C7A3603B9821E28B8F760155, Op.ADDRESS
             ),
         )
         + Op.SSTORE(key=0x1, value=0x2)
@@ -162,7 +162,7 @@ def test_static_check_opcodes4(
         + Op.JUMPDEST
         + Op.STOP,
         nonce=0,
-        address=Address(0xB4B91C40F3E3A6E5576B0413572B88D535CEE7B0),  # noqa: E501
+        address=Address(0xE2878985406313E1C7A3603B9821E28B8F760155),  # noqa: E501
     )
     # Source: lll
     # { (if (= <eoa:sender:0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b> (ORIGIN)) (MSTORE 1 1) (SSTORE 1 2) ) (if (= <contract:target:0x1000000000000000000000000000000000000000> (CALLER)) (MSTORE 1 1) (SSTORE 1 2) ) (if (= <contract:0x1000000000000000000000000000000000000002> (ADDRESS)) (MSTORE 1 1) (SSTORE 1 2) )   (if (= 0 (CALLVALUE)) (MSTORE 1 1) (SSTORE 1 2) ) }  # noqa: E501

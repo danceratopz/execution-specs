@@ -118,7 +118,7 @@ def test_eoa_empty_paris(
     contract_2 = Address(0x000000000000000000000000000000000000BAD3)
     contract_3 = Address(0x000000000000000000000000000000000000BAD4)
     contract_4 = Address(0x000000000000000000000000000000000000DEAD)
-    contract_5 = Address(0x000000000000000000000000000000000000C0DE)
+    contract_5 = Address(0x3693B42144896588DA996FAFC547DF4D8E775168)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -243,7 +243,7 @@ def test_eoa_empty_paris(
         + Op.SSTORE(key=0xFF, value=Op.SUB)
         + Op.STOP,
         nonce=1,
-        address=Address(0x000000000000000000000000000000000000C0DE),  # noqa: E501
+        address=Address(0x3693B42144896588DA996FAFC547DF4D8E775168),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

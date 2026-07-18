@@ -87,7 +87,7 @@ def test_static_call1024_oog(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0xCB3BE9066E128BE7E2E34F09B4887B6C0FABA4F0),  # noqa: E501
     )
     # Source: lll
     # { [[ 0 ]] (ADD @@0 1) [[ 1 ]] (STATICCALL (MUL (SUB (GAS) 10000) (SUB 1 (DIV @@0 1025))) <contract:0xbbbf5374fce5edbc8e2a8697c15331677e6ebf0b> 0 0 0 0) [[ 2 ]] (ADD 1(MUL @@0 1000)) }  # noqa: E501

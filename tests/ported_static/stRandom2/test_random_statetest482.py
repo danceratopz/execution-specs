@@ -34,7 +34,7 @@ def test_random_statetest482(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest482."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0x9EE77DC29F1CB259796F2C0E6CDA522C476A50EF)
     sender = EOA(
         key=0xB1F4CBC3A50042184425A6F9E996D0910F7BA879457CE5DAC5C71E498AD3C005
     )
@@ -62,7 +62,7 @@ def test_random_statetest482(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0x9EE77DC29F1CB259796F2C0E6CDA522C476A50EF),  # noqa: E501
     )
     # Source: raw
     # 0x7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000017f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>437fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000017f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff6f027c9d313d9b09376505927c8e71565560005155  # noqa: E501
@@ -74,7 +74,7 @@ def test_random_statetest482(
             0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
         ]
         + Op.PUSH32[0x1]
-        + Op.PUSH32[0x4F3F701464972E74606D6EA82D4D3080599A0E79]
+        + Op.PUSH32[0x9EE77DC29F1CB259796F2C0E6CDA522C476A50EF]
         + Op.NUMBER
         + Op.PUSH32[
             0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
@@ -92,7 +92,7 @@ def test_random_statetest482(
         sender=sender,
         to=target,
         data=Bytes(
-            "7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000017f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e79437fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000017f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff6f027c9d313d9b09376505927c8e7156"  # noqa: E501
+            "7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000017f0000000000000000000000009ee77dc29f1cb259796f2c0e6cda522c476a50ef437fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000017f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff6f027c9d313d9b09376505927c8e7156"  # noqa: E501
         ),
         value=0x636F84BF,
     )

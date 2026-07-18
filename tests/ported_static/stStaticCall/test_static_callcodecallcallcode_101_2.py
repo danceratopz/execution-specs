@@ -87,7 +87,7 @@ def test_static_callcodecallcallcode_101_2(
     addr_4 = pre.deploy_contract(  # noqa: F841
         code=Op.MSTORE(offset=0x1, value=0x1) + Op.STOP,
         nonce=0,
-        address=Address(0x2A142C79A9B097C111CE945214226126B75E332C),  # noqa: E501
+        address=Address(0xAEEAF79D2C3C92E5CD03E97BE4B78DCA2B0DF08D),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 0 (CALLDATALOAD 0)) [[ 0 ]] (CALLCODE 350000 <contract:0x1000000000000000000000000000000000000001> (CALLVALUE) 0 64 0 64 ) [[ 1 ]] 1 }  # noqa: E501
@@ -116,7 +116,7 @@ def test_static_callcodecallcallcode_101_2(
     addr_2 = pre.deploy_contract(  # noqa: F841
         code=Op.CALLCODE(
             gas=0x3D090,
-            address=0x2A142C79A9B097C111CE945214226126B75E332C,
+            address=0xAEEAF79D2C3C92E5CD03E97BE4B78DCA2B0DF08D,
             value=0x0,
             args_offset=0x0,
             args_size=0x40,
@@ -126,14 +126,14 @@ def test_static_callcodecallcallcode_101_2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x709EB538153D5F98F0B8482C462070C26DB1CBAE),  # noqa: E501
+        address=Address(0x21689A795E6D1D5E7AA5E654F24CD0AA72A7EACF),  # noqa: E501
     )
     # Source: lll
     # {  (CALLCODE 250000 <contract:0x1000000000000000000000000000000000000003> 1 0 64 0 64 ) }  # noqa: E501
     addr_3 = pre.deploy_contract(  # noqa: F841
         code=Op.CALLCODE(
             gas=0x3D090,
-            address=0x2A142C79A9B097C111CE945214226126B75E332C,
+            address=0xAEEAF79D2C3C92E5CD03E97BE4B78DCA2B0DF08D,
             value=0x1,
             args_offset=0x0,
             args_size=0x40,
@@ -143,7 +143,7 @@ def test_static_callcodecallcallcode_101_2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x3CEA889FD03A922CC673D25E5DB4E72743AA4878),  # noqa: E501
+        address=Address(0xA62BF59BB04AE4B8EC4ECEAF90ADC748918FDB9A),  # noqa: E501
     )
 
     tx_data = [

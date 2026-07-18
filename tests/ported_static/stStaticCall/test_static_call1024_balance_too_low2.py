@@ -89,7 +89,7 @@ def test_static_call1024_balance_too_low2(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0x66C95A0EB232465ABAD4F2D2F8B438F10322FFA0),  # noqa: E501
     )
     # Source: lll
     # { [[ 0 ]] (ADD @@0 1) [[ 1 ]] (STATICCALL 0xfffffffffff <contract:0xbbbf5374fce5edbc8e2a8697c15331677e6ebf0b> @@0 0 0 0) }  # noqa: E501
@@ -99,7 +99,7 @@ def test_static_call1024_balance_too_low2(
             key=0x1,
             value=Op.STATICCALL(
                 gas=0xFFFFFFFFFFF,
-                address=0xD395A2CB1CB7EF1B90E2EDB71FC0A390ECC84FE8,
+                address=0xC41FBF9F7B3C52331A8C80437CE4847B31119A96,
                 args_offset=Op.SLOAD(key=0x0),
                 args_size=0x0,
                 ret_offset=0x0,
@@ -109,7 +109,7 @@ def test_static_call1024_balance_too_low2(
         + Op.STOP,
         balance=1024,
         nonce=0,
-        address=Address(0xD395A2CB1CB7EF1B90E2EDB71FC0A390ECC84FE8),  # noqa: E501
+        address=Address(0xC41FBF9F7B3C52331A8C80437CE4847B31119A96),  # noqa: E501
     )
     # Source: lll
     # { (MSTORE 0 (ADD (MLOAD 0) 1)) (MSTORE 32 (STATICCALL 0xfffffffffff <contract:0xcbbf5374fce5edbc8e2a8697c15331677e6ebf0b> (MLOAD 0) 0 0 0)) }  # noqa: E501
@@ -119,7 +119,7 @@ def test_static_call1024_balance_too_low2(
             offset=0x20,
             value=Op.STATICCALL(
                 gas=0xFFFFFFFFFFF,
-                address=0xE8F28EE50521B0388CF0A623B1A89E43D022C039,
+                address=0x6057DC3D303E81876767F1EFF3010E2297C6455D,
                 args_offset=Op.MLOAD(offset=0x0),
                 args_size=0x0,
                 ret_offset=0x0,
@@ -129,7 +129,7 @@ def test_static_call1024_balance_too_low2(
         + Op.STOP,
         balance=1024,
         nonce=0,
-        address=Address(0xE8F28EE50521B0388CF0A623B1A89E43D022C039),  # noqa: E501
+        address=Address(0x6057DC3D303E81876767F1EFF3010E2297C6455D),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

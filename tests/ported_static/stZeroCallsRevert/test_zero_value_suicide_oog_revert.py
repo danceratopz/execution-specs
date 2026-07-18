@@ -48,7 +48,7 @@ def test_zero_value_suicide_oog_revert(
         code=Op.POP(
             Op.CALL(
                 gas=0x9C40,
-                address=0xDA2EB5512889130C4AF686A291B08665B889CB22,
+                address=0x6A40826432ACB062C1F9AAC15CB5A3E371EFDDF6,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -68,11 +68,11 @@ def test_zero_value_suicide_oog_revert(
     # { (SELFDESTRUCT <contract:0xc94f5374fce5edbc8e2a8697c15331677e6ebf0b>)  }
     addr = pre.deploy_contract(  # noqa: F841
         code=Op.SELFDESTRUCT(
-            address=0xDA2EB5512889130C4AF686A291B08665B889CB22
+            address=0x6A40826432ACB062C1F9AAC15CB5A3E371EFDDF6
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0xDA2EB5512889130C4AF686A291B08665B889CB22),  # noqa: E501
+        address=Address(0x6A40826432ACB062C1F9AAC15CB5A3E371EFDDF6),  # noqa: E501
     )
 
     tx = Transaction(

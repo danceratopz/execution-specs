@@ -211,7 +211,7 @@ def test_ranges_example(
         code=Op.SSTORE(key=0x0, value=Op.CALLDATALOAD(offset=0x0)) + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0xA054BC58F204030CBC0EC558A5B88AC9BD5ADED2),  # noqa: E501
+        address=Address(0xCF51267BE5406F8C97BC52012D33B1FA141D705A),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

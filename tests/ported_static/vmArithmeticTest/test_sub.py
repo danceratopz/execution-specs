@@ -77,12 +77,12 @@ def test_sub(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x15EB759D480FD0178018AEC36C00F4F06B9FA16A)
+    contract_1 = Address(0x15EB759D480FD0178018AEC36C00F4F06B9FA16B)
+    contract_2 = Address(0x15EB759D480FD0178018AEC36C00F4F06B9FA16C)
+    contract_3 = Address(0x15EB759D480FD0178018AEC36C00F4F06B9FA16D)
+    contract_4 = Address(0x15EB759D480FD0178018AEC36C00F4F06B9FA16E)
+    contract_5 = Address(0x7F180CAF43D2908213FA24F84D51672DED17070A)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -105,7 +105,7 @@ def test_sub(
         code=Op.SSTORE(key=0x0, value=Op.SUB(0x17, 0x1)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x15EB759D480FD0178018AEC36C00F4F06B9FA16A),  # noqa: E501
     )
     # Source: lll
     # {
@@ -115,7 +115,7 @@ def test_sub(
         code=Op.SSTORE(key=0x0, value=Op.SUB(0x2, 0x3)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x15EB759D480FD0178018AEC36C00F4F06B9FA16B),  # noqa: E501
     )
     # Source: lll
     # {
@@ -125,7 +125,7 @@ def test_sub(
         code=Op.SSTORE(key=0x0, value=Op.SUB(0x0, 0x17)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x15EB759D480FD0178018AEC36C00F4F06B9FA16C),  # noqa: E501
     )
     # Source: lll
     # {
@@ -145,7 +145,7 @@ def test_sub(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x15EB759D480FD0178018AEC36C00F4F06B9FA16D),  # noqa: E501
     )
     # Source: lll
     # {
@@ -165,7 +165,7 @@ def test_sub(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x15EB759D480FD0178018AEC36C00F4F06B9FA16E),  # noqa: E501
     )
     # Source: lll
     # {
@@ -174,7 +174,10 @@ def test_sub(
     contract_5 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x15EB759D480FD0178018AEC36C00F4F06B9FA16A,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -184,7 +187,7 @@ def test_sub(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x7F180CAF43D2908213FA24F84D51672DED17070A),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

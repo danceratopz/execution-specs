@@ -49,7 +49,7 @@ def test_callcallcode_01_suicide_end(
         code=Op.SSTORE(key=0x2, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x703B936FD4D674F0FF5D6957F61097152F8781B8),  # noqa: E501
+        address=Address(0xD4CB222A4A4D4D9E68078E1DA39721AEC39B0546),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (CALL 150000 <contract:0x1000000000000000000000000000000000000001> 0 0 64 0 64 ) }  # noqa: E501
@@ -58,7 +58,7 @@ def test_callcallcode_01_suicide_end(
             key=0x0,
             value=Op.CALL(
                 gas=0x249F0,
-                address=0x799DA5A3C983A22F9C430DE1BF99134EE561E856,
+                address=0xF3465FF8457D51044A0A0288EBC3003836476B23,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -69,7 +69,7 @@ def test_callcallcode_01_suicide_end(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x4353E77718BE108D4C149D88B34CACEDA42C5C66),  # noqa: E501
+        address=Address(0xBCEFB64D71ED9D0D5A1D80DA5C570A627DD9BEB7),  # noqa: E501
     )
     # Source: lll
     # {  [[ 1 ]] (CALLCODE 50000 <contract:0x1000000000000000000000000000000000000002> 0 0 64 0 64 ) (SELFDESTRUCT <contract:target:0x1000000000000000000000000000000000000000>) }  # noqa: E501
@@ -78,7 +78,7 @@ def test_callcallcode_01_suicide_end(
             key=0x1,
             value=Op.CALLCODE(
                 gas=0xC350,
-                address=0x703B936FD4D674F0FF5D6957F61097152F8781B8,
+                address=0xD4CB222A4A4D4D9E68078E1DA39721AEC39B0546,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -86,11 +86,11 @@ def test_callcallcode_01_suicide_end(
                 ret_size=0x40,
             ),
         )
-        + Op.SELFDESTRUCT(address=0x4353E77718BE108D4C149D88B34CACEDA42C5C66)
+        + Op.SELFDESTRUCT(address=0xBCEFB64D71ED9D0D5A1D80DA5C570A627DD9BEB7)
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x799DA5A3C983A22F9C430DE1BF99134EE561E856),  # noqa: E501
+        address=Address(0xF3465FF8457D51044A0A0288EBC3003836476B23),  # noqa: E501
     )
 
     tx = Transaction(

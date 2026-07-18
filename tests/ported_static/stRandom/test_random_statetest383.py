@@ -34,7 +34,7 @@ def test_random_statetest383(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest383."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0x9092BE7BCFB1ED84057529190A582E73411C1111)
     sender = EOA(
         key=0xB1F4CBC3A50042184425A6F9E996D0910F7BA879457CE5DAC5C71E498AD3C005
     )
@@ -62,13 +62,13 @@ def test_random_statetest383(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0x9092BE7BCFB1ED84057529190A582E73411C1111),  # noqa: E501
     )
     # Source: raw
     # 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff09150255436c75107e  # noqa: E501
     target = pre.deploy_contract(  # noqa: F841
         code=bytes.fromhex(
-            "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e797fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e797f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff09150255436c75107e"  # noqa: E501
+            "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000009092be7bcfb1ed84057529190a582e73411c11117fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000009092be7bcfb1ed84057529190a582e73411c11117f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff09150255436c75107e"  # noqa: E501
         ),
         nonce=0,
         address=Address(0x9306B5E9E12F8E3524CB929C05E3F817FD403029),  # noqa: E501
@@ -78,7 +78,7 @@ def test_random_statetest383(
         sender=sender,
         to=target,
         data=Bytes(
-            "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e797fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e797f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff09150255436c75107e"  # noqa: E501
+            "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000009092be7bcfb1ed84057529190a582e73411c11117fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000009092be7bcfb1ed84057529190a582e73411c11117f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff09150255436c75107e"  # noqa: E501
         ),
         value=0x6379C077,
     )
@@ -86,7 +86,7 @@ def test_random_statetest383(
     post = {
         target: Account(
             storage={
-                0x4F3F701464972E74606D6EA82D4D3080599A0E79: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF,  # noqa: E501
+                0x9092BE7BCFB1ED84057529190A582E73411C1111: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF,  # noqa: E501
             },
             balance=0x6379C077,
             nonce=0,

@@ -35,7 +35,7 @@ def test_random_statetest245(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest245."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0x8FA4049F6B51C3B4855E1CFDD3B59B03BE92C12B)
     sender = EOA(
         key=0xB1F4CBC3A50042184425A6F9E996D0910F7BA879457CE5DAC5C71E498AD3C005
     )
@@ -63,17 +63,17 @@ def test_random_statetest245(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0x8FA4049F6B51C3B4855E1CFDD3B59B03BE92C12B),  # noqa: E501
     )
     # Source: raw
     # 0x7f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff157f00000000000000000000000000000000000000000000000000000000000000007f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7f000000000000000000000000000000000000000000000000000000000000c3507ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0469877c39141650434587895560005155  # noqa: E501
     target = pre.deploy_contract(  # noqa: F841
-        code=Op.PUSH32[0x4F3F701464972E74606D6EA82D4D3080599A0E79]
+        code=Op.PUSH32[0x8FA4049F6B51C3B4855E1CFDD3B59B03BE92C12B]
         + Op.ISZERO(
             0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
         )
         + Op.PUSH32[0x0]
-        + Op.PUSH32[0x4F3F701464972E74606D6EA82D4D3080599A0E79]
+        + Op.PUSH32[0x8FA4049F6B51C3B4855E1CFDD3B59B03BE92C12B]
         + Op.PUSH32[
             0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE
         ]
@@ -94,7 +94,7 @@ def test_random_statetest245(
         sender=sender,
         to=target,
         data=Bytes(
-            "7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e797fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff157f00000000000000000000000000000000000000000000000000000000000000007f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e797ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7f000000000000000000000000000000000000000000000000000000000000c3507ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0469877c3914165043458789"  # noqa: E501
+            "7f0000000000000000000000008fa4049f6b51c3b4855e1cfdd3b59b03be92c12b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff157f00000000000000000000000000000000000000000000000000000000000000007f0000000000000000000000008fa4049f6b51c3b4855e1cfdd3b59b03be92c12b7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7f000000000000000000000000000000000000000000000000000000000000c3507ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0469877c3914165043458789"  # noqa: E501
         ),
         gas_limit=2100000 if fork >= Amsterdam else 100000,
         value=0x109B6E97,

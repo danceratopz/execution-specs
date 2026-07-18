@@ -52,7 +52,7 @@ def test_static_callcallcallcode_001_suicide_middle(
         code=Op.MSTORE(offset=0x3, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3),  # noqa: E501
+        address=Address(0xF524E0A6FF9703580A4FFA961DF810F1A489B963),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (STATICCALL 150000 <contract:0x1000000000000000000000000000000000000001> 0 64 0 64 ) [[ 1 ]] 1 }  # noqa: E501
@@ -61,7 +61,7 @@ def test_static_callcallcallcode_001_suicide_middle(
             key=0x0,
             value=Op.STATICCALL(
                 gas=0x249F0,
-                address=0x620B381D01CBD812FFB798AB35A1A316BDE90CE6,
+                address=0xBEE533991086C684473D416CFE921E64D5BC32B5,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -72,7 +72,7 @@ def test_static_callcallcallcode_001_suicide_middle(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x569CDC3B32CC3F9747BBDE39FD70FEAD591D2F0D),  # noqa: E501
+        address=Address(0x480C3505AECB632942A04C6632D7F38CB2F5DB8C),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 3 1) (STATICCALL 100000 <contract:0x1000000000000000000000000000000000000002> 0 64 0 64 ) (MSTORE 32 1) }  # noqa: E501
@@ -92,17 +92,17 @@ def test_static_callcallcallcode_001_suicide_middle(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x620B381D01CBD812FFB798AB35A1A316BDE90CE6),  # noqa: E501
+        address=Address(0xBEE533991086C684473D416CFE921E64D5BC32B5),  # noqa: E501
     )
     # Source: lll
     # {  (SELFDESTRUCT <contract:target:0x1000000000000000000000000000000000000000>) (DELEGATECALL 50000 <contract:0x1000000000000000000000000000000000000003> 0 64 0 64 ) }  # noqa: E501
     addr_2 = pre.deploy_contract(  # noqa: F841
         code=Op.SELFDESTRUCT(
-            address=0x569CDC3B32CC3F9747BBDE39FD70FEAD591D2F0D
+            address=0x480C3505AECB632942A04C6632D7F38CB2F5DB8C
         )
         + Op.DELEGATECALL(
             gas=0xC350,
-            address=0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3,
+            address=0xF524E0A6FF9703580A4FFA961DF810F1A489B963,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,

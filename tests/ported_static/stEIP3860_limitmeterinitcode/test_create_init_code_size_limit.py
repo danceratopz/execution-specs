@@ -63,7 +63,7 @@ def test_create_init_code_size_limit(
     """Test_create_init_code_size_limit."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
     contract_0 = Address(0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB)
-    contract_1 = Address(0x000000000000000000000000000000000000C0DE)
+    contract_1 = Address(0xACE4899EE36E4D9FB22C2F1778F8CFED2E62E8E4)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -110,7 +110,7 @@ def test_create_init_code_size_limit(
         + Op.SSTORE
         + Op.STOP,
         nonce=1,
-        address=Address(0x000000000000000000000000000000000000C0DE),  # noqa: E501
+        address=Address(0xACE4899EE36E4D9FB22C2F1778F8CFED2E62E8E4),  # noqa: E501
     )
     # Source: yul
     # berlin

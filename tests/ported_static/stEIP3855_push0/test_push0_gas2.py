@@ -57,9 +57,9 @@ def test_push0_gas2(
 ) -> None:
     """Test_push0_gas2."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
-    contract_1 = Address(0x0000000000000000000000000000000000001000)
-    contract_2 = Address(0x0000000000000000000000000000000000000200)
+    contract_0 = Address(0xE80C9C368718941F2AE64E26F977C9A68C353023)
+    contract_1 = Address(0xE46AD7026BC87CFA010D468C4E36528FD430FAF4)
+    contract_2 = Address(0xE2F8F18FF15C67D4F921AB761E6C9DFA7C660B4D)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -96,7 +96,7 @@ def test_push0_gas2(
         + Op.SSTORE(key=Op.DUP1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0xE80C9C368718941F2AE64E26F977C9A68C353023),  # noqa: E501
     )
     # Source: raw
     # 0x5a5f5a9091039055
@@ -110,7 +110,7 @@ def test_push0_gas2(
         + Op.SWAP1
         + Op.SSTORE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0xE46AD7026BC87CFA010D468C4E36528FD430FAF4),  # noqa: E501
     )
     # Source: raw
     # 0x5a60005a9091039055
@@ -124,7 +124,7 @@ def test_push0_gas2(
         + Op.SWAP1
         + Op.SSTORE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000000200),  # noqa: E501
+        address=Address(0xE2F8F18FF15C67D4F921AB761E6C9DFA7C660B4D),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

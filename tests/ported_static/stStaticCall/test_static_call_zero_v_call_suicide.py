@@ -49,7 +49,7 @@ def test_static_call_zero_v_call_suicide(
     target = pre.deploy_contract(  # noqa: F841
         code=Op.STATICCALL(
             gas=0xEA60,
-            address=0x79968A94DBEDB20475585E9DD4DAE6333ADD4C01,
+            address=0xBE91347759FDC7AAB633C892DCA731FD27CD098B,
             args_offset=0x0,
             args_size=0x0,
             ret_offset=0x0,
@@ -67,7 +67,7 @@ def test_static_call_zero_v_call_suicide(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0x79968A94DBEDB20475585E9DD4DAE6333ADD4C01),  # noqa: E501
+        address=Address(0xBE91347759FDC7AAB633C892DCA731FD27CD098B),  # noqa: E501
     )
 
     tx = Transaction(

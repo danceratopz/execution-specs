@@ -78,7 +78,7 @@ def test_returndatacopy_following_call(
         + Op.STOP,
         storage={0: 1},
         nonce=0,
-        address=Address(0x2FAF9D2A81304665C9A06A42935DDC42B24F488B),  # noqa: E501
+        address=Address(0x6E371161FC256CCE4D7ADC47FA9CDA5E48E33C9A),  # noqa: E501
     )
 
     tx = Transaction(

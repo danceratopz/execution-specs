@@ -89,7 +89,7 @@ def test_static_callcallcode_01_ooge_2(
         + Op.MSTORE(offset=0x2, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xCE21F15217A7B94DB9C505A66C9549E803BF141C),  # noqa: E501
+        address=Address(0x24CDFA6ABE920D51919E583A12F001740B1A411B),  # noqa: E501
     )
     # Source: lll
     # {  (def 'i 0x80) (for {} (< @i 50000) [i](+ @i 1) (EXTCODESIZE 1)  ) }
@@ -104,7 +104,7 @@ def test_static_callcallcode_01_ooge_2(
         + Op.JUMPDEST
         + Op.STOP,
         nonce=0,
-        address=Address(0x609E4DFE6190235B9A0362084C741D9EC330FB1E),  # noqa: E501
+        address=Address(0x0AC3EF079EA09FC53AC07485A152285FE3D33E67),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 0 (CALLDATALOAD 0)) [[ 0 ]] (STATICCALL 150000 <contract:0x1000000000000000000000000000000000000001> 0 32 0 64 ) [[ 1 ]] 1 }  # noqa: E501

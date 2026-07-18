@@ -38,7 +38,7 @@ def test_call_contract_to_create_contract_oog_bonus_gas(
 ) -> None:
     """Test_call_contract_to_create_contract_oog_bonus_gas."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0x2D003E1858E92D1FE3D10E3B2B5D8A07784380C4)
     sender = pre.fund_eoa(amount=0x3B9ACA00)
 
     env = Environment(
@@ -68,7 +68,7 @@ def test_call_contract_to_create_contract_oog_bonus_gas(
         + Op.STOP,
         balance=112,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x2D003E1858E92D1FE3D10E3B2B5D8A07784380C4),  # noqa: E501
     )
 
     tx = Transaction(

@@ -52,7 +52,7 @@ def test_static_callcodecallcall_100_suicide_middle(
         code=Op.MSTORE(offset=0x3, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3),  # noqa: E501
+        address=Address(0x9C3BCB72F174DC6091B1BDF49806A8D60E836780),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (DELEGATECALL 150000 <contract:0x1000000000000000000000000000000000000001> 0 64 0 64 ) [[ 1 ]] 1 }  # noqa: E501
@@ -72,7 +72,7 @@ def test_static_callcodecallcall_100_suicide_middle(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x31D06FAD70E2A598413824A9BC68D80A5D2B194E),  # noqa: E501
+        address=Address(0x18CB1DF57069DD23890309EBCFAEC801D2697100),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 3 1) (STATICCALL 100000 <contract:0x1000000000000000000000000000000000000002> 0 64 0 64 ) (MSTORE 32 1)}  # noqa: E501
@@ -81,7 +81,7 @@ def test_static_callcodecallcall_100_suicide_middle(
         + Op.POP(
             Op.STATICCALL(
                 gas=0x186A0,
-                address=0x408F1ACEFFEC7BDAA35D77006CDCAEAD563BB694,
+                address=0x6AE49698D08F39071DABA23B7C4D1FA3BCE9009F,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -98,11 +98,11 @@ def test_static_callcodecallcall_100_suicide_middle(
     # {  (SELFDESTRUCT <contract:target:0x1000000000000000000000000000000000000000>) (STATICCALL 50000 <contract:0x1000000000000000000000000000000000000003> 0 64 0 64 ) }  # noqa: E501
     addr_2 = pre.deploy_contract(  # noqa: F841
         code=Op.SELFDESTRUCT(
-            address=0x31D06FAD70E2A598413824A9BC68D80A5D2B194E
+            address=0x18CB1DF57069DD23890309EBCFAEC801D2697100
         )
         + Op.STATICCALL(
             gas=0xC350,
-            address=0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3,
+            address=0x9C3BCB72F174DC6091B1BDF49806A8D60E836780,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,
@@ -111,7 +111,7 @@ def test_static_callcodecallcall_100_suicide_middle(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x408F1ACEFFEC7BDAA35D77006CDCAEAD563BB694),  # noqa: E501
+        address=Address(0x6AE49698D08F39071DABA23B7C4D1FA3BCE9009F),  # noqa: E501
     )
 
     tx = Transaction(

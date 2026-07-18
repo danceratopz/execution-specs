@@ -56,7 +56,7 @@ def test_fill_stack(
     v: int,
 ) -> None:
     """Test_fill_stack."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0x0133D7D0A471449E0CE387437C0A13E4A58EB915)
     sender = pre.fund_eoa(amount=0x152D02C7E14AF6800000)
 
     env = Environment(
@@ -107,7 +107,7 @@ def test_fill_stack(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0x0133D7D0A471449E0CE387437C0A13E4A58EB915),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

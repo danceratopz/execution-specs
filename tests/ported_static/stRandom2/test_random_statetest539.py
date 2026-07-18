@@ -34,7 +34,7 @@ def test_random_statetest539(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest539."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0xA2395BB2419E1311D0E9DF9E97BC8FF9BF25538D)
     sender = EOA(
         key=0xB1F4CBC3A50042184425A6F9E996D0910F7BA879457CE5DAC5C71E498AD3C005
     )
@@ -81,7 +81,7 @@ def test_random_statetest539(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0xA2395BB2419E1311D0E9DF9E97BC8FF9BF25538D),  # noqa: E501
     )
 
     tx = Transaction(
@@ -96,7 +96,7 @@ def test_random_statetest539(
     post = {
         target: Account(
             storage={
-                0x4F3F701464972E74606D6EA82D4D3080599A0E79: 0x94200BF18B0B316E,
+                0xA2395BB2419E1311D0E9DF9E97BC8FF9BF25538D: 0x94200BF18B0B316E,
             },
             nonce=0,
         ),

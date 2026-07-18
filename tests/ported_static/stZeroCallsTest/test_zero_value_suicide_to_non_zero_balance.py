@@ -59,7 +59,7 @@ def test_zero_value_suicide_to_non_zero_balance(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0x888748026558F849C1B2433EA5E1DAF1444DFC60),  # noqa: E501
+        address=Address(0xFDD370F11165E3DC65103387F33F385312ECBB4E),  # noqa: E501
     )
 
     tx = Transaction(

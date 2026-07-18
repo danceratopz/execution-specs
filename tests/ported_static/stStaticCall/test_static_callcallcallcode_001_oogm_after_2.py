@@ -93,14 +93,14 @@ def test_static_callcallcallcode_001_oogm_after_2(
     addr_4 = pre.deploy_contract(  # noqa: F841
         code=Op.MSTORE(offset=0x3, value=0x1) + Op.STOP,
         nonce=0,
-        address=Address(0x335C5531B84765A7626E6E76688F18B81BE5259C),  # noqa: E501
+        address=Address(0x8B2828151DACB439D9D57FB5A17081627F5EBDCC),  # noqa: E501
     )
     # Source: lll
     # { (DELEGATECALL 120020 <contract:0x1000000000000000000000000000000000000003> 0 64 0 64 ) }  # noqa: E501
     addr_3 = pre.deploy_contract(  # noqa: F841
         code=Op.DELEGATECALL(
             gas=0x1D4D4,
-            address=0x335C5531B84765A7626E6E76688F18B81BE5259C,
+            address=0x8B2828151DACB439D9D57FB5A17081627F5EBDCC,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,

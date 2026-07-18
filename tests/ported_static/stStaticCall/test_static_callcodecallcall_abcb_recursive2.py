@@ -74,7 +74,7 @@ def test_static_callcodecallcall_abcb_recursive2(
             key=0x0,
             value=Op.CALLCODE(
                 gas=0x17D7840,
-                address=0x2733821FA13C4EAD1C9631C76820333F42059B7C,
+                address=0x9C2E282C59F8E35BCDBA7765ACCEB4BFC403BBAC,
                 value=Op.CALLVALUE,
                 args_offset=0x0,
                 args_size=0x40,
@@ -86,14 +86,14 @@ def test_static_callcodecallcall_abcb_recursive2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x3DA1F9D4153096BD467629A1FDB678437ACD810B),  # noqa: E501
+        address=Address(0x3AB876866DDC6A6DCA4BD4795B9C499B48A6AEF4),  # noqa: E501
     )
     # Source: lll
     # {  (STATICCALL 1000000 <contract:0x1000000000000000000000000000000000000002> 0 64 0 64 ) }  # noqa: E501
     addr = pre.deploy_contract(  # noqa: F841
         code=Op.STATICCALL(
             gas=0xF4240,
-            address=0x1E2229D0F325B81B81B8B14F2D239FF9742683C0,
+            address=0x9197DA5F225442D1C313EE4B3E5D40E496846DB9,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,
@@ -102,14 +102,14 @@ def test_static_callcodecallcall_abcb_recursive2(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x2733821FA13C4EAD1C9631C76820333F42059B7C),  # noqa: E501
+        address=Address(0x9C2E282C59F8E35BCDBA7765ACCEB4BFC403BBAC),  # noqa: E501
     )
     # Source: lll
     # {  (STATICCALL 500000 <contract:0x1000000000000000000000000000000000000001> 0 64 0 64 ) }  # noqa: E501
     addr_2 = pre.deploy_contract(  # noqa: F841
         code=Op.STATICCALL(
             gas=0x7A120,
-            address=0x2733821FA13C4EAD1C9631C76820333F42059B7C,
+            address=0x9C2E282C59F8E35BCDBA7765ACCEB4BFC403BBAC,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,
@@ -118,7 +118,7 @@ def test_static_callcodecallcall_abcb_recursive2(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x1E2229D0F325B81B81B8B14F2D239FF9742683C0),  # noqa: E501
+        address=Address(0x9197DA5F225442D1C313EE4B3E5D40E496846DB9),  # noqa: E501
     )
 
     tx_data = [

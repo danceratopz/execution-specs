@@ -52,7 +52,7 @@ def test_static_callcodecallcodecallcode_111_suicide_end(
         code=Op.MSTORE(offset=0x3, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3),  # noqa: E501
+        address=Address(0xBA2F11289315DB3EF7B8E35FD4E643E124F0A92E),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (DELEGATECALL 150000 <contract:0x1000000000000000000000000000000000000001> 0 64 0 64 ) [[ 1 ]] 1 }  # noqa: E501
@@ -72,14 +72,14 @@ def test_static_callcodecallcodecallcode_111_suicide_end(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x31D06FAD70E2A598413824A9BC68D80A5D2B194E),  # noqa: E501
+        address=Address(0x311D8BDE0DDEB2843D447F6C7968C23E29035434),  # noqa: E501
     )
     # Source: lll
     # {  (STATICCALL 100000 <contract:0x1000000000000000000000000000000000000002> 0 64 0 64) }  # noqa: E501
     addr = pre.deploy_contract(  # noqa: F841
         code=Op.STATICCALL(
             gas=0x186A0,
-            address=0x90E9B92C59A0E93D8AB0B7AFBC945D6999A50A9B,
+            address=0x027AF4509A6CD014935AD6AB5D8596AB36F627FC,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,
@@ -96,7 +96,7 @@ def test_static_callcodecallcodecallcode_111_suicide_end(
         code=Op.POP(
             Op.CALLCODE(
                 gas=0xC350,
-                address=0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3,
+                address=0xBA2F11289315DB3EF7B8E35FD4E643E124F0A92E,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -108,7 +108,7 @@ def test_static_callcodecallcodecallcode_111_suicide_end(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x90E9B92C59A0E93D8AB0B7AFBC945D6999A50A9B),  # noqa: E501
+        address=Address(0x027AF4509A6CD014935AD6AB5D8596AB36F627FC),  # noqa: E501
     )
 
     tx = Transaction(

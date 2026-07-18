@@ -35,7 +35,7 @@ def test_create_init_fail_oo_gduring_init(
 ) -> None:
     """Create fails because init code has OOG."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0xF9D8BFA179D5DCD2C632CD79878E95815EDD6F08)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -58,7 +58,7 @@ def test_create_init_fail_oo_gduring_init(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0xF9D8BFA179D5DCD2C632CD79878E95815EDD6F08),  # noqa: E501
     )
 
     tx = Transaction(

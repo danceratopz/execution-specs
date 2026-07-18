@@ -87,7 +87,7 @@ def test_static_call10(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0x2A1505943312438AC5CE819161F302F6132D69D7),  # noqa: E501
     )
     # Source: lll
     # { (def 'i 0x80) (for {} (< @i 10) [i](+ @i 1) [[ 0 ]](STATICCALL 0xfffffffffff <eoa:0xaaaf5374fce5edbc8e2a8697c15331677e6ebf0b> 0 50000 0 0) ) [[ 1 ]] @i}  # noqa: E501

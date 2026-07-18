@@ -33,7 +33,7 @@ def test_non_zero_value_suicide(
 ) -> None:
     """Test_non_zero_value_suicide."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_0 = Address(0xC9794E8A1E002F64C8541BF8F1C4B3D318A618AE)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -57,7 +57,7 @@ def test_non_zero_value_suicide(
         + Op.STOP,
         balance=1,
         nonce=0,
-        address=Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0xC9794E8A1E002F64C8541BF8F1C4B3D318A618AE),  # noqa: E501
     )
 
     tx = Transaction(

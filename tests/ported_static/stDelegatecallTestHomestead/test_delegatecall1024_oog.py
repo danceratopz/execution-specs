@@ -55,7 +55,7 @@ def test_delegatecall1024_oog(
                     Op.SUB(Op.GAS, 0x2710),
                     Op.SUB(0x1, Op.DIV(Op.SLOAD(key=0x0), 0x401)),
                 ),
-                address=0x62C5C9278DA01E6594D6FEDE061838CF5E597F2B,
+                address=0x55F5677E101D0094C85141417C153DD362875EE9,
                 args_offset=0x0,
                 args_size=0x0,
                 ret_offset=0x0,
@@ -68,7 +68,7 @@ def test_delegatecall1024_oog(
         + Op.STOP,
         balance=1024,
         nonce=0,
-        address=Address(0x62C5C9278DA01E6594D6FEDE061838CF5E597F2B),  # noqa: E501
+        address=Address(0x55F5677E101D0094C85141417C153DD362875EE9),  # noqa: E501
     )
 
     tx = Transaction(

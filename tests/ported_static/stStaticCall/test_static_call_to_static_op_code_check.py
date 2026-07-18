@@ -65,7 +65,7 @@ def test_static_call_to_static_op_code_check(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x7EF8271E6CDB0A23220B73BF3E9697E173F9D015),  # noqa: E501
+        address=Address(0xAA95FEB945973E3390887F45008E89491D294E61),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 0 (STATICCALL 100000 <contract:0x1000000000000000000000000000000000000002> 0 0 0 0)) (if (= 1 (MLOAD 0)) (MSTORE 1 1) (SSTORE 1 1) ) }  # noqa: E501
@@ -74,7 +74,7 @@ def test_static_call_to_static_op_code_check(
             offset=0x0,
             value=Op.STATICCALL(
                 gas=0x186A0,
-                address=0xD366057A988CB6562F7FA2A601F06A503D30A90,
+                address=0xF6CBD2FA7549698B9B3C2B78AB2D5BEE469464C3,
                 args_offset=0x0,
                 args_size=0x0,
                 ret_offset=0x0,
@@ -120,7 +120,7 @@ def test_static_call_to_static_op_code_check(
         + Op.JUMPI(
             pc=0x74,
             condition=Op.EQ(
-                0xD366057A988CB6562F7FA2A601F06A503D30A90, Op.ADDRESS
+                0xF6CBD2FA7549698B9B3C2B78AB2D5BEE469464C3, Op.ADDRESS
             ),
         )
         + Op.SSTORE(key=0x1, value=0x2)
@@ -137,7 +137,7 @@ def test_static_call_to_static_op_code_check(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0D366057A988CB6562F7FA2A601F06A503D30A90),  # noqa: E501
+        address=Address(0xF6CBD2FA7549698B9B3C2B78AB2D5BEE469464C3),  # noqa: E501
     )
 
     tx = Transaction(

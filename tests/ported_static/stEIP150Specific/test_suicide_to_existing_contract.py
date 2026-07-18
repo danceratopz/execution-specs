@@ -61,7 +61,7 @@ def test_suicide_to_existing_contract(
         + Op.POP(
             Op.CALL(
                 gas=0xEA60,
-                address=0x79968A94DBEDB20475585E9DD4DAE6333ADD4C01,
+                address=0x390867504B50027AD813355BFD8DA412A10259D7,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -82,7 +82,7 @@ def test_suicide_to_existing_contract(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0x79968A94DBEDB20475585E9DD4DAE6333ADD4C01),  # noqa: E501
+        address=Address(0x390867504B50027AD813355BFD8DA412A10259D7),  # noqa: E501
     )
 
     tx = Transaction(

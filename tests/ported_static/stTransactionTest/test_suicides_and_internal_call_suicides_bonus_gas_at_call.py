@@ -36,7 +36,7 @@ def test_suicides_and_internal_call_suicides_bonus_gas_at_call(
     """Test_suicides_and_internal_call_suicides_bonus_gas_at_call."""
     coinbase = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
     contract_0 = Address(0x0000000000000000000000000000000000000000)
-    contract_1 = Address(0xC94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_1 = Address(0x56EFEBB21925CCA853BD70D826844193B89F714B)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -76,7 +76,7 @@ def test_suicides_and_internal_call_suicides_bonus_gas_at_call(
         + Op.STOP,
         balance=10,
         nonce=0,
-        address=Address(0xC94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0x56EFEBB21925CCA853BD70D826844193B89F714B),  # noqa: E501
     )
 
     tx = Transaction(

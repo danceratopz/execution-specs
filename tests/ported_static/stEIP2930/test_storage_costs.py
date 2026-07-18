@@ -277,17 +277,17 @@ def test_storage_costs(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001010)
-    contract_7 = Address(0x0000000000000000000000000000000000001011)
-    contract_8 = Address(0x0000000000000000000000000000000000001020)
-    contract_9 = Address(0x0000000000000000000000000000000000001021)
-    contract_10 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E0)
+    contract_1 = Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E1)
+    contract_2 = Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E2)
+    contract_3 = Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E3)
+    contract_4 = Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E4)
+    contract_5 = Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E5)
+    contract_6 = Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2F0)
+    contract_7 = Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2F1)
+    contract_8 = Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C300)
+    contract_9 = Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C301)
+    contract_10 = Address(0xA7626872F1935971A4D4D6EDB0C51A5CF125D451)
     sender = pre.fund_eoa(amount=0xDE0B6B3A7640000)
 
     env = Environment(
@@ -326,7 +326,7 @@ def test_storage_costs(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E0),  # noqa: E501
     )
     # Source: lll
     # {
@@ -351,7 +351,7 @@ def test_storage_costs(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E1),  # noqa: E501
     )
     # Source: lll
     # {
@@ -385,7 +385,7 @@ def test_storage_costs(
         storage={0: 24743},
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E2),  # noqa: E501
     )
     # Source: lll
     # {
@@ -416,7 +416,7 @@ def test_storage_costs(
         storage={0: 24743},
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E3),  # noqa: E501
     )
     # Source: lll
     # {
@@ -446,7 +446,7 @@ def test_storage_costs(
         storage={0: 24743},
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E4),  # noqa: E501
     )
     # Source: lll
     # {
@@ -476,7 +476,7 @@ def test_storage_costs(
         storage={0: 0},
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2E5),  # noqa: E501
     )
     # Source: lll
     # {
@@ -511,7 +511,7 @@ def test_storage_costs(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001010),  # noqa: E501
+        address=Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2F0),  # noqa: E501
     )
     # Source: lll
     # {
@@ -539,7 +539,7 @@ def test_storage_costs(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001011),  # noqa: E501
+        address=Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C2F1),  # noqa: E501
     )
     # Source: lll
     # {
@@ -573,7 +573,7 @@ def test_storage_costs(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001020),  # noqa: E501
+        address=Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C300),  # noqa: E501
     )
     # Source: lll
     # {
@@ -600,7 +600,7 @@ def test_storage_costs(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001021),  # noqa: E501
+        address=Address(0x6C5955BF8E08F166BE67D2DBA3561B263535C301),  # noqa: E501
     )
     # Source: lll
     # { ; TO_ADDR_VALID   TO_ADDR_INVALID_ADDR    TO_ADDR_INVALID_CELL
@@ -632,7 +632,10 @@ def test_storage_costs(
         code=Op.POP(
             Op.CALL(
                 gas=Op.GAS,
-                address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+                address=Op.ADD(
+                    0x6C5955BF8E08F166BE67D2DBA3561B263535C2E0,
+                    Op.CALLDATALOAD(offset=0x4),
+                ),
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -658,7 +661,7 @@ def test_storage_costs(
         storage={24743: 57005},
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0xA7626872F1935971A4D4D6EDB0C51A5CF125D451),  # noqa: E501
     )
 
     # EIP-8037 moves the bulk of storage-write cost into a per-storage

@@ -65,10 +65,10 @@ def test_mload(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0xE4D74717D40799C524A790348FB69F6DA20ABAAD)
+    contract_1 = Address(0xE4D74717D40799C524A790348FB69F6DA20ABAAE)
+    contract_2 = Address(0xE4D74717D40799C524A790348FB69F6DA20ABAAF)
+    contract_3 = Address(0xC1118A0122EC9EB429ED75ACCBFC6D5D6AE222D7)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -98,7 +98,7 @@ def test_mload(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0xE4D74717D40799C524A790348FB69F6DA20ABAAD),  # noqa: E501
     )
     # Source: lll
     # {
@@ -109,7 +109,7 @@ def test_mload(
         code=Op.SSTORE(key=0x0, value=Op.MLOAD(offset=0xFFFFFFF)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0xE4D74717D40799C524A790348FB69F6DA20ABAAE),  # noqa: E501
     )
     # Source: lll
     # {
@@ -120,7 +120,7 @@ def test_mload(
         code=Op.SSTORE(key=0x0, value=Op.MLOAD(offset=0x724825)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0xE4D74717D40799C524A790348FB69F6DA20ABAAF),  # noqa: E501
     )
     # Source: lll
     # {
@@ -129,7 +129,10 @@ def test_mload(
     contract_3 = pre.deploy_contract(  # noqa: F841
         code=Op.DELEGATECALL(
             gas=Op.GAS,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0xE4D74717D40799C524A790348FB69F6DA20ABAAD,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             args_offset=0x0,
             args_size=0x0,
             ret_offset=0x0,
@@ -139,7 +142,7 @@ def test_mload(
         storage={0: 2989},
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0xC1118A0122EC9EB429ED75ACCBFC6D5D6AE222D7),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

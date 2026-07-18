@@ -64,10 +64,10 @@ def test_sstore_sload(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x3A72C8E391BFE00DEE6A4971285120961B7C3902)
+    contract_1 = Address(0x3A72C8E391BFE00DEE6A4971285120961B7C3903)
+    contract_2 = Address(0x3A72C8E391BFE00DEE6A4971285120961B7C3904)
+    contract_3 = Address(0xA607B11EC89FD662EFA3A7F6636CECBC29C4890A)
     sender = pre.fund_eoa(amount=0x100000000000)
 
     env = Environment(
@@ -92,7 +92,7 @@ def test_sstore_sload(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x3A72C8E391BFE00DEE6A4971285120961B7C3902),  # noqa: E501
     )
     # Source: lll
     # {
@@ -107,7 +107,7 @@ def test_sstore_sload(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x3A72C8E391BFE00DEE6A4971285120961B7C3903),  # noqa: E501
     )
     # Source: lll
     # {
@@ -126,7 +126,7 @@ def test_sstore_sload(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x3A72C8E391BFE00DEE6A4971285120961B7C3904),  # noqa: E501
     )
     # Source: lll
     # {
@@ -135,7 +135,10 @@ def test_sstore_sload(
     contract_3 = pre.deploy_contract(  # noqa: F841
         code=Op.DELEGATECALL(
             gas=Op.GAS,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x3A72C8E391BFE00DEE6A4971285120961B7C3902,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             args_offset=0x0,
             args_size=0x0,
             ret_offset=0x0,
@@ -145,7 +148,7 @@ def test_sstore_sload(
         storage={0: 2989},
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0xA607B11EC89FD662EFA3A7F6636CECBC29C4890A),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

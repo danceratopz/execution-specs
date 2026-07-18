@@ -32,7 +32,7 @@ def test_random_statetest48(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest48."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0xC115735597D981174506BF39F56B3EDE7D68448E)
     sender = pre.fund_eoa(amount=0xDE0B6B3A7640000)
 
     env = Environment(
@@ -58,7 +58,7 @@ def test_random_statetest48(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0xC115735597D981174506BF39F56B3EDE7D68448E),  # noqa: E501
     )
     # Source: raw
     # 0x38785231d8e75db11d6da7040cee1a12ebf739e5022caa60f92d51636060b6d96d698fc0e9ced2f6a0087344559c43612f0561a73ba3600a600d6014600963186262c173<contract:target:0x095e7baea6a6c7c4c2dfeb977efac326af552d87>6370f82d9ff1604166f49ef1fea120af77ba4cce3f35bc52ca5c40bf14c77e95ea92e69520143ff9c7827bcfe760aee06d241e31a0773476da22f7ce8131475838c23b59f7a3c46b2b99c0955e169ee3527ca9f7674467bdf2c0eebf6f60129232  # noqa: E501

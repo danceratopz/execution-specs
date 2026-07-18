@@ -42,9 +42,9 @@ def test_callcode_to_precompile_from_called_contract(
 ) -> None:
     """Contract C calls contract B."""
     coinbase = Address(0xCAFE000000000000000000000000000000000001)
-    contract_0 = Address(0xC000000000000000000000000000000000000000)
-    contract_1 = Address(0xB000000000000000000000000000000000000000)
-    contract_2 = Address(0xA000000000000000000000000000000000000000)
+    contract_0 = Address(0x8EEAA3A18C72A847A606033799559D40D0BB7589)
+    contract_1 = Address(0x809DFF7D1DEB81DD7EC07D1D33761AEBEEF22D7C)
+    contract_2 = Address(0xEC6CD59B62507317B4079EEC4397F0543ACA60E9)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -477,7 +477,7 @@ def test_callcode_to_precompile_from_called_contract(
         + Op.STOP,
         balance=1000,
         nonce=0,
-        address=Address(0xA000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0xEC6CD59B62507317B4079EEC4397F0543ACA60E9),  # noqa: E501
     )
     # Source: lll
     # {
@@ -575,7 +575,7 @@ def test_callcode_to_precompile_from_called_contract(
         },
         balance=1000,
         nonce=0,
-        address=Address(0xB000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x809DFF7D1DEB81DD7EC07D1D33761AEBEEF22D7C),  # noqa: E501
     )
     # Source: lll
     # {
@@ -610,7 +610,7 @@ def test_callcode_to_precompile_from_called_contract(
         },
         balance=1000,
         nonce=0,
-        address=Address(0xC000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x8EEAA3A18C72A847A606033799559D40D0BB7589),  # noqa: E501
     )
 
     tx = Transaction(

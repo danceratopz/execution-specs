@@ -65,10 +65,10 @@ def test_mstore8(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0xAAE101E36843BFD4F7D56A716F8E2738A24FA512)
+    contract_1 = Address(0xAAE101E36843BFD4F7D56A716F8E2738A24FA513)
+    contract_2 = Address(0xAAE101E36843BFD4F7D56A716F8E2738A24FA514)
+    contract_3 = Address(0x54ADEB3856CA0E0B850A150CEF9036C458CDC08F)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -95,7 +95,7 @@ def test_mstore8(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0xAAE101E36843BFD4F7D56A716F8E2738A24FA512),  # noqa: E501
     )
     # Source: lll
     # {
@@ -110,7 +110,7 @@ def test_mstore8(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0xAAE101E36843BFD4F7D56A716F8E2738A24FA513),  # noqa: E501
     )
     # Source: lll
     # {
@@ -124,7 +124,7 @@ def test_mstore8(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0xAAE101E36843BFD4F7D56A716F8E2738A24FA514),  # noqa: E501
     )
     # Source: lll
     # {
@@ -133,7 +133,10 @@ def test_mstore8(
     contract_3 = pre.deploy_contract(  # noqa: F841
         code=Op.DELEGATECALL(
             gas=Op.GAS,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0xAAE101E36843BFD4F7D56A716F8E2738A24FA512,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             args_offset=0x0,
             args_size=0x0,
             ret_offset=0x0,
@@ -143,7 +146,7 @@ def test_mstore8(
         storage={0: 2989},
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x54ADEB3856CA0E0B850A150CEF9036C458CDC08F),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

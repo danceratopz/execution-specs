@@ -149,24 +149,24 @@ def test_sha3(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001006)
-    contract_7 = Address(0x0000000000000000000000000000000000001007)
-    contract_8 = Address(0x0000000000000000000000000000000000001008)
-    contract_9 = Address(0x0000000000000000000000000000000000001009)
-    contract_10 = Address(0x000000000000000000000000000000000000100A)
-    contract_11 = Address(0x000000000000000000000000000000000000100B)
-    contract_12 = Address(0x000000000000000000000000000000000000100C)
-    contract_13 = Address(0x000000000000000000000000000000000000100D)
-    contract_14 = Address(0x000000000000000000000000000000000000100E)
-    contract_15 = Address(0x000000000000000000000000000000000000100F)
-    contract_16 = Address(0x0000000000000000000000000000000000001010)
-    contract_17 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F27F)
+    contract_1 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F280)
+    contract_2 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F281)
+    contract_3 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F282)
+    contract_4 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F283)
+    contract_5 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F284)
+    contract_6 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F285)
+    contract_7 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F286)
+    contract_8 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F287)
+    contract_9 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F288)
+    contract_10 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F289)
+    contract_11 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28A)
+    contract_12 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28B)
+    contract_13 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28C)
+    contract_14 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28D)
+    contract_15 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28E)
+    contract_16 = Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28F)
+    contract_17 = Address(0xE968019D3D5887782166C148AE15276F722BBD3D)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -189,7 +189,7 @@ def test_sha3(
         code=Op.SSTORE(key=0x0, value=Op.SHA3(offset=0x0, size=0x0)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F27F),  # noqa: E501
     )
     # Source: lll
     # {
@@ -199,7 +199,7 @@ def test_sha3(
         code=Op.SSTORE(key=0x0, value=Op.SHA3(offset=0x4, size=0x5)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F280),  # noqa: E501
     )
     # Source: lll
     # {
@@ -209,7 +209,7 @@ def test_sha3(
         code=Op.SSTORE(key=0x0, value=Op.SHA3(offset=0xA, size=0xA)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F281),  # noqa: E501
     )
     # Source: lll
     # {
@@ -220,7 +220,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F282),  # noqa: E501
     )
     # Source: lll
     # {
@@ -232,7 +232,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F283),  # noqa: E501
     )
     # Source: lll
     # {
@@ -244,7 +244,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F284),  # noqa: E501
     )
     # Source: lll
     # {
@@ -262,7 +262,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001006),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F285),  # noqa: E501
     )
     # Source: lll
     # {
@@ -280,7 +280,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001007),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F286),  # noqa: E501
     )
     # Source: lll
     # {
@@ -291,7 +291,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001008),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F287),  # noqa: E501
     )
     # Source: lll
     # {
@@ -302,7 +302,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001009),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F288),  # noqa: E501
     )
     # Source: lll
     # {
@@ -313,7 +313,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100A),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F289),  # noqa: E501
     )
     # Source: lll
     # {
@@ -324,7 +324,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100B),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28A),  # noqa: E501
     )
     # Source: lll
     # {
@@ -335,7 +335,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100C),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28B),  # noqa: E501
     )
     # Source: lll
     # {
@@ -346,7 +346,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100D),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28C),  # noqa: E501
     )
     # Source: lll
     # {
@@ -357,7 +357,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100E),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28D),  # noqa: E501
     )
     # Source: lll
     # {
@@ -368,7 +368,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100F),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28E),  # noqa: E501
     )
     # Source: lll
     # {
@@ -379,7 +379,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001010),  # noqa: E501
+        address=Address(0x9BD31017C4B5F9FDC274F8885FC63391F506F28F),  # noqa: E501
     )
     # Source: lll
     # {
@@ -390,7 +390,10 @@ def test_sha3(
     contract_17 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=Op.SUB(0x0, 0x1),
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x9BD31017C4B5F9FDC274F8885FC63391F506F27F,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0xF,
             args_size=0x10,
@@ -400,7 +403,7 @@ def test_sha3(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0xE968019D3D5887782166C148AE15276F722BBD3D),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

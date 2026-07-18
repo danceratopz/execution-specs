@@ -57,7 +57,7 @@ def test_returndatacopy_after_failing_delegatecall(
         code=Op.REVERT,
         balance=0x6400000000,
         nonce=0,
-        address=Address(0x665521FD750490FD880EE369C267FCA44ED8A078),  # noqa: E501
+        address=Address(0xAFA08469819AE000E2519125165ECD98E5E06BD7),  # noqa: E501
     )
     # Source: lll
     # { (DELEGATECALL 10000 <contract:0x1000000000000000000000000000000000000002> 0 0 0 0) (RETURNDATACOPY 0x0 0x0 32) ( SSTORE 0 (MLOAD 0))}  # noqa: E501

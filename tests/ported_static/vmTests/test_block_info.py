@@ -76,12 +76,12 @@ def test_block_info(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x9862F8CA4C9706A8A4F246D15AABC0CD6C04B72A)
+    contract_1 = Address(0x9862F8CA4C9706A8A4F246D15AABC0CD6C04B72B)
+    contract_2 = Address(0x9862F8CA4C9706A8A4F246D15AABC0CD6C04B72C)
+    contract_3 = Address(0x9862F8CA4C9706A8A4F246D15AABC0CD6C04B72D)
+    contract_4 = Address(0x9862F8CA4C9706A8A4F246D15AABC0CD6C04B72E)
+    contract_5 = Address(0x47D1B88A1C3D7B18897F9F68BA6725FB912D8672)
     sender = pre.fund_eoa(amount=0xBA1A9CE0BA1A9CE)
 
     env = Environment(
@@ -101,7 +101,7 @@ def test_block_info(
         code=Op.SSTORE(key=0x0, value=Op.COINBASE) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x9862F8CA4C9706A8A4F246D15AABC0CD6C04B72A),  # noqa: E501
     )
     # Source: lll
     # {
@@ -111,7 +111,7 @@ def test_block_info(
         code=Op.SSTORE(key=0x0, value=Op.PREVRANDAO) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x9862F8CA4C9706A8A4F246D15AABC0CD6C04B72B),  # noqa: E501
     )
     # Source: lll
     # {
@@ -121,7 +121,7 @@ def test_block_info(
         code=Op.SSTORE(key=0x0, value=Op.GASLIMIT) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x9862F8CA4C9706A8A4F246D15AABC0CD6C04B72C),  # noqa: E501
     )
     # Source: lll
     # {  ; The blocknumber
@@ -131,7 +131,7 @@ def test_block_info(
         code=Op.SSTORE(key=0x0, value=Op.NUMBER) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x9862F8CA4C9706A8A4F246D15AABC0CD6C04B72D),  # noqa: E501
     )
     # Source: lll
     # {
@@ -141,7 +141,7 @@ def test_block_info(
         code=Op.SSTORE(key=0x0, value=Op.TIMESTAMP) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x9862F8CA4C9706A8A4F246D15AABC0CD6C04B72E),  # noqa: E501
     )
     # Source: lll
     # {
@@ -150,7 +150,10 @@ def test_block_info(
     contract_5 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x9862F8CA4C9706A8A4F246D15AABC0CD6C04B72A,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -160,7 +163,7 @@ def test_block_info(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x47D1B88A1C3D7B18897F9F68BA6725FB912D8672),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

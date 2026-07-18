@@ -48,7 +48,7 @@ def test_call_contract_to_create_contract_which_would_create_contract_if_called(
         tx_gas_limit = 800_000
 
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0x88469F38C93319A2B1D0D1F5A4FA514CA2335509)
     sender = pre.fund_eoa(amount=0x3B9ACA00)
 
     env = Environment(
@@ -79,7 +79,7 @@ def test_call_contract_to_create_contract_which_would_create_contract_if_called(
         + Op.STOP,
         balance=1000,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x88469F38C93319A2B1D0D1F5A4FA514CA2335509),  # noqa: E501
     )
 
     tx = Transaction(

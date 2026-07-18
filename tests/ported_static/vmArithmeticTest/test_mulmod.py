@@ -142,23 +142,23 @@ def test_mulmod(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001006)
-    contract_7 = Address(0x0000000000000000000000000000000000001007)
-    contract_8 = Address(0x0000000000000000000000000000000000001008)
-    contract_9 = Address(0x0000000000000000000000000000000000001009)
-    contract_10 = Address(0x000000000000000000000000000000000000100A)
-    contract_11 = Address(0x000000000000000000000000000000000000100B)
-    contract_12 = Address(0x000000000000000000000000000000000000100C)
-    contract_13 = Address(0x000000000000000000000000000000000000100D)
-    contract_14 = Address(0x000000000000000000000000000000000000100E)
-    contract_15 = Address(0x000000000000000000000000000000000000100F)
-    contract_16 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDBD)
+    contract_1 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDBE)
+    contract_2 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDBF)
+    contract_3 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC0)
+    contract_4 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC1)
+    contract_5 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC2)
+    contract_6 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC3)
+    contract_7 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC4)
+    contract_8 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC5)
+    contract_9 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC6)
+    contract_10 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC7)
+    contract_11 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC8)
+    contract_12 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC9)
+    contract_13 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDCA)
+    contract_14 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDCB)
+    contract_15 = Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDCC)
+    contract_16 = Address(0x33F7739508EE0F1B6D35DE512E8C99A773FAFE23)
     sender = pre.fund_eoa(amount=0xBA1A9CE0BA1A9CE)
 
     env = Environment(
@@ -179,7 +179,7 @@ def test_mulmod(
         code=Op.SSTORE(key=0x0, value=Op.MULMOD(0x1, 0x2, 0x2)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDBD),  # noqa: E501
     )
     # Source: lll
     # {
@@ -196,7 +196,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDBE),  # noqa: E501
     )
     # Source: lll
     # {
@@ -208,7 +208,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDBF),  # noqa: E501
     )
     # Source: lll
     # {
@@ -220,7 +220,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC0),  # noqa: E501
     )
     # Source: lll
     # {
@@ -230,7 +230,7 @@ def test_mulmod(
         code=Op.SSTORE(key=0x0, value=Op.MULMOD(0x1B, 0x25, 0x64)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC1),  # noqa: E501
     )
     # Source: lll
     # {
@@ -253,7 +253,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC2),  # noqa: E501
     )
     # Source: lll
     # {
@@ -265,7 +265,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001006),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC3),  # noqa: E501
     )
     # Source: lll
     # {
@@ -291,7 +291,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001007),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC4),  # noqa: E501
     )
     # Source: lll
     # {
@@ -317,7 +317,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001008),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC5),  # noqa: E501
     )
     # Source: lll
     # {
@@ -337,7 +337,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001009),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC6),  # noqa: E501
     )
     # Source: lll
     # {
@@ -356,7 +356,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100A),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC7),  # noqa: E501
     )
     # Source: lll
     # {
@@ -372,7 +372,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100B),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC8),  # noqa: E501
     )
     # Source: lll
     # {
@@ -383,7 +383,7 @@ def test_mulmod(
         code=Op.SSTORE(key=0x0, value=Op.MULMOD(0x0, 0x1, 0x0)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100C),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDC9),  # noqa: E501
     )
     # Source: lll
     # {
@@ -394,7 +394,7 @@ def test_mulmod(
         code=Op.SSTORE(key=0x0, value=Op.MULMOD(0x1, 0x0, 0x0)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100D),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDCA),  # noqa: E501
     )
     # Source: lll
     # {
@@ -406,7 +406,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100E),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDCB),  # noqa: E501
     )
     # Source: lll
     # {
@@ -417,7 +417,7 @@ def test_mulmod(
         code=Op.SSTORE(key=0x0, value=Op.MULMOD(0x5, 0x1, 0x0)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100F),  # noqa: E501
+        address=Address(0x777102E62279CE4BB57B18B1860C0526D4AFDDCC),  # noqa: E501
     )
     # Source: lll
     # {
@@ -426,7 +426,10 @@ def test_mulmod(
     contract_16 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x777102E62279CE4BB57B18B1860C0526D4AFDDBD,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -436,7 +439,7 @@ def test_mulmod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x33F7739508EE0F1B6D35DE512E8C99A773FAFE23),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

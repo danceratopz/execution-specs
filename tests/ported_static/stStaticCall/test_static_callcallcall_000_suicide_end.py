@@ -59,7 +59,7 @@ def test_static_callcallcall_000_suicide_end(
             key=0x0,
             value=Op.STATICCALL(
                 gas=0x249F0,
-                address=0x620B381D01CBD812FFB798AB35A1A316BDE90CE6,
+                address=0x19326A38969F2D3E48731898E9238A848287AFD8,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -70,7 +70,7 @@ def test_static_callcallcall_000_suicide_end(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x569CDC3B32CC3F9747BBDE39FD70FEAD591D2F0D),  # noqa: E501
+        address=Address(0x91764F8F0F1A717754341C6D24745610624D0232),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 3 1) (STATICCALL 100000 <contract:0x1000000000000000000000000000000000000002> 0 64 0 64 ) (MSTORE 32 1) }  # noqa: E501
@@ -90,7 +90,7 @@ def test_static_callcallcall_000_suicide_end(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x620B381D01CBD812FFB798AB35A1A316BDE90CE6),  # noqa: E501
+        address=Address(0x19326A38969F2D3E48731898E9238A848287AFD8),  # noqa: E501
     )
     # Source: lll
     # { (MSTORE 3 1) (STATICCALL 50000 <contract:0x1000000000000000000000000000000000000003> 0 64 0 64 ) (SELFDESTRUCT <contract:0x1000000000000000000000000000000000000001>) }  # noqa: E501
@@ -106,7 +106,7 @@ def test_static_callcallcall_000_suicide_end(
                 ret_size=0x40,
             )
         )
-        + Op.SELFDESTRUCT(address=0x620B381D01CBD812FFB798AB35A1A316BDE90CE6)
+        + Op.SELFDESTRUCT(address=0x19326A38969F2D3E48731898E9238A848287AFD8)
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,

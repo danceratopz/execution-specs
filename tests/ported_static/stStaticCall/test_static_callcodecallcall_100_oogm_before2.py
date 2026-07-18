@@ -101,7 +101,7 @@ def test_static_callcodecallcall_100_oogm_before2(
     addr_4 = pre.deploy_contract(  # noqa: F841
         code=Op.MSTORE(offset=0x3, value=0x1) + Op.STOP,
         nonce=0,
-        address=Address(0x335C5531B84765A7626E6E76688F18B81BE5259C),  # noqa: E501
+        address=Address(0xC8660AB377B51837E48B006F26AC49E4C7F043D5),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 0 (CALLDATALOAD 0)) [[ 0 ]] (CALLCODE 150000 <contract:0x1000000000000000000000000000000000000001> (CALLVALUE) 0 64 0 64 ) [[ 1 ]] 1 }  # noqa: E501
@@ -131,7 +131,7 @@ def test_static_callcodecallcall_100_oogm_before2(
         code=Op.SSTORE(key=0x3, value=0x1)
         + Op.STATICCALL(
             gas=0x4E34,
-            address=0x335C5531B84765A7626E6E76688F18B81BE5259C,
+            address=0xC8660AB377B51837E48B006F26AC49E4C7F043D5,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,
@@ -154,7 +154,7 @@ def test_static_callcodecallcall_100_oogm_before2(
         + Op.JUMPDEST
         + Op.STATICCALL(
             gas=0x4E34,
-            address=0x335C5531B84765A7626E6E76688F18B81BE5259C,
+            address=0xC8660AB377B51837E48B006F26AC49E4C7F043D5,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,

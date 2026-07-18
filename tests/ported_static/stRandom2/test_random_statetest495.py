@@ -35,7 +35,7 @@ def test_random_statetest495(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest495."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0x39585671AA6B865C053CC4577A13CE30BF8D6DA3)
     sender = EOA(
         key=0xB1F4CBC3A50042184425A6F9E996D0910F7BA879457CE5DAC5C71E498AD3C005
     )
@@ -63,13 +63,13 @@ def test_random_statetest495(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0x39585671AA6B865C053CC4577A13CE30BF8D6DA3),  # noqa: E501
     )
     # Source: raw
     # 0x7f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>7f00000000000000000000000100000000000000000000000000000000000000006f427ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7e6410f26f519c538ea2070a6c60005155  # noqa: E501
     target = pre.deploy_contract(  # noqa: F841
         code=bytes.fromhex(
-            "7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e797f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e797f00000000000000000000000100000000000000000000000000000000000000006f427ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7e6410f26f519c538ea2070a6c60005155"  # noqa: E501
+            "7f00000000000000000000000039585671aa6b865c053cc4577a13ce30bf8d6da37f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7f00000000000000000000000039585671aa6b865c053cc4577a13ce30bf8d6da37f00000000000000000000000100000000000000000000000000000000000000006f427ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7e6410f26f519c538ea2070a6c60005155"  # noqa: E501
         ),
         nonce=0,
         address=Address(0x3960D00F7AF05F0183BA04D1DB89BFE241A50926),  # noqa: E501
@@ -79,7 +79,7 @@ def test_random_statetest495(
         sender=sender,
         to=target,
         data=Bytes(
-            "7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e797f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e797f00000000000000000000000100000000000000000000000000000000000000006f427ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7e6410f26f519c538ea2070a6c"  # noqa: E501
+            "7f00000000000000000000000039585671aa6b865c053cc4577a13ce30bf8d6da37f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7f00000000000000000000000039585671aa6b865c053cc4577a13ce30bf8d6da37f00000000000000000000000100000000000000000000000000000000000000006f427ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7e6410f26f519c538ea2070a6c"  # noqa: E501
         ),
         gas_limit=2100000 if fork >= Amsterdam else 100000,
         value=0xCA044EE,

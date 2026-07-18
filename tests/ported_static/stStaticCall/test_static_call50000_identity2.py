@@ -88,7 +88,7 @@ def test_static_call50000_identity2(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0x225C1FEB3E639C664E2C014C04B9FF3293A09F50),  # noqa: E501
     )
     # Source: lll
     # { (def 'i 0x80) [ 1 ] 42 (for {} (< @i 50000) [i](+ @i 1) [[ 0 ]] (STATICCALL 1564 4 0 50000 1 50000) ) [[ 1 ]] @i [[ 2 ]] @1 }  # noqa: E501

@@ -53,7 +53,7 @@ def test_delegatecall1024(
             key=0x1,
             value=Op.DELEGATECALL(
                 gas=0xFFFFFFFFFFF,
-                address=0xE7ADDF870A481E1A0829E5A67DEBD5B963861979,
+                address=0xABF141B2F2410A32FBCA261C3E202ABD1E186DDE,
                 args_offset=0x0,
                 args_size=0x0,
                 ret_offset=0x0,
@@ -63,7 +63,7 @@ def test_delegatecall1024(
         + Op.STOP,
         balance=1024,
         nonce=0,
-        address=Address(0xE7ADDF870A481E1A0829E5A67DEBD5B963861979),  # noqa: E501
+        address=Address(0xABF141B2F2410A32FBCA261C3E202ABD1E186DDE),  # noqa: E501
     )
 
     tx = Transaction(

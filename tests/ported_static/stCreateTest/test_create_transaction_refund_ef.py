@@ -36,7 +36,7 @@ def test_create_transaction_refund_ef(
     pre: Alloc,
 ) -> None:
     """Test combination of gas refund and EF-prefixed create transaction..."""
-    contract_0 = Address(0x00000000000000000000000000000000005EF94D)
+    contract_0 = Address(0xD12D799FD2DF5E60C1A11ECE67E27CD3F40F942E)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -59,7 +59,7 @@ def test_create_transaction_refund_ef(
         code=Op.SSTORE(key=Op.DUP1, value=0x0) + Op.STOP,
         storage={0: 1},
         nonce=0,
-        address=Address(0x00000000000000000000000000000000005EF94D),  # noqa: E501
+        address=Address(0xD12D799FD2DF5E60C1A11ECE67E27CD3F40F942E),  # noqa: E501
     )
 
     tx = Transaction(

@@ -86,7 +86,7 @@ def test_static_ab_acalls3(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0x5AF15ADE574816570DAE42D1599E5FAD13264353),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (ADD (SLOAD 0) 1) (STATICCALL (- (GAS) 100000) <contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5> 0 0 0 0) }  # noqa: E501
@@ -94,7 +94,7 @@ def test_static_ab_acalls3(
         code=Op.SSTORE(key=0x0, value=Op.ADD(Op.SLOAD(key=0x0), 0x1))
         + Op.STATICCALL(
             gas=Op.SUB(Op.GAS, 0x186A0),
-            address=0xE278F8058BEF1396C2B1DF4D1DC4B65233133C57,
+            address=0xF1B7E3791E566FD70952363901F3E28698EA5D9F,
             args_offset=0x0,
             args_size=0x0,
             ret_offset=0x0,
@@ -119,7 +119,7 @@ def test_static_ab_acalls3(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0xE278F8058BEF1396C2B1DF4D1DC4B65233133C57),  # noqa: E501
+        address=Address(0xF1B7E3791E566FD70952363901F3E28698EA5D9F),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 0 (ADD (SLOAD 0) 1)) (STATICCALL (- (GAS) 100000) <contract:0x245304eb96065b2a98b57a48a06ae28d285a71b5> 0 0 0 0) }  # noqa: E501

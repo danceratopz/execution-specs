@@ -36,7 +36,7 @@ def test_static_call_ecrecover0_overlapping_input_output(
 ) -> None:
     """Test_static_call_ecrecover0_overlapping_input_output."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0x33BC13973BF5819589DD104F5D3EDD38409DFB0D)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -85,7 +85,7 @@ def test_static_call_ecrecover0_overlapping_input_output(
         + Op.STOP,
         balance=0x1312D00,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x33BC13973BF5819589DD104F5D3EDD38409DFB0D),  # noqa: E501
     )
 
     tx = Transaction(

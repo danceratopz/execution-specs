@@ -31,7 +31,7 @@ def test_random_statetest274(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest274."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0xD49A3AD678B9AE428A829B340CD129C439D18AA5)
     sender = pre.fund_eoa(amount=0xDE0B6B3A7640000)
 
     env = Environment(
@@ -57,7 +57,7 @@ def test_random_statetest274(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0xD49A3AD678B9AE428A829B340CD129C439D18AA5),  # noqa: E501
     )
     # Source: raw
     # 0x7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffffa405457f00000000000000000000000100000000000000000000000000000000000000007f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>88015a9a0542a13a051497514215  # noqa: E501
@@ -68,7 +68,7 @@ def test_random_statetest274(
         + Op.GASLIMIT
         + Op.PUSH32[0x10000000000000000000000000000000000000000]
         + Op.ADD(
-            Op.DUP9, Op.PUSH32[0x4F3F701464972E74606D6EA82D4D3080599A0E79]
+            Op.DUP9, Op.PUSH32[0xD49A3AD678B9AE428A829B340CD129C439D18AA5]
         )
         + Op.GAS
         + Op.SWAP11
@@ -86,7 +86,7 @@ def test_random_statetest274(
         sender=sender,
         to=target,
         data=Bytes(
-            "7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffffa405457f00000000000000000000000100000000000000000000000000000000000000007f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e7988015a9a0542a13a051497514215"  # noqa: E501
+            "7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffffa405457f00000000000000000000000100000000000000000000000000000000000000007f000000000000000000000000d49a3ad678b9ae428a829b340cd129c439d18aa588015a9a0542a13a051497514215"  # noqa: E501
         ),
         gas_limit=100000,
         value=0xB6A01E0,

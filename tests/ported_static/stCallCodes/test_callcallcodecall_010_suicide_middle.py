@@ -49,7 +49,7 @@ def test_callcallcodecall_010_suicide_middle(
         code=Op.SSTORE(key=0x3, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x73B954EBC05BB0FF4A0F6A13A054D50AD1584099),  # noqa: E501
+        address=Address(0x6E92D0CA1AC08328BB9A2486C65BF7B579786099),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (CALL 150000 <contract:0x1000000000000000000000000000000000000001> 0 0 64 0 64 ) }  # noqa: E501
@@ -58,7 +58,7 @@ def test_callcallcodecall_010_suicide_middle(
             key=0x0,
             value=Op.CALL(
                 gas=0x249F0,
-                address=0xEAF8C2AE0D01A880CEA4E1AA88DEF5EDD153D57B,
+                address=0xF24140FC087E315582ACC5A1E94BE634A613E2A5,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -69,7 +69,7 @@ def test_callcallcodecall_010_suicide_middle(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x4353E77718BE108D4C149D88B34CACEDA42C5C66),  # noqa: E501
+        address=Address(0x464788973FEA05A6A2AF43625E2759AC8F9859DF),  # noqa: E501
     )
     # Source: lll
     # {  [[ 1 ]] (CALLCODE 100000 <contract:0x1000000000000000000000000000000000000002> 0 0 64 0 64 ) }  # noqa: E501
@@ -78,7 +78,7 @@ def test_callcallcodecall_010_suicide_middle(
             key=0x1,
             value=Op.CALLCODE(
                 gas=0x186A0,
-                address=0xAC90BB4611B91D4C6292BD64E8656110822E01ED,
+                address=0x7E25186C4AF94DFD6D282474546E0050C7ADC1AF,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -89,19 +89,19 @@ def test_callcallcodecall_010_suicide_middle(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0xEAF8C2AE0D01A880CEA4E1AA88DEF5EDD153D57B),  # noqa: E501
+        address=Address(0xF24140FC087E315582ACC5A1E94BE634A613E2A5),  # noqa: E501
     )
     # Source: lll
     # {  (SELFDESTRUCT <contract:target:0x1000000000000000000000000000000000000000>) [[ 2 ]] (CALL 50000 <contract:0x1000000000000000000000000000000000000003> 0 0 64 0 64 ) }  # noqa: E501
     addr_2 = pre.deploy_contract(  # noqa: F841
         code=Op.SELFDESTRUCT(
-            address=0x4353E77718BE108D4C149D88B34CACEDA42C5C66
+            address=0x464788973FEA05A6A2AF43625E2759AC8F9859DF
         )
         + Op.SSTORE(
             key=0x2,
             value=Op.CALL(
                 gas=0xC350,
-                address=0x73B954EBC05BB0FF4A0F6A13A054D50AD1584099,
+                address=0x6E92D0CA1AC08328BB9A2486C65BF7B579786099,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -112,7 +112,7 @@ def test_callcallcodecall_010_suicide_middle(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0xAC90BB4611B91D4C6292BD64E8656110822E01ED),  # noqa: E501
+        address=Address(0x7E25186C4AF94DFD6D282474546E0050C7ADC1AF),  # noqa: E501
     )
 
     tx = Transaction(

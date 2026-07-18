@@ -94,14 +94,14 @@ def test_static_callcallcodecall_010_2(
     addr_4 = pre.deploy_contract(  # noqa: F841
         code=Op.MSTORE(offset=0x3, value=0x1) + Op.STOP,
         nonce=0,
-        address=Address(0x335C5531B84765A7626E6E76688F18B81BE5259C),  # noqa: E501
+        address=Address(0x3CAB2E13510ECB12CB7D1EEFA9FA37E39E2F359F),  # noqa: E501
     )
     # Source: lll
     # {  (STATICCALL 250000 <contract:0x1000000000000000000000000000000000000003> 0 64 0 64 ) }  # noqa: E501
     addr_3 = pre.deploy_contract(  # noqa: F841
         code=Op.STATICCALL(
             gas=0x3D090,
-            address=0x335C5531B84765A7626E6E76688F18B81BE5259C,
+            address=0x3CAB2E13510ECB12CB7D1EEFA9FA37E39E2F359F,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,

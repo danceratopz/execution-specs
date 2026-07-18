@@ -34,7 +34,7 @@ def test_static_internal_call_store_clears_oog(
     """Test_static_internal_call_store_clears_oog."""
     coinbase = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
     contract_0 = Address(0x0000000000000000000000000000000000000000)
-    contract_1 = Address(0xC94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_1 = Address(0x5F6D7B32D65ACC4A4F9BB8B2D786C7A1064AECBC)
     sender = pre.fund_eoa(amount=0x5F5E100)
 
     env = Environment(
@@ -92,7 +92,7 @@ def test_static_internal_call_store_clears_oog(
         + Op.STOP,
         balance=10,
         nonce=0,
-        address=Address(0xC94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0x5F6D7B32D65ACC4A4F9BB8B2D786C7A1064AECBC),  # noqa: E501
     )
 
     tx = Transaction(

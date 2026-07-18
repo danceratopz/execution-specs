@@ -54,7 +54,7 @@ def test_call_lose_gas_oog(
             key=0x1,
             value=Op.DELEGATECALL(
                 gas=Op.ADD(0x1, Op.MUL(Op.SLOAD(key=0x0), 0x186A0)),
-                address=0xBE855315B63D137B74D5EED6BE5CD9DDE6E2478D,
+                address=0x43B3EAFCBF0CC43D6511FC13EB8D56651B390D1D,
                 args_offset=0x0,
                 args_size=0x0,
                 ret_offset=0x0,
@@ -67,7 +67,7 @@ def test_call_lose_gas_oog(
         + Op.STOP,
         balance=1024,
         nonce=0,
-        address=Address(0xBE855315B63D137B74D5EED6BE5CD9DDE6E2478D),  # noqa: E501
+        address=Address(0x43B3EAFCBF0CC43D6511FC13EB8D56651B390D1D),  # noqa: E501
     )
 
     tx = Transaction(

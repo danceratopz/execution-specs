@@ -75,7 +75,7 @@ def test_static_refund_call_to_suicide_no_storage(
             key=0x0,
             value=Op.STATICCALL(
                 gas=Op.CALLDATALOAD(offset=0x0),
-                address=0x4FF65047CE9C85F968689E4369C10003026A41A9,
+                address=0x059479031DB15D302D19C6CCCECB6BFFE262284D,
                 args_offset=0x0,
                 args_size=0x0,
                 ret_offset=0x0,
@@ -98,7 +98,7 @@ def test_static_refund_call_to_suicide_no_storage(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x4FF65047CE9C85F968689E4369C10003026A41A9),  # noqa: E501
+        address=Address(0x059479031DB15D302D19C6CCCECB6BFFE262284D),  # noqa: E501
     )
 
     tx_data = [

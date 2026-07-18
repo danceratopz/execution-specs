@@ -97,7 +97,7 @@ def test_static_call_with_high_value_and_gas_oog(
         + Op.RETURN(offset=0x0, size=0x2),
         balance=23,
         nonce=0,
-        address=Address(0xD5D9E9E0158920B17B6DF82FAC474B3E2691EE99),  # noqa: E501
+        address=Address(0x87F133229C02DCFA573AE0F2579686902675B34B),  # noqa: E501
     )
     # Source: lll
     # { (KECCAK256 0x00 0x2fffff) }
@@ -122,7 +122,7 @@ def test_static_call_with_high_value_and_gas_oog(
             key=0x0,
             value=Op.STATICCALL(
                 gas=0xFFFFFFFFFFFFFFFFFFFFFFFF,
-                address=0xD5D9E9E0158920B17B6DF82FAC474B3E2691EE99,
+                address=0x87F133229C02DCFA573AE0F2579686902675B34B,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,

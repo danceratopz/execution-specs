@@ -84,7 +84,7 @@ def test_static_callcall_00_ooge_2(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0xB320B4E9F224DDF8CC4D70F354C3BA91EE9B36B0),  # noqa: E501
     )
     # Source: lll
     # {  (SSTORE 2 1) (SSTORE 5 (CALLVALUE)) }
@@ -93,7 +93,7 @@ def test_static_callcall_00_ooge_2(
         + Op.SSTORE(key=0x5, value=Op.CALLVALUE)
         + Op.STOP,
         nonce=0,
-        address=Address(0xA65F4B36F21EF107A26AB282B736F93D47BF83DE),  # noqa: E501
+        address=Address(0x3A9195AA11D417869ABFBCF7428B627A59AF54A6),  # noqa: E501
     )
     # Source: lll
     # {  (def 'i 0x80) (for {} (< @i 50000) [i](+ @i 1) (EXTCODESIZE 1)  ) }
@@ -108,7 +108,7 @@ def test_static_callcall_00_ooge_2(
         + Op.JUMPDEST
         + Op.STOP,
         nonce=0,
-        address=Address(0x609E4DFE6190235B9A0362084C741D9EC330FB1E),  # noqa: E501
+        address=Address(0x913EDAF834147454952B5B97C1BF11BFE2762415),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 2 1) (STATICCALL 100000 <contract:0x1000000000000000000000000000000000000002> 0 64 0 64 ) (MSTORE 32 1) }  # noqa: E501
@@ -117,7 +117,7 @@ def test_static_callcall_00_ooge_2(
         + Op.POP(
             Op.STATICCALL(
                 gas=0x186A0,
-                address=0xA65F4B36F21EF107A26AB282B736F93D47BF83DE,
+                address=0x3A9195AA11D417869ABFBCF7428B627A59AF54A6,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -137,7 +137,7 @@ def test_static_callcall_00_ooge_2(
         + Op.POP(
             Op.STATICCALL(
                 gas=0x186A0,
-                address=0x609E4DFE6190235B9A0362084C741D9EC330FB1E,
+                address=0x913EDAF834147454952B5B97C1BF11BFE2762415,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -167,7 +167,7 @@ def test_static_callcall_00_ooge_2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0xA2CA69F1CF9FFA7A761899E8DD2F941D40326FD6),  # noqa: E501
+        address=Address(0xF97E8704C3645EBB0BE64275D4FBDC3CECC18AFD),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (STATICCALL 150000 <contract:0x2000000000000000000000000000000000000001> 0 64 0 64 ) }  # noqa: E501
@@ -186,7 +186,7 @@ def test_static_callcall_00_ooge_2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x998A75F1A4457FB7B5872C51F34AA7256F732B1E),  # noqa: E501
+        address=Address(0xFF2D5FC6DAB7513FD974032315738D254B16299C),  # noqa: E501
     )
 
     tx_data = [

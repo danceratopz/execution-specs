@@ -31,7 +31,7 @@ def test_random_statetest569(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest569."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0x816EE6F3AA41F99AB5A8750D2740D2D9BB7B3E6D)
     sender = pre.fund_eoa(amount=0xDE0B6B3A7640000)
 
     env = Environment(
@@ -57,13 +57,13 @@ def test_random_statetest569(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0x816EE6F3AA41F99AB5A8750D2740D2D9BB7B3E6D),  # noqa: E501
     )
     # Source: raw
     # 0x7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe427f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>097f00000000000000000000000000000000000000000000000000000000000000017ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe8e0781816fff31986c0a773c9b014460005155  # noqa: E501
     target = pre.deploy_contract(  # noqa: F841
         code=bytes.fromhex(
-            "7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe427f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e79097f00000000000000000000000000000000000000000000000000000000000000017ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe8e0781816fff31986c0a773c9b014460005155"  # noqa: E501
+            "7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe427f000000000000000000000000816ee6f3aa41f99ab5a8750d2740d2d9bb7b3e6d097f00000000000000000000000000000000000000000000000000000000000000017ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe8e0781816fff31986c0a773c9b014460005155"  # noqa: E501
         ),
         nonce=0,
     )
@@ -72,7 +72,7 @@ def test_random_statetest569(
         sender=sender,
         to=target,
         data=Bytes(
-            "7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe427f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e79097f00000000000000000000000000000000000000000000000000000000000000017ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe8e0781816fff31986c0a773c9b0144"  # noqa: E501
+            "7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe427f000000000000000000000000816ee6f3aa41f99ab5a8750d2740d2d9bb7b3e6d097f00000000000000000000000000000000000000000000000000000000000000017ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe8e0781816fff31986c0a773c9b0144"  # noqa: E501
         ),
         gas_limit=100000,
         value=0x6795ECCE,

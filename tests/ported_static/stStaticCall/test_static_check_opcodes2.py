@@ -137,7 +137,7 @@ def test_static_check_opcodes2(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0x50F628D871A69F2DB31E98D7FBF8AE6F1FC0D55C),  # noqa: E501
+        address=Address(0x19C19119ACCD6C3E5F70EE33C6C305010882E3A1),  # noqa: E501
     )
     # Source: lll
     # { (MSTORE 0 (CALL 100000 <contract:0xa100000000000000000000000000000000000001> 0 0 0 0 0))  (if (= 1 (MLOAD 0)) (MSTORE 1 1) (SSTORE 1 2) ) }  # noqa: E501
@@ -173,7 +173,7 @@ def test_static_check_opcodes2(
             offset=0x0,
             value=Op.CALL(
                 gas=0x186A0,
-                address=0xEF6A70E5546CA5339758B2F3B819780625C233C3,
+                address=0xF4A47EBC59372331BCE6136D63FA67F6BE885319,
                 value=0x1,
                 args_offset=0x0,
                 args_size=0x0,
@@ -339,7 +339,7 @@ def test_static_check_opcodes2(
         + Op.JUMPI(
             pc=0x74,
             condition=Op.EQ(
-                0xEF6A70E5546CA5339758B2F3B819780625C233C3, Op.ADDRESS
+                0xF4A47EBC59372331BCE6136D63FA67F6BE885319, Op.ADDRESS
             ),
         )
         + Op.SSTORE(key=0x1, value=0x2)
@@ -355,7 +355,7 @@ def test_static_check_opcodes2(
         + Op.JUMPDEST
         + Op.STOP,
         nonce=0,
-        address=Address(0xEF6A70E5546CA5339758B2F3B819780625C233C3),  # noqa: E501
+        address=Address(0xF4A47EBC59372331BCE6136D63FA67F6BE885319),  # noqa: E501
     )
     # Source: lll
     # { (if (= <eoa:sender:0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b> (ORIGIN)) (MSTORE 1 1) (SSTORE 1 2) ) (if (= <contract:0x3000000000000000000000000000000000000001> (CALLER)) (MSTORE 1 1) (SSTORE 1 2) ) (if (= <contract:0x3000000000000000000000000000000000000001> (ADDRESS)) (MSTORE 1 1) (SSTORE 1 2) )   (if (= 0 (CALLVALUE)) (MSTORE 1 1) (SSTORE 1 2) ) }  # noqa: E501
@@ -466,7 +466,7 @@ def test_static_check_opcodes2(
         + Op.JUMPI(
             pc=0x4B,
             condition=Op.EQ(
-                0x50F628D871A69F2DB31E98D7FBF8AE6F1FC0D55C, Op.CALLER
+                0x19C19119ACCD6C3E5F70EE33C6C305010882E3A1, Op.CALLER
             ),
         )
         + Op.SSTORE(key=0x1, value=0x2)

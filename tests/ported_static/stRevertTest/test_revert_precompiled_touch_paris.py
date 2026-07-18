@@ -114,7 +114,7 @@ def test_revert_precompiled_touch_paris(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0xE7C596DE24CCC387DAA5C017066AEB25EA8D2F3F),  # noqa: E501
+        address=Address(0x3A16AD6106FAC09D0047140D426109201C6AD24C),  # noqa: E501
     )
     # Source: lll
     # { (CALL 50000 1 0 0 0 0 0) (CALL 50000 2 0 0 0 0 0) (CALL 50000 3 0 0 0 0 0) (CALL 50000 4 0 0 0 0 0) (CALL 50000 5 0 0 0 0 0) (CALL 50000 6 0 0 0 0 0) (CALL 50000 7 0 0 0 0 0) (CALL 50000 8 0 0 0 0 0) [[1]] (GAS) [[2]] (GAS) [[3]] (GAS) }  # noqa: E501
@@ -212,7 +212,7 @@ def test_revert_precompiled_touch_paris(
         + Op.SSTORE(key=0x3, value=Op.GAS)
         + Op.STOP,
         nonce=0,
-        address=Address(0x87AAEB9E422487283B0B008EF445E32ACB9DD1AE),  # noqa: E501
+        address=Address(0xD4CFCF05D048984441674097FFB14369B0B71962),  # noqa: E501
     )
     # Source: lll
     # { (DELEGATECALL 50000 1 0 0 0 0) (DELEGATECALL 50000 2 0 0 0 0) (DELEGATECALL 50000 3 0 0 0 0) (DELEGATECALL 50000 4 0 0 0 0) (DELEGATECALL 50000 5 0 0 0 0) (DELEGATECALL 50000 6 0 0 0 0) (DELEGATECALL 50000 7 0 0 0 0) (DELEGATECALL 50000 8 0 0 0 0) [[1]] (GAS) [[2]] (GAS) [[3]] (GAS) }  # noqa: E501
@@ -302,7 +302,7 @@ def test_revert_precompiled_touch_paris(
         + Op.SSTORE(key=0x3, value=Op.GAS)
         + Op.STOP,
         nonce=0,
-        address=Address(0x31F52A66CF9D94C60F089A2CA9C4E784261C57FA),  # noqa: E501
+        address=Address(0x12BC7C358F9DFD56F63176A51356F32966441ED4),  # noqa: E501
     )
     # Source: lll
     # { (CALLCODE 50000 1 0 0 0 0 0) (CALLCODE 50000 2 0 0 0 0 0) (CALLCODE 50000 3 0 0 0 0 0) (CALLCODE 50000 4 0 0 0 0 0) (CALLCODE 50000 5 0 0 0 0 0) (CALLCODE 50000 6 0 0 0 0 0) (CALLCODE 50000 7 0 0 0 0 0) (CALLCODE 50000 8 0 0 0 0 0) [[1]] (GAS) [[2]] (GAS) [[3]] (GAS) }  # noqa: E501
@@ -400,7 +400,7 @@ def test_revert_precompiled_touch_paris(
         + Op.SSTORE(key=0x3, value=Op.GAS)
         + Op.STOP,
         nonce=0,
-        address=Address(0xDE1200B7ECAEA2D15B57D0F331AD5ADE8E924255),  # noqa: E501
+        address=Address(0xF78E4A50BE9CC0C7605938751D258D2DFD77F38D),  # noqa: E501
     )
     # Source: lll
     # { (STATICCALL 50000 1 0 0 0 0) (STATICCALL 50000 2 0 0 0 0) (STATICCALL 50000 3 0 0 0 0) (STATICCALL 50000 4 0 0 0 0) (STATICCALL 50000 5 0 0 0 0) (STATICCALL 50000 6 0 0 0 0) (STATICCALL 50000 7 0 0 0 0) (STATICCALL 50000 8 0 0 0 0) [[1]] (GAS) [[2]] (GAS) [[3]] (GAS) }  # noqa: E501
@@ -490,7 +490,7 @@ def test_revert_precompiled_touch_paris(
         + Op.SSTORE(key=0x3, value=Op.GAS)
         + Op.STOP,
         nonce=0,
-        address=Address(0x10EF6D6218ADA53728683CEC4D5160C8C72159BD),  # noqa: E501
+        address=Address(0xAB774E2849F4A883BC0993A7858BA4535A3FFAEA),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

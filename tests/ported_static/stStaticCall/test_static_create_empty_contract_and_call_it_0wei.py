@@ -39,7 +39,7 @@ def test_static_create_empty_contract_and_call_it_0wei(
 ) -> None:
     """Test_static_create_empty_contract_and_call_it_0wei."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_0 = Address(0x27F3E658046A8EA337EC8F05FF7910FCEAD458AA)
     sender = pre.fund_eoa(amount=0xE8D4A51000)
 
     env = Environment(
@@ -71,7 +71,7 @@ def test_static_create_empty_contract_and_call_it_0wei(
         + Op.SSTORE(key=0x64, value=Op.GAS)
         + Op.STOP,
         nonce=0,
-        address=Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0x27F3E658046A8EA337EC8F05FF7910FCEAD458AA),  # noqa: E501
     )
 
     tx = Transaction(

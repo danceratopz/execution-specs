@@ -34,7 +34,7 @@ def test_recursive_create_contracts(
 ) -> None:
     """Test_recursive_create_contracts."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0x6E19D45B742250ABFC1317CF00E56D6F65DAC2FE)
     sender = pre.fund_eoa(amount=0x1DCD6500)
 
     env = Environment(
@@ -70,7 +70,7 @@ def test_recursive_create_contracts(
         + Op.RETURN(offset=0x0, size=0x0)
         + Op.JUMPDEST
         + Op.PUSH1[0x0]
-        + Op.PUSH20[0x95E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87]
+        + Op.PUSH20[0x6E19D45B742250ABFC1317CF00E56D6F65DAC2FE]
         + Op.PUSH1[0x0]
         + Op.DUP2
         + Op.SWAP1
@@ -243,7 +243,7 @@ def test_recursive_create_contracts(
         + Op.STOP * 2,
         balance=0x314DC6448D9338C15B0A00000000,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x6E19D45B742250ABFC1317CF00E56D6F65DAC2FE),  # noqa: E501
     )
 
     tx = Transaction(

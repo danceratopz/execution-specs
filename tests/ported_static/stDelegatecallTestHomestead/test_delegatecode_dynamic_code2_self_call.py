@@ -36,7 +36,7 @@ def test_delegatecode_dynamic_code2_self_call(
 ) -> None:
     """Test_delegatecode_dynamic_code2_self_call."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x1000000000000000000000000000000000000000)
+    contract_0 = Address(0xC0462DA13F7A4D02DFB8C7A1315AFF19CA9B544B)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -66,7 +66,7 @@ def test_delegatecode_dynamic_code2_self_call(
         + Op.STOP,
         balance=0x10C8E0,
         nonce=0,
-        address=Address(0x1000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0xC0462DA13F7A4D02DFB8C7A1315AFF19CA9B544B),  # noqa: E501
     )
 
     tx = Transaction(

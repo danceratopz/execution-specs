@@ -52,7 +52,7 @@ def test_static_callcodecallcall_100_suicide_end2(
         code=Op.MSTORE(offset=0x3, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3),  # noqa: E501
+        address=Address(0x7F8A5E4DD96679590BF7CD94FC6B97C8A9C89E95),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (CALLCODE 150000 <contract:0x1000000000000000000000000000000000000001> 0 0 64 0 64 ) [[ 1 ]] 1 }  # noqa: E501
@@ -61,7 +61,7 @@ def test_static_callcodecallcall_100_suicide_end2(
             key=0x0,
             value=Op.CALLCODE(
                 gas=0x249F0,
-                address=0x620B381D01CBD812FFB798AB35A1A316BDE90CE6,
+                address=0x7C7E7E04B71CEF12B6F4B3340E8E81E513166EC2,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -82,7 +82,7 @@ def test_static_callcodecallcall_100_suicide_end2(
         + Op.POP(
             Op.STATICCALL(
                 gas=0x186A0,
-                address=0x8C800ABF2A49CA6FFAC93555AF4B5C7F9A3A8186,
+                address=0x5A092B1C6583FE51BD9772742A333657BAF42C6B,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -93,7 +93,7 @@ def test_static_callcodecallcall_100_suicide_end2(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x620B381D01CBD812FFB798AB35A1A316BDE90CE6),  # noqa: E501
+        address=Address(0x7C7E7E04B71CEF12B6F4B3340E8E81E513166EC2),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 3 1) (STATICCALL 50000 <contract:0x1000000000000000000000000000000000000003> 0 64 0 64 ) (SELFDESTRUCT <contract:0x1000000000000000000000000000000000000001>) }  # noqa: E501
@@ -102,18 +102,18 @@ def test_static_callcodecallcall_100_suicide_end2(
         + Op.POP(
             Op.STATICCALL(
                 gas=0xC350,
-                address=0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3,
+                address=0x7F8A5E4DD96679590BF7CD94FC6B97C8A9C89E95,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
                 ret_size=0x40,
             )
         )
-        + Op.SELFDESTRUCT(address=0x620B381D01CBD812FFB798AB35A1A316BDE90CE6)
+        + Op.SELFDESTRUCT(address=0x7C7E7E04B71CEF12B6F4B3340E8E81E513166EC2)
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x8C800ABF2A49CA6FFAC93555AF4B5C7F9A3A8186),  # noqa: E501
+        address=Address(0x5A092B1C6583FE51BD9772742A333657BAF42C6B),  # noqa: E501
     )
 
     tx = Transaction(

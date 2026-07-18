@@ -34,8 +34,8 @@ def test_static_call_create3(
 ) -> None:
     """Test_static_call_create3."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xA000000000000000000000000000000000000000)
-    contract_1 = Address(0x1000000000000000000000000000000000000000)
+    contract_0 = Address(0x0F91226F80ADBC001D95AEDEAF6039B0A62A688B)
+    contract_1 = Address(0x0041ECB178D830814CDCB1B2514407061118B988)
     sender = pre.fund_eoa(amount=0xDE0B6B3A7640000)
 
     env = Environment(
@@ -62,7 +62,7 @@ def test_static_call_create3(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0xA000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x0F91226F80ADBC001D95AEDEAF6039B0A62A688B),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 0 0x6d600060006000600030620186a0fa600052600e6012f3) [[ 0 ]] (CREATE 1 9 23)  [[ 1 ]] (STATICCALL 30000 (SLOAD 0) 0 0 0 0) [[ 2 ]] 1 }  # noqa: E501
@@ -86,7 +86,7 @@ def test_static_call_create3(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x1000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x0041ECB178D830814CDCB1B2514407061118B988),  # noqa: E501
     )
 
     tx = Transaction(

@@ -62,7 +62,7 @@ def test_static_call_contract_to_create_contract_oog_bonus_gas(
 ) -> None:
     """Gas analysis showed this test's gas can go as low as 101174, and..."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0xFD684C82199A765C8338984C2D3AF8D5DCF67C32)
     sender = pre.fund_eoa(amount=0x2540BE400)
 
     env = Environment(
@@ -95,7 +95,7 @@ def test_static_call_contract_to_create_contract_oog_bonus_gas(
         + Op.STOP,
         balance=112,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0xFD684C82199A765C8338984C2D3AF8D5DCF67C32),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

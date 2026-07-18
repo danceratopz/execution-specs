@@ -86,21 +86,21 @@ def test_static_callcallcodecallcode_011_oogm_after2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x652A62E8338E91A46AA8387A2C205F35F79347AB),  # noqa: E501
+        address=Address(0x02D5140E465362E3B76EECF4F953C5B1D09EBECB),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 3 1) }
     addr_4 = pre.deploy_contract(  # noqa: F841
         code=Op.MSTORE(offset=0x3, value=0x1) + Op.STOP,
         nonce=0,
-        address=Address(0x335C5531B84765A7626E6E76688F18B81BE5259C),  # noqa: E501
+        address=Address(0x28FA05C5B6468F5DAECE40F6AC8AB24A4827234C),  # noqa: E501
     )
     # Source: lll
     # {  (CALLCODE 20020 <contract:0x1000000000000000000000000000000000000003> 0 0 64 0 64 ) }  # noqa: E501
     addr_3 = pre.deploy_contract(  # noqa: F841
         code=Op.CALLCODE(
             gas=0x4E34,
-            address=0x335C5531B84765A7626E6E76688F18B81BE5259C,
+            address=0x28FA05C5B6468F5DAECE40F6AC8AB24A4827234C,
             value=0x0,
             args_offset=0x0,
             args_size=0x40,

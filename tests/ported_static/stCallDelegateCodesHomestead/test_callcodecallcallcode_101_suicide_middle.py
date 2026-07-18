@@ -34,10 +34,10 @@ def test_callcodecallcallcode_101_suicide_middle(
 ) -> None:
     """Test_callcodecallcallcode_101_suicide_middle."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x1000000000000000000000000000000000000000)
-    contract_1 = Address(0x1000000000000000000000000000000000000001)
-    contract_2 = Address(0x1000000000000000000000000000000000000002)
-    contract_3 = Address(0x1000000000000000000000000000000000000003)
+    contract_0 = Address(0xD9A76CB01EAE959CE99CA30022047A524D8BBE1B)
+    contract_1 = Address(0xD9A76CB01EAE959CE99CA30022047A524D8BBE1C)
+    contract_2 = Address(0xD9A76CB01EAE959CE99CA30022047A524D8BBE1D)
+    contract_3 = Address(0xD9A76CB01EAE959CE99CA30022047A524D8BBE1E)
     sender = pre.fund_eoa(amount=0xDE0B6B3A7640000)
 
     env = Environment(
@@ -55,7 +55,7 @@ def test_callcodecallcallcode_101_suicide_middle(
         code=Op.SSTORE(key=0x3, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x1000000000000000000000000000000000000003),  # noqa: E501
+        address=Address(0xD9A76CB01EAE959CE99CA30022047A524D8BBE1E),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (DELEGATECALL 150000 0x1000000000000000000000000000000000000001 0 64 0 64 ) }  # noqa: E501
@@ -64,7 +64,7 @@ def test_callcodecallcallcode_101_suicide_middle(
             key=0x0,
             value=Op.DELEGATECALL(
                 gas=0x249F0,
-                address=0x1000000000000000000000000000000000000001,
+                address=0xD9A76CB01EAE959CE99CA30022047A524D8BBE1C,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -74,7 +74,7 @@ def test_callcodecallcallcode_101_suicide_middle(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x1000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0xD9A76CB01EAE959CE99CA30022047A524D8BBE1B),  # noqa: E501
     )
     # Source: lll
     # {  [[ 1 ]] (CALL 100000 0x1000000000000000000000000000000000000002 0 0 64 0 64 ) }  # noqa: E501
@@ -83,7 +83,7 @@ def test_callcodecallcallcode_101_suicide_middle(
             key=0x1,
             value=Op.CALL(
                 gas=0x186A0,
-                address=0x1000000000000000000000000000000000000002,
+                address=0xD9A76CB01EAE959CE99CA30022047A524D8BBE1D,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -94,19 +94,19 @@ def test_callcodecallcallcode_101_suicide_middle(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x1000000000000000000000000000000000000001),  # noqa: E501
+        address=Address(0xD9A76CB01EAE959CE99CA30022047A524D8BBE1C),  # noqa: E501
     )
     # Source: lll
     # { (SELFDESTRUCT 0x1000000000000000000000000000000000000000) [[ 2 ]] (DELEGATECALL 50000 0x1000000000000000000000000000000000000003 0 64 0 64 ) }  # noqa: E501
     contract_2 = pre.deploy_contract(  # noqa: F841
         code=Op.SELFDESTRUCT(
-            address=0x1000000000000000000000000000000000000000
+            address=0xD9A76CB01EAE959CE99CA30022047A524D8BBE1B
         )
         + Op.SSTORE(
             key=0x2,
             value=Op.DELEGATECALL(
                 gas=0xC350,
-                address=0x1000000000000000000000000000000000000003,
+                address=0xD9A76CB01EAE959CE99CA30022047A524D8BBE1E,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -116,7 +116,7 @@ def test_callcodecallcallcode_101_suicide_middle(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x1000000000000000000000000000000000000002),  # noqa: E501
+        address=Address(0xD9A76CB01EAE959CE99CA30022047A524D8BBE1D),  # noqa: E501
     )
 
     tx = Transaction(
@@ -131,7 +131,7 @@ def test_callcodecallcallcode_101_suicide_middle(
         contract_2: Account(
             storage={},
             code=bytes.fromhex(
-                "731000000000000000000000000000000000000000ff604060006040600073100000000000000000000000000000000000000361c350f460025500"  # noqa: E501
+                "73d9a76cb01eae959ce99ca30022047a524d8bbe1bff604060006040600073d9a76cb01eae959ce99ca30022047a524d8bbe1e61c350f460025500"  # noqa: E501
             ),
             balance=0,
             nonce=0,

@@ -83,13 +83,13 @@ def test_xor(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x6153C67AC657816492EA47CD63930494C424AD15)
+    contract_1 = Address(0x6153C67AC657816492EA47CD63930494C424AD16)
+    contract_2 = Address(0x6153C67AC657816492EA47CD63930494C424AD17)
+    contract_3 = Address(0x6153C67AC657816492EA47CD63930494C424AD18)
+    contract_4 = Address(0x6153C67AC657816492EA47CD63930494C424AD19)
+    contract_5 = Address(0x6153C67AC657816492EA47CD63930494C424AD1A)
+    contract_6 = Address(0x1A068226D7062F49B29D1E2FADF9F32FB4FE2133)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -112,7 +112,7 @@ def test_xor(
         code=Op.SSTORE(key=0x0, value=Op.XOR(0x2, 0x2)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x6153C67AC657816492EA47CD63930494C424AD15),  # noqa: E501
     )
     # Source: lll
     # {
@@ -122,7 +122,7 @@ def test_xor(
         code=Op.SSTORE(key=0x0, value=Op.XOR(0x2, 0x1)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x6153C67AC657816492EA47CD63930494C424AD16),  # noqa: E501
     )
     # Source: lll
     # {
@@ -132,7 +132,7 @@ def test_xor(
         code=Op.SSTORE(key=0x0, value=Op.XOR(0x3, 0x1)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x6153C67AC657816492EA47CD63930494C424AD17),  # noqa: E501
     )
     # Source: lll
     # {
@@ -153,7 +153,7 @@ def test_xor(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x6153C67AC657816492EA47CD63930494C424AD18),  # noqa: E501
     )
     # Source: lll
     # {
@@ -174,7 +174,7 @@ def test_xor(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x6153C67AC657816492EA47CD63930494C424AD19),  # noqa: E501
     )
     # Source: lll
     # {
@@ -195,7 +195,7 @@ def test_xor(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x6153C67AC657816492EA47CD63930494C424AD1A),  # noqa: E501
     )
     # Source: lll
     # {
@@ -204,7 +204,10 @@ def test_xor(
     contract_6 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x6153C67AC657816492EA47CD63930494C424AD15,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -214,7 +217,7 @@ def test_xor(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x1A068226D7062F49B29D1E2FADF9F32FB4FE2133),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

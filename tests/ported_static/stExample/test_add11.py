@@ -33,7 +33,7 @@ def test_add11(
 ) -> None:
     """A test for (add 1 1) opcode result."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0x6D6E856F256E132C49DEA1940C76B7EB1E24E4A2)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -60,7 +60,7 @@ def test_add11(
         code=Op.SSTORE(key=0x0, value=Op.ADD(0x1, 0x1)) + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x6D6E856F256E132C49DEA1940C76B7EB1E24E4A2),  # noqa: E501
     )
 
     tx = Transaction(

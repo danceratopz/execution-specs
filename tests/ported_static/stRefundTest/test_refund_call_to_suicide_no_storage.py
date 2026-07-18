@@ -75,7 +75,7 @@ def test_refund_call_to_suicide_no_storage(
             key=0x0,
             value=Op.CALL(
                 gas=Op.CALLDATALOAD(offset=0x0),
-                address=0x4FF65047CE9C85F968689E4369C10003026A41A9,
+                address=0x282777207916A729B816CBC3B72BDB0D0A02222E,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -87,18 +87,18 @@ def test_refund_call_to_suicide_no_storage(
         storage={1: 1},
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x5BE4B33890F720EFF72BE0019B122E0FF75CB937),  # noqa: E501
+        address=Address(0x732D7BC7A7AF4219513AD6AE42E53CA3D8EA754E),  # noqa: E501
     )
     # Source: lll
     # { (SELFDESTRUCT <contract:target:0x095e7baea6a6c7c4c2dfeb977efac326af552d87>) }  # noqa: E501
     addr = pre.deploy_contract(  # noqa: F841
         code=Op.SELFDESTRUCT(
-            address=0x5BE4B33890F720EFF72BE0019B122E0FF75CB937
+            address=0x732D7BC7A7AF4219513AD6AE42E53CA3D8EA754E
         )
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x4FF65047CE9C85F968689E4369C10003026A41A9),  # noqa: E501
+        address=Address(0x282777207916A729B816CBC3B72BDB0D0A02222E),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

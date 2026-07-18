@@ -73,8 +73,8 @@ def test_modexp_0_0_0_20500(
     v: int,
 ) -> None:
     """Puts the base 0, exponent 0 and modulus 0 into the MODEXP..."""
-    coinbase = Address(0x3535353535353535353535353535353535353535)
-    contract_0 = Address(0xC305C901078781C232A2A521C2AF7980F8385EE9)
+    coinbase = Address(0xF85CDC1A3259967A73A9D3FC69C487DF7E785983)
+    contract_0 = Address(0xF4B3C0CCF09DA7CF9C8FD78B315BA4F8A7886660)
     contract_1 = Address(0x0000000000000000000000000000000000000001)
     contract_2 = Address(0x0000000000000000000000000000000000000005)
     contract_3 = Address(0x0000000000000000000000000000000000000008)
@@ -103,7 +103,7 @@ def test_modexp_0_0_0_20500(
         code="",
         balance=0x201EE,
         nonce=0,
-        address=Address(0x3535353535353535353535353535353535353535),  # noqa: E501
+        address=Address(0xF85CDC1A3259967A73A9D3FC69C487DF7E785983),  # noqa: E501
     )
     # Source: hex
     # 0x
@@ -262,7 +262,7 @@ def test_modexp_0_0_0_20500(
         + Op.STOP
         + Op.JUMPDEST,
         nonce=1,
-        address=Address(0xC305C901078781C232A2A521C2AF7980F8385EE9),  # noqa: E501
+        address=Address(0xF4B3C0CCF09DA7CF9C8FD78B315BA4F8A7886660),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

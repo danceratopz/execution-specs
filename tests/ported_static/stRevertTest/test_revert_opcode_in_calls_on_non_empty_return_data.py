@@ -133,7 +133,7 @@ def test_revert_opcode_in_calls_on_non_empty_return_data(
         + Op.STOP,
         balance=1,
         nonce=0,
-        address=Address(0x93A599BDE9A3B6390AFDB06952AA5EC0B8C44F3B),  # noqa: E501
+        address=Address(0x1193EE519F4945501FD57F1C20B945DDCCA7595C),  # noqa: E501
     )
     # Source: lll
     # { [1] 12 (RETURN 0 64) }
@@ -163,7 +163,7 @@ def test_revert_opcode_in_calls_on_non_empty_return_data(
             key=0x0,
             value=Op.DELEGATECALL(
                 gas=inner_call_gas,
-                address=0x93A599BDE9A3B6390AFDB06952AA5EC0B8C44F3B,
+                address=0x1193EE519F4945501FD57F1C20B945DDCCA7595C,
                 args_offset=0x0,
                 args_size=0x0,
                 ret_offset=0x0,
@@ -194,7 +194,7 @@ def test_revert_opcode_in_calls_on_non_empty_return_data(
             key=0x0,
             value=Op.CALLCODE(
                 gas=inner_call_gas,
-                address=0x93A599BDE9A3B6390AFDB06952AA5EC0B8C44F3B,
+                address=0x1193EE519F4945501FD57F1C20B945DDCCA7595C,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -226,7 +226,7 @@ def test_revert_opcode_in_calls_on_non_empty_return_data(
             key=0x4,
             value=Op.CALL(
                 gas=inner_call_gas,
-                address=0x93A599BDE9A3B6390AFDB06952AA5EC0B8C44F3B,
+                address=0x1193EE519F4945501FD57F1C20B945DDCCA7595C,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -258,7 +258,7 @@ def test_revert_opcode_in_calls_on_non_empty_return_data(
             key=0x0,
             value=Op.CALL(
                 gas=inner_call_gas,
-                address=0x93A599BDE9A3B6390AFDB06952AA5EC0B8C44F3B,
+                address=0x1193EE519F4945501FD57F1C20B945DDCCA7595C,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,

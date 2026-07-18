@@ -105,7 +105,7 @@ def test_static_callcodecall_10_ooge_2(
         + Op.JUMPDEST
         + Op.STOP,
         nonce=0,
-        address=Address(0xFBEF21C5A6C2ADCF3D769F085E0CC9FE9A8DF954),  # noqa: E501
+        address=Address(0x1C33CE54CF3D60230F8F34C5B1425F689B690BBC),  # noqa: E501
     )
     # Source: lll
     # { (MSTORE 0 (CALLDATALOAD 0)) [[ 0 ]] (CALLCODE 150000 <contract:0x1000000000000000000000000000000000000001> 0 0 64 0 64 ) [[ 1 ]] 1 }  # noqa: E501

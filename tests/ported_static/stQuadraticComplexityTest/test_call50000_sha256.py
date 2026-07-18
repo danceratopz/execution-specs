@@ -60,7 +60,7 @@ def test_call50000_sha256(
 ) -> None:
     """Test_call50000_sha256."""
     coinbase = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
-    contract_0 = Address(0xBBBF5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_0 = Address(0xD6881BF1533774E2DB150A67B9EFED10EEEFFE74)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -101,7 +101,7 @@ def test_call50000_sha256(
         + Op.STOP,
         balance=0xFFFFFFFFFFFFF,
         nonce=0,
-        address=Address(0xBBBF5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0xD6881BF1533774E2DB150A67B9EFED10EEEFFE74),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

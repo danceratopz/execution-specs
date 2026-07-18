@@ -65,7 +65,7 @@ def test_static_call_to_del_call_op_code_check(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x7EF8271E6CDB0A23220B73BF3E9697E173F9D015),  # noqa: E501
+        address=Address(0xD8D36B054A53D884E9A4E519FD483D682381A901),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 0 (DELEGATECALL 100000 <contract:0x1000000000000000000000000000000000000002> 0 0 0 0)) (if (= 1 (MLOAD 0)) (MSTORE 1 1) (SSTORE 1 1) ) }  # noqa: E501
@@ -109,7 +109,7 @@ def test_static_call_to_del_call_op_code_check(
         + Op.JUMPI(
             pc=0x4B,
             condition=Op.EQ(
-                0x7EF8271E6CDB0A23220B73BF3E9697E173F9D015, Op.CALLER
+                0xD8D36B054A53D884E9A4E519FD483D682381A901, Op.CALLER
             ),
         )
         + Op.SSTORE(key=0x1, value=0x2)

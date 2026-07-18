@@ -33,7 +33,7 @@ def test_ecrecover_short_buff(
 ) -> None:
     """Test_ecrecover_short_buff."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0xEBA90BE60F2C4B15A0DA14A61D83AD77A6AA1CAC)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -148,7 +148,7 @@ def test_ecrecover_short_buff(
             4249: 24743,
         },
         nonce=1,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0xEBA90BE60F2C4B15A0DA14A61D83AD77A6AA1CAC),  # noqa: E501
     )
 
     tx = Transaction(

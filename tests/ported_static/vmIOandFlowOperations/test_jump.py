@@ -148,24 +148,24 @@ def test_jump(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001006)
-    contract_7 = Address(0x0000000000000000000000000000000000001007)
-    contract_8 = Address(0x0000000000000000000000000000000000001008)
-    contract_9 = Address(0x0000000000000000000000000000000000001009)
-    contract_10 = Address(0x000000000000000000000000000000000000100A)
-    contract_11 = Address(0x000000000000000000000000000000000000100B)
-    contract_12 = Address(0x000000000000000000000000000000000000100C)
-    contract_13 = Address(0x000000000000000000000000000000000000100D)
-    contract_14 = Address(0x000000000000000000000000000000000000100E)
-    contract_15 = Address(0x000000000000000000000000000000000000100F)
-    contract_16 = Address(0x0000000000000000000000000000000000001010)
-    contract_17 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x005CE216252824AA23EBC8635AAE311B02CF7439)
+    contract_1 = Address(0x005CE216252824AA23EBC8635AAE311B02CF743A)
+    contract_2 = Address(0x005CE216252824AA23EBC8635AAE311B02CF743B)
+    contract_3 = Address(0x005CE216252824AA23EBC8635AAE311B02CF743C)
+    contract_4 = Address(0x005CE216252824AA23EBC8635AAE311B02CF743D)
+    contract_5 = Address(0x005CE216252824AA23EBC8635AAE311B02CF743E)
+    contract_6 = Address(0x005CE216252824AA23EBC8635AAE311B02CF743F)
+    contract_7 = Address(0x005CE216252824AA23EBC8635AAE311B02CF7440)
+    contract_8 = Address(0x005CE216252824AA23EBC8635AAE311B02CF7441)
+    contract_9 = Address(0x005CE216252824AA23EBC8635AAE311B02CF7442)
+    contract_10 = Address(0x005CE216252824AA23EBC8635AAE311B02CF7443)
+    contract_11 = Address(0x005CE216252824AA23EBC8635AAE311B02CF7444)
+    contract_12 = Address(0x005CE216252824AA23EBC8635AAE311B02CF7445)
+    contract_13 = Address(0x005CE216252824AA23EBC8635AAE311B02CF7446)
+    contract_14 = Address(0x005CE216252824AA23EBC8635AAE311B02CF7447)
+    contract_15 = Address(0x005CE216252824AA23EBC8635AAE311B02CF7448)
+    contract_16 = Address(0x005CE216252824AA23EBC8635AAE311B02CF7449)
+    contract_17 = Address(0x813874FC4CCA684CAED752A6356C181ABC552A16)
     sender = pre.fund_eoa(amount=0x100000000000)
 
     env = Environment(
@@ -189,7 +189,7 @@ def test_jump(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF7439),  # noqa: E501
     )
     # Source: lll
     # {
@@ -203,7 +203,7 @@ def test_jump(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF743A),  # noqa: E501
     )
     # Source: raw
     # 0x600456005B61600D60005500
@@ -215,7 +215,7 @@ def test_jump(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF743B),  # noqa: E501
     )
     # Source: lll
     # {
@@ -228,7 +228,7 @@ def test_jump(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF743C),  # noqa: E501
     )
     # Source: raw
     # 0x602360085660015b600255
@@ -241,7 +241,7 @@ def test_jump(
         + Op.SSTORE,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF743D),  # noqa: E501
     )
     # Source: raw
     # 0x61600D6000555B600656
@@ -249,7 +249,7 @@ def test_jump(
         code=Op.SSTORE(key=0x0, value=0x600D) + Op.JUMPDEST + Op.JUMP(pc=0x6),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF743E),  # noqa: E501
     )
     # Source: raw
     # 0x61600D60085660FF5B600055
@@ -262,7 +262,7 @@ def test_jump(
         + Op.SSTORE,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001006),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF743F),  # noqa: E501
     )
     # Source: raw
     # 0x600B565B61600D600055005B600356
@@ -275,7 +275,7 @@ def test_jump(
         + Op.JUMP(pc=0x3),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001007),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF7440),  # noqa: E501
     )
     # Source: raw
     # 0x600260050156005B61600D600055
@@ -286,7 +286,7 @@ def test_jump(
         + Op.SSTORE(key=0x0, value=0x600D),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001008),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF7441),  # noqa: E501
     )
     # Source: raw
     # 0x60055600605B61600D600055
@@ -297,7 +297,7 @@ def test_jump(
         + Op.SSTORE(key=0x0, value=0x600D),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001009),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF7442),  # noqa: E501
     )
     # Source: raw
     # 0x60055600600161600D600055
@@ -308,7 +308,7 @@ def test_jump(
         + Op.SSTORE(key=0x0, value=0x600D),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100A),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF7443),  # noqa: E501
     )
     # Source: raw
     # 0x61600D600055600B565A5B5A600155
@@ -320,7 +320,7 @@ def test_jump(
         + Op.SSTORE(key=0x1, value=Op.GAS),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100B),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF7444),  # noqa: E501
     )
     # Source: raw
     # 0x61600D6000556009565A5B5A600155
@@ -332,7 +332,7 @@ def test_jump(
         + Op.SSTORE(key=0x1, value=Op.GAS),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100C),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF7445),  # noqa: E501
     )
     # Source: raw
     # 0x6801000000000000000b565b5b6001600155
@@ -342,7 +342,7 @@ def test_jump(
         + Op.SSTORE(key=0x1, value=0x1),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100D),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF7446),  # noqa: E501
     )
     # Source: raw
     # 0x640100000007565b5b6001600155
@@ -352,7 +352,7 @@ def test_jump(
         + Op.SSTORE(key=0x1, value=0x1),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100E),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF7447),  # noqa: E501
     )
     # Source: lll
     # {
@@ -367,7 +367,7 @@ def test_jump(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100F),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF7448),  # noqa: E501
     )
     # Source: raw
     # 0x600E565B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B61600D600055
@@ -377,7 +377,7 @@ def test_jump(
         + Op.SSTORE(key=0x0, value=0x600D),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001010),  # noqa: E501
+        address=Address(0x005CE216252824AA23EBC8635AAE311B02CF7449),  # noqa: E501
     )
     # Source: lll
     # {
@@ -387,7 +387,10 @@ def test_jump(
     contract_17 = pre.deploy_contract(  # noqa: F841
         code=Op.DELEGATECALL(
             gas=0x10000,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x005CE216252824AA23EBC8635AAE311B02CF7439,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             args_offset=0x0,
             args_size=0x0,
             ret_offset=0x0,
@@ -397,7 +400,7 @@ def test_jump(
         storage={0: 2989},
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x813874FC4CCA684CAED752A6356C181ABC552A16),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

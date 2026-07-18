@@ -39,8 +39,8 @@ def test_delegatecall_to_precompile_from_transaction(
 ) -> None:
     """Contract B staticcalls contract A."""
     coinbase = Address(0xCAFE000000000000000000000000000000000001)
-    contract_0 = Address(0xB000000000000000000000000000000000000000)
-    contract_1 = Address(0xA000000000000000000000000000000000000000)
+    contract_0 = Address(0xE44A83F94DE8920CB1972156A253F82ABED0AEBE)
+    contract_1 = Address(0x478BE87D72EA654584D031DFB44348F3D589D3E8)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -341,7 +341,7 @@ def test_delegatecall_to_precompile_from_transaction(
         + Op.STOP,
         balance=1000,
         nonce=0,
-        address=Address(0xA000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x478BE87D72EA654584D031DFB44348F3D589D3E8),  # noqa: E501
     )
     # Source: lll
     # {
@@ -408,7 +408,7 @@ def test_delegatecall_to_precompile_from_transaction(
         },
         balance=1000,
         nonce=0,
-        address=Address(0xB000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0xE44A83F94DE8920CB1972156A253F82ABED0AEBE),  # noqa: E501
     )
 
     tx = Transaction(

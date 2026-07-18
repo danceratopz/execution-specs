@@ -52,7 +52,7 @@ def test_static_callcallcodecall_abcb_recursive(
             key=0x0,
             value=Op.STATICCALL(
                 gas=0x17D7840,
-                address=0x2C81F66472668C71014CE3A9537B033DB57AF77B,
+                address=0x367F53CA2CD14CDC892B5322A1DDC3E3C52043C8,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -63,7 +63,7 @@ def test_static_callcallcodecall_abcb_recursive(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x0F30355D1F829E0DD67066517A43A738AC501D99),  # noqa: E501
+        address=Address(0x2E7102C420B1E26425C7089DC8F051C17D586072),  # noqa: E501
     )
     # Source: lll
     # {  (DELEGATECALL 1000000 <contract:0x1000000000000000000000000000000000000002> 0 64 0 64 ) }  # noqa: E501
@@ -79,14 +79,14 @@ def test_static_callcallcodecall_abcb_recursive(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x2C81F66472668C71014CE3A9537B033DB57AF77B),  # noqa: E501
+        address=Address(0x367F53CA2CD14CDC892B5322A1DDC3E3C52043C8),  # noqa: E501
     )
     # Source: lll
     # { (STATICCALL 500000 <contract:0x1000000000000000000000000000000000000001> 0 64 0 64 ) }  # noqa: E501
     addr_2 = pre.deploy_contract(  # noqa: F841
         code=Op.STATICCALL(
             gas=0x7A120,
-            address=0x2C81F66472668C71014CE3A9537B033DB57AF77B,
+            address=0x367F53CA2CD14CDC892B5322A1DDC3E3C52043C8,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,

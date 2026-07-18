@@ -34,7 +34,7 @@ def test_random_statetest(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0x1DA8100D74BFE44B8AFB5347D9197A50D0EBFEA6)
     sender = EOA(
         key=0xB1F4CBC3A50042184425A6F9E996D0910F7BA879457CE5DAC5C71E498AD3C005
     )
@@ -62,7 +62,7 @@ def test_random_statetest(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0x1DA8100D74BFE44B8AFB5347D9197A50D0EBFEA6),  # noqa: E501
     )
     # Source: raw
     # 0x7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000017f000000000000000000000000000000000000000000000000000000000000c3507f00000000000000000000000000000000000000000000000000000000000000007f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe6f29199c9aa4054170f1a15a55056f965560005155  # noqa: E501
@@ -74,7 +74,7 @@ def test_random_statetest(
         + Op.PUSH32[0x1]
         + Op.PUSH32[0xC350]
         + Op.PUSH32[0x0]
-        + Op.PUSH32[0x4F3F701464972E74606D6EA82D4D3080599A0E79]
+        + Op.PUSH32[0x1DA8100D74BFE44B8AFB5347D9197A50D0EBFEA6]
         + Op.PUSH32[0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF]
         + Op.PUSH32[
             0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE
@@ -83,14 +83,14 @@ def test_random_statetest(
             key=Op.MLOAD(offset=0x0), value=0x29199C9AA4054170F1A15A55056F9655
         ),
         nonce=0,
-        address=Address(0xA482D90F6CDA557C1E8E41C3755C25821C27BB9D),  # noqa: E501
+        address=Address(0x75F4CEF2E3551F328095F38E97FB8CD3383F775A),  # noqa: E501
     )
 
     tx = Transaction(
         sender=sender,
         to=target,
         data=Bytes(
-            "7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000017f000000000000000000000000000000000000000000000000000000000000c3507f00000000000000000000000000000000000000000000000000000000000000007f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e797f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe6f29199c9aa4054170f1a15a55056f96"  # noqa: E501
+            "7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe7f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000017f000000000000000000000000000000000000000000000000000000000000c3507f00000000000000000000000000000000000000000000000000000000000000007f0000000000000000000000001da8100d74bfe44b8afb5347d9197a50d0ebfea67f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe6f29199c9aa4054170f1a15a55056f96"  # noqa: E501
         ),
         value=0xF08F864,
     )

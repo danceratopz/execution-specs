@@ -35,7 +35,7 @@ def test_call_ecrecover_v_prefixed0(
 ) -> None:
     """Test_call_ecrecover_v_prefixed0."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0x2D50E0F8F17F58DEB865899F6D43F8B281E0212E)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -85,7 +85,7 @@ def test_call_ecrecover_v_prefixed0(
         + Op.STOP,
         balance=0x1312D00,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x2D50E0F8F17F58DEB865899F6D43F8B281E0212E),  # noqa: E501
     )
 
     tx = Transaction(

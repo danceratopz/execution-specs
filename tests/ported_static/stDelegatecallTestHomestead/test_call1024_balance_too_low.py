@@ -55,7 +55,7 @@ def test_call1024_balance_too_low(
             key=0x1,
             value=Op.DELEGATECALL(
                 gas=0xFFFFFFFFFFF,
-                address=0xE7ADDF870A481E1A0829E5A67DEBD5B963861979,
+                address=0x9B7BAD3C279A710F253720FAB7F96C0FF3973587,
                 args_offset=0x0,
                 args_size=0x0,
                 ret_offset=0x0,
@@ -65,7 +65,7 @@ def test_call1024_balance_too_low(
         + Op.STOP,
         balance=1024,
         nonce=0,
-        address=Address(0xE7ADDF870A481E1A0829E5A67DEBD5B963861979),  # noqa: E501
+        address=Address(0x9B7BAD3C279A710F253720FAB7F96C0FF3973587),  # noqa: E501
     )
 
     tx = Transaction(

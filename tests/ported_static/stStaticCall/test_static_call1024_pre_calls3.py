@@ -89,7 +89,7 @@ def test_static_call1024_pre_calls3(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0xEF4E00F9BD524235C9695B632443DB5BB0E2EAC7),  # noqa: E501
     )
     # Source: lll
     # { [[ 2 ]] (STATICCALL 0xffff <eoa:0xaaaf5374fce5edbc8e2a8697c15331677e6ebf0b> 0 0 0 0) [[ 3 ]] (STATICCALL 0xffff <eoa:0xaaaf5374fce5edbc8e2a8697c15331677e6ebf0b> 0 0 0 0)  [[ 0 ]] (ADD @@0 1) [[ 1 ]] (STATICCALL 0xfffffffffff <contract:0xbbbf5374fce5edbc8e2a8697c15331677e6ebf0b> 0 0 0 0) }  # noqa: E501
@@ -121,7 +121,7 @@ def test_static_call1024_pre_calls3(
             key=0x1,
             value=Op.STATICCALL(
                 gas=0xFFFFFFFFFFF,
-                address=0x2806E7553F3585D821F91D679A254ABBF002F6F2,
+                address=0xCB832DCBFE32CF6272245DA35ABA47C10B62DE54,
                 args_offset=0x0,
                 args_size=0x0,
                 ret_offset=0x0,
@@ -131,7 +131,7 @@ def test_static_call1024_pre_calls3(
         + Op.STOP,
         balance=2024,
         nonce=0,
-        address=Address(0x2806E7553F3585D821F91D679A254ABBF002F6F2),  # noqa: E501
+        address=Address(0xCB832DCBFE32CF6272245DA35ABA47C10B62DE54),  # noqa: E501
     )
     # Source: lll
     # { (STATICCALL 0xffff <eoa:0xaaaf5374fce5edbc8e2a8697c15331677e6ebf0b> 0 0 0 0) (STATICCALL 0xffff <eoa:0xaaaf5374fce5edbc8e2a8697c15331677e6ebf0b> 0 0 0 0)  (MSTORE 0 (ADD (MLOAD 0) 1)) (STATICCALL 0xfffffffffff <contract:0xcbbf5374fce5edbc8e2a8697c15331677e6ebf0b> 0 0 0 0) }  # noqa: E501
@@ -150,7 +150,7 @@ def test_static_call1024_pre_calls3(
         + Op.MSTORE(offset=0x0, value=Op.ADD(Op.MLOAD(offset=0x0), 0x1))
         + Op.STATICCALL(
             gas=0xFFFFFFFFFFF,
-            address=0x7C546B69D5BDA111C03C8D7B51B41A8D55B843CA,
+            address=0xAB3FE4D9CA6271990F2306EEF85DF0241B5AE8A3,
             args_offset=0x0,
             args_size=0x0,
             ret_offset=0x0,
@@ -159,7 +159,7 @@ def test_static_call1024_pre_calls3(
         + Op.STOP,
         balance=2024,
         nonce=0,
-        address=Address(0x7C546B69D5BDA111C03C8D7B51B41A8D55B843CA),  # noqa: E501
+        address=Address(0xAB3FE4D9CA6271990F2306EEF85DF0241B5AE8A3),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

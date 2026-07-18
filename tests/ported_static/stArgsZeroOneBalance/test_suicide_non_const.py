@@ -54,7 +54,7 @@ def test_suicide_non_const(
 ) -> None:
     """Test_suicide_non_const."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0x609B1B05E3926F22E48BA2517B59E56BB50DD7EC)
     sender = pre.fund_eoa(amount=0xDE0B6B3A7640000)
 
     env = Environment(
@@ -71,12 +71,12 @@ def test_suicide_non_const(
     contract_0 = pre.deploy_contract(  # noqa: F841
         code=Op.SELFDESTRUCT(
             address=Op.BALANCE(
-                address=0x95E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87
+                address=0x609B1B05E3926F22E48BA2517B59E56BB50DD7EC
             )
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x609B1B05E3926F22E48BA2517B59E56BB50DD7EC),  # noqa: E501
     )
 
     tx_data = [
@@ -97,7 +97,7 @@ def test_suicide_non_const(
         contract_0: Account(
             storage={},
             code=bytes.fromhex(
-                "73095e7baea6a6c7c4c2dfeb977efac326af552d8731ff00"
+                "73609b1b05e3926f22e48ba2517b59e56bb50dd7ec31ff00"
             ),
             balance=0,
             nonce=0,

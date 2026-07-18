@@ -53,7 +53,7 @@ def test_callcode_output3(
         code=Op.SSTORE(key=0x0, value=Op.ADD(0x1, 0x1)),
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0xBCC1197CCD23A97607F2F96D031F3432E0D16A02),  # noqa: E501
+        address=Address(0x0703905BC10D2C946EFE74F89F645F220ABE4658),  # noqa: E501
     )
     # Source: lll
     # { (MSTORE 0 0x5e20a0453cecd065ea59c37ac63e079ee08998b6045136a8ce6635c7912ec0b6) (DELEGATECALL 50000 <contract:0xaaae7baea6a6c7c4c2dfeb977efac326af552d87> 0 0 0 32) [[ 0 ]] (MLOAD 0)}  # noqa: E501
@@ -76,7 +76,7 @@ def test_callcode_output3(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x4E40004DEDFDAD4927C60DE1289AB14535F5121A),  # noqa: E501
+        address=Address(0x79B3EE2253491EC5545524E9CED10F47F9DF3B40),  # noqa: E501
     )
 
     tx = Transaction(

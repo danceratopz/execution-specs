@@ -60,7 +60,7 @@ def test_zero_value_suicide_to_one_storage_key_paris(
         + Op.STOP,
         storage={0: 1},
         nonce=0,
-        address=Address(0x8D444744833C9B79FDFE630F155CF1F3BBEB92E3),  # noqa: E501
+        address=Address(0x7173B87ECDC8964B77749BB86C8E256C7BC1F525),  # noqa: E501
     )
 
     tx = Transaction(

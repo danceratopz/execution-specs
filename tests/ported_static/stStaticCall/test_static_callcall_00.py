@@ -87,7 +87,7 @@ def test_static_callcall_00(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0x0E09056BEC4D8DED80C5B4CFABF1C4ECF999AC12),  # noqa: E501
     )
     # Source: lll
     # {  (SSTORE 2 1) (SSTORE 4 (CALLER)) (SSTORE 7 (CALLVALUE)) (SSTORE 230 (ADDRESS)) (SSTORE 232 (ORIGIN)) (SSTORE 236 (CALLDATASIZE)) (SSTORE 238 (CODESIZE)) (SSTORE 240 (GASPRICE))}  # noqa: E501
@@ -168,7 +168,7 @@ def test_static_callcall_00(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x2F9EC0AFCB4EDCD7D38C6A48F5E36038263CA3CD),  # noqa: E501
+        address=Address(0x0E8CAEC635F38FED7F8B3F8B5DDA7B883ABD4BD0),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (STATICCALL 350000 <contract:0x2000000000000000000000000000000000000001> 0 64 0 64 ) }  # noqa: E501
@@ -187,7 +187,7 @@ def test_static_callcall_00(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0xBF23F3306533431B2EE5E4CA95E0A0834C090105),  # noqa: E501
+        address=Address(0xDE5C5FE52616649D9C9FE12607BF9B8DEB1D6882),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

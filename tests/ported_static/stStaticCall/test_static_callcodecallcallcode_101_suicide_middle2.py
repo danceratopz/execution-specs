@@ -74,7 +74,7 @@ def test_static_callcodecallcallcode_101_suicide_middle2(
         code=Op.MSTORE(offset=0x3, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3),  # noqa: E501
+        address=Address(0x1049100B2CDA1B40E440D4D644F75A44E29FA17C),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (CALLCODE 150000 <contract:0x1000000000000000000000000000000000000001> (CALLVALUE) 0 64 0 64 ) [[ 1 ]] 1 }  # noqa: E501
@@ -83,7 +83,7 @@ def test_static_callcodecallcallcode_101_suicide_middle2(
             key=0x0,
             value=Op.CALLCODE(
                 gas=0x249F0,
-                address=0x620B381D01CBD812FFB798AB35A1A316BDE90CE6,
+                address=0x3998B520D291E96964CB8D11BB5E8E768536E577,
                 value=Op.CALLVALUE,
                 args_offset=0x0,
                 args_size=0x40,
@@ -95,7 +95,7 @@ def test_static_callcodecallcallcode_101_suicide_middle2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0xCC7B2C7C17E1DD7940B1AA2F4B3E55D7BD662608),  # noqa: E501
+        address=Address(0xBDE0AA245078D52C1AFD968E86CAE2305A5D0FB6),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 3 1) (STATICCALL 100000 <contract:0x1000000000000000000000000000000000000002> 0 64 0 64 ) (MSTORE 32 1) }  # noqa: E501
@@ -115,17 +115,17 @@ def test_static_callcodecallcallcode_101_suicide_middle2(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x620B381D01CBD812FFB798AB35A1A316BDE90CE6),  # noqa: E501
+        address=Address(0x3998B520D291E96964CB8D11BB5E8E768536E577),  # noqa: E501
     )
     # Source: lll
     # { (SELFDESTRUCT <contract:target:0x1000000000000000000000000000000000000000>) (CALLCODE 50000 <contract:0x1000000000000000000000000000000000000003> 0 0 64 0 64 ) }  # noqa: E501
     addr_2 = pre.deploy_contract(  # noqa: F841
         code=Op.SELFDESTRUCT(
-            address=0xCC7B2C7C17E1DD7940B1AA2F4B3E55D7BD662608
+            address=0xBDE0AA245078D52C1AFD968E86CAE2305A5D0FB6
         )
         + Op.CALLCODE(
             gas=0xC350,
-            address=0x48E2D4C0B593BFEBE5DDB4F13AA355B8BD83DDD3,
+            address=0x1049100B2CDA1B40E440D4D644F75A44E29FA17C,
             value=0x0,
             args_offset=0x0,
             args_size=0x40,

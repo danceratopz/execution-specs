@@ -123,7 +123,7 @@ def test_static_callcallcodecallcode_011_oogm_before2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x6E143211E9D36EAEEBE65F6ED69D6C28500040D6),  # noqa: E501
+        address=Address(0x63246EBE83F306599055B79E2AF060B433A5B5C8),  # noqa: E501
     )
     # Source: lll
     # {  (SSTORE 3 1) (CALLCODE 20020 <contract:0x1000000000000000000000000000000000000003> 0 0 64 0 64 ) (MSTORE 32 1) }  # noqa: E501

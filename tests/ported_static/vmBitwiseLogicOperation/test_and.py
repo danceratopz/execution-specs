@@ -77,12 +77,12 @@ def test_and(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x21480DD26EA80B8BFC68C29120C8E4FDDC649836)
+    contract_1 = Address(0x21480DD26EA80B8BFC68C29120C8E4FDDC649837)
+    contract_2 = Address(0x21480DD26EA80B8BFC68C29120C8E4FDDC649838)
+    contract_3 = Address(0x21480DD26EA80B8BFC68C29120C8E4FDDC649839)
+    contract_4 = Address(0x21480DD26EA80B8BFC68C29120C8E4FDDC64983A)
+    contract_5 = Address(0x0FFB11344E468BE7E14D251CD21FE522D844AD78)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -105,7 +105,7 @@ def test_and(
         code=Op.SSTORE(key=0x0, value=Op.AND(0x2, 0x2)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x21480DD26EA80B8BFC68C29120C8E4FDDC649836),  # noqa: E501
     )
     # Source: lll
     # {
@@ -115,7 +115,7 @@ def test_and(
         code=Op.SSTORE(key=0x0, value=Op.AND(0x2, 0x1)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x21480DD26EA80B8BFC68C29120C8E4FDDC649837),  # noqa: E501
     )
     # Source: lll
     # {
@@ -125,7 +125,7 @@ def test_and(
         code=Op.SSTORE(key=0x0, value=Op.AND(0x3, 0x1)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x21480DD26EA80B8BFC68C29120C8E4FDDC649838),  # noqa: E501
     )
     # Source: lll
     # {
@@ -146,7 +146,7 @@ def test_and(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x21480DD26EA80B8BFC68C29120C8E4FDDC649839),  # noqa: E501
     )
     # Source: lll
     # {
@@ -167,7 +167,7 @@ def test_and(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x21480DD26EA80B8BFC68C29120C8E4FDDC64983A),  # noqa: E501
     )
     # Source: lll
     # {
@@ -176,7 +176,10 @@ def test_and(
     contract_5 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x21480DD26EA80B8BFC68C29120C8E4FDDC649836,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -186,7 +189,7 @@ def test_and(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x0FFB11344E468BE7E14D251CD21FE522D844AD78),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

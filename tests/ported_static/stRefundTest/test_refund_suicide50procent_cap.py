@@ -78,7 +78,7 @@ def test_refund_suicide50procent_cap(
             key=0xB,
             value=Op.CALL(
                 gas=Op.CALLDATALOAD(offset=0x0),
-                address=0x4FF65047CE9C85F968689E4369C10003026A41A9,
+                address=0x8995CA8C5B33B7F224122815093FB642EEE4B819,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -110,7 +110,7 @@ def test_refund_suicide50procent_cap(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x4FF65047CE9C85F968689E4369C10003026A41A9),  # noqa: E501
+        address=Address(0x8995CA8C5B33B7F224122815093FB642EEE4B819),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

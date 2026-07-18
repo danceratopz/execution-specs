@@ -33,7 +33,7 @@ def test_non_zero_value_call(
 ) -> None:
     """Test_non_zero_value_call."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_0 = Address(0xC1FE0102E4E9DFD9C1D762CE02165A9FBE40AFAB)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -68,7 +68,7 @@ def test_non_zero_value_call(
         + Op.STOP,
         balance=100,
         nonce=0,
-        address=Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0xC1FE0102E4E9DFD9C1D762CE02165A9FBE40AFAB),  # noqa: E501
     )
 
     tx = Transaction(

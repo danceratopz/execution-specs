@@ -64,10 +64,10 @@ def test_iszero(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x607319CC0F519ADC3078E71EBFB0509513ECBC0A)
+    contract_1 = Address(0x607319CC0F519ADC3078E71EBFB0509513ECBC0B)
+    contract_2 = Address(0x607319CC0F519ADC3078E71EBFB0509513ECBC0C)
+    contract_3 = Address(0xC7013BE610E6F733037777C6DE5C90FE0D4587F8)
     sender = pre.fund_eoa(amount=0xBA1A9CE0BA1A9CE)
 
     env = Environment(
@@ -95,7 +95,7 @@ def test_iszero(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x607319CC0F519ADC3078E71EBFB0509513ECBC0A),  # noqa: E501
     )
     # Source: lll
     # {
@@ -105,7 +105,7 @@ def test_iszero(
         code=Op.SSTORE(key=0x0, value=Op.ISZERO(0x0)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x607319CC0F519ADC3078E71EBFB0509513ECBC0B),  # noqa: E501
     )
     # Source: lll
     # {
@@ -115,7 +115,7 @@ def test_iszero(
         code=Op.SSTORE(key=0x0, value=Op.ISZERO(Op.SUB(0x0, 0x2))) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x607319CC0F519ADC3078E71EBFB0509513ECBC0C),  # noqa: E501
     )
     # Source: lll
     # {
@@ -124,7 +124,10 @@ def test_iszero(
     contract_3 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x607319CC0F519ADC3078E71EBFB0509513ECBC0A,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -134,7 +137,7 @@ def test_iszero(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0xC7013BE610E6F733037777C6DE5C90FE0D4587F8),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

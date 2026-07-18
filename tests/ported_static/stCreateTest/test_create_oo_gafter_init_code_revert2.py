@@ -59,10 +59,10 @@ def test_create_oo_gafter_init_code_revert2(
 ) -> None:
     """Calls a contract that runs CREATE which deploy a code."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x1000000000000000000000000000000000000000)
-    contract_1 = Address(0xC94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
-    contract_2 = Address(0xD94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
-    contract_3 = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_0 = Address(0x9763E23A562E7B108D7C3C0FE0C813850D397ED1)
+    contract_1 = Address(0xA47D6E885984A1ADC234E5F7288A62C23E8DAAA7)
+    contract_2 = Address(0xE4C68E621E7685F136CEDBCD69E0207890320F19)
+    contract_3 = Address(0x31DDE1D31090AC53584169110056D6069CB3090E)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -102,7 +102,7 @@ def test_create_oo_gafter_init_code_revert2(
         + Op.STOP,
         balance=0xE8D4A51000,
         nonce=0,
-        address=Address(0x1000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x9763E23A562E7B108D7C3C0FE0C813850D397ED1),  # noqa: E501
     )
     # Source: lll
     # { (MSTORE 0 0x6460016001556000526005601bf3) (CREATE 0 18 14) (REVERT 0 32) }  # noqa: E501
@@ -112,7 +112,7 @@ def test_create_oo_gafter_init_code_revert2(
         + Op.REVERT(offset=0, size=32)
         + Op.STOP,
         nonce=0,
-        address=Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0x31DDE1D31090AC53584169110056D6069CB3090E),  # noqa: E501
     )
     # Source: lll
     # { (CALL 33000 0xb94f5374fce5edbc8e2a8697c15331677e6ebf0b 0 0 0 0 32) [[ 1 ]] (MLOAD 0) }  # noqa: E501
@@ -120,7 +120,7 @@ def test_create_oo_gafter_init_code_revert2(
         code=Op.POP(
             Op.CALL(
                 gas=contract_1_call_gas,
-                address=0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B,
+                address=0x31DDE1D31090AC53584169110056D6069CB3090E,
                 value=0,
                 args_offset=0,
                 args_size=0,
@@ -132,7 +132,7 @@ def test_create_oo_gafter_init_code_revert2(
         + Op.STOP,
         storage={1: 255},
         nonce=0,
-        address=Address(0xC94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0xA47D6E885984A1ADC234E5F7288A62C23E8DAAA7),  # noqa: E501
     )
     # Source: lll
     # { (CALL 23000 0xb94f5374fce5edbc8e2a8697c15331677e6ebf0b 0 0 0 0 32) [[ 1 ]] (MLOAD 0) }  # noqa: E501
@@ -140,7 +140,7 @@ def test_create_oo_gafter_init_code_revert2(
         code=Op.POP(
             Op.CALL(
                 gas=contract_2_call_gas,
-                address=0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B,
+                address=0x31DDE1D31090AC53584169110056D6069CB3090E,
                 value=0,
                 args_offset=0,
                 args_size=0,
@@ -152,7 +152,7 @@ def test_create_oo_gafter_init_code_revert2(
         + Op.STOP,
         storage={1: 255},
         nonce=0,
-        address=Address(0xD94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0xE4C68E621E7685F136CEDBCD69E0207890320F19),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

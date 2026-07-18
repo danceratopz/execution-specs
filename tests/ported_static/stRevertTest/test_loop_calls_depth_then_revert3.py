@@ -34,7 +34,7 @@ def test_loop_calls_depth_then_revert3(
 ) -> None:
     """Test_loop_calls_depth_then_revert3."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xA000000000000000000000000000000000000000)
+    contract_0 = Address(0x75290EB6143F33F55A95BC97FCECCA40ECDDB0D9)
     sender = pre.fund_eoa(amount=0x13426172C74D822B878FE800000000)
 
     env = Environment(
@@ -54,7 +54,7 @@ def test_loop_calls_depth_then_revert3(
         + Op.POP(
             Op.CALL(
                 gas=Op.GAS,
-                address=0xA000000000000000000000000000000000000000,
+                address=0x75290EB6143F33F55A95BC97FCECCA40ECDDB0D9,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -69,7 +69,7 @@ def test_loop_calls_depth_then_revert3(
         + Op.JUMPDEST,
         balance=10,
         nonce=0,
-        address=Address(0xA000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x75290EB6143F33F55A95BC97FCECCA40ECDDB0D9),  # noqa: E501
     )
 
     tx = Transaction(

@@ -91,7 +91,7 @@ def test_labels_example(
         code=Op.SSTORE(key=0x0, value=Op.CALLDATALOAD(offset=0x0)) + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0xA054BC58F204030CBC0EC558A5B88AC9BD5ADED2),  # noqa: E501
+        address=Address(0xB3959191F763B2228F63FBE386D9000E1A472A11),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

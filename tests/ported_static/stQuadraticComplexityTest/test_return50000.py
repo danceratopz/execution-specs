@@ -107,7 +107,7 @@ def test_return50000(
         + Op.STOP,
         balance=0xFFFFFFFFFFFFF,
         nonce=0,
-        address=Address(0x6123B8B3E245B90F39ED7418D320A60ABB365B9F),  # noqa: E501
+        address=Address(0x286145E929BA6125D2490BDC7B79503D023DB414),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

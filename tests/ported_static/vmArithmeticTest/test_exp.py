@@ -113,18 +113,18 @@ def test_exp(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001006)
-    contract_7 = Address(0x0000000000000000000000000000000000001007)
-    contract_8 = Address(0x0000000000000000000000000000000000001008)
-    contract_9 = Address(0x0000000000000000000000000000000000001009)
-    contract_10 = Address(0x000000000000000000000000000000000000100A)
-    contract_11 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180CF)
+    contract_1 = Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D0)
+    contract_2 = Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D1)
+    contract_3 = Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D2)
+    contract_4 = Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D3)
+    contract_5 = Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D4)
+    contract_6 = Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D5)
+    contract_7 = Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D6)
+    contract_8 = Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D7)
+    contract_9 = Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D8)
+    contract_10 = Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D9)
+    contract_11 = Address(0x87368004EA8FEE17B9414D9373A33A27BA3248A8)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -147,7 +147,7 @@ def test_exp(
         code=Op.SSTORE(key=0x0, value=Op.EXP(0x2, 0x2)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180CF),  # noqa: E501
     )
     # Source: lll
     # {  ; (-1)^(-2)
@@ -169,7 +169,7 @@ def test_exp(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D0),  # noqa: E501
     )
     # Source: lll
     # {  ; just a big number to the power of itself
@@ -180,7 +180,7 @@ def test_exp(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D1),  # noqa: E501
     )
     # Source: lll
     # {  ; zero to the power of a big number
@@ -190,7 +190,7 @@ def test_exp(
         code=Op.SSTORE(key=0x0, value=Op.EXP(0x0, 0x7FFFFFFF)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D2),  # noqa: E501
     )
     # Source: lll
     # {  ; big number to the power of zero
@@ -200,7 +200,7 @@ def test_exp(
         code=Op.SSTORE(key=0x0, value=Op.EXP(0x7FFFFFFF, 0x0)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D3),  # noqa: E501
     )
     # Source: lll
     # {  ; 257^1
@@ -210,7 +210,7 @@ def test_exp(
         code=Op.SSTORE(key=0x0, value=Op.EXP(0x101, 0x1)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D4),  # noqa: E501
     )
     # Source: lll
     # {  ; 1^257
@@ -220,7 +220,7 @@ def test_exp(
         code=Op.SSTORE(key=0x0, value=Op.EXP(0x1, 0x101)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001006),  # noqa: E501
+        address=Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D5),  # noqa: E501
     )
     # Source: lll
     # {  ; 2^257 (which is zero mod 2^256)
@@ -230,7 +230,7 @@ def test_exp(
         code=Op.SSTORE(key=0x0, value=Op.EXP(0x2, 0x101)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001007),  # noqa: E501
+        address=Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D6),  # noqa: E501
     )
     # Source: lll
     # {  ; 0^0 (that is 1 in evm arithmetic)
@@ -240,7 +240,7 @@ def test_exp(
         code=Op.SSTORE(key=0x0, value=Op.EXP(0x0, 0x0)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001008),  # noqa: E501
+        address=Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D7),  # noqa: E501
     )
     # Source: lll
     # {  ; 2^big = 0
@@ -250,7 +250,7 @@ def test_exp(
         code=Op.SSTORE(key=0x0, value=Op.EXP(0x2, 0x100000000000F)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001009),  # noqa: E501
+        address=Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D8),  # noqa: E501
     )
     # Source: lll
     # {  ; 2^15 = 0x8000
@@ -260,7 +260,7 @@ def test_exp(
         code=Op.SSTORE(key=0x0, value=Op.EXP(0x2, 0xF)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100A),  # noqa: E501
+        address=Address(0x22C95952D9A23074A8F8D31F0E7EF98B61E180D9),  # noqa: E501
     )
     # Source: lll
     # {
@@ -269,7 +269,10 @@ def test_exp(
     contract_11 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x22C95952D9A23074A8F8D31F0E7EF98B61E180CF,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -279,7 +282,7 @@ def test_exp(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x87368004EA8FEE17B9414D9373A33A27BA3248A8),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

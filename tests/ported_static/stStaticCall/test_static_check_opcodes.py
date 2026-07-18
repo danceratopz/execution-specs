@@ -125,7 +125,7 @@ def test_static_check_opcodes(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0x50F628D871A69F2DB31E98D7FBF8AE6F1FC0D55C),  # noqa: E501
+        address=Address(0xA6EC4D64A30599EBD2A2B3A28296F32735F35369),  # noqa: E501
     )
     # Source: lll
     # { (if (= <eoa:sender:0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b> (ORIGIN)) (MSTORE 1 1) (SSTORE 1 2) ) (if (= <contract:target:0x1000000000000000000000000000000000000000> (CALLER)) (MSTORE 1 1) (SSTORE 1 2) ) (if (= <contract:0x1000000000000000000000000000000000000001> (ADDRESS)) (MSTORE 1 1) (SSTORE 1 2) )   (if (= 0 (CALLVALUE)) (MSTORE 1 1) (SSTORE 1 2) ) }  # noqa: E501
@@ -144,7 +144,7 @@ def test_static_check_opcodes(
         + Op.JUMPI(
             pc=0x4B,
             condition=Op.EQ(
-                0x50F628D871A69F2DB31E98D7FBF8AE6F1FC0D55C, Op.CALLER
+                0xA6EC4D64A30599EBD2A2B3A28296F32735F35369, Op.CALLER
             ),
         )
         + Op.SSTORE(key=0x1, value=0x2)
@@ -155,7 +155,7 @@ def test_static_check_opcodes(
         + Op.JUMPI(
             pc=0x74,
             condition=Op.EQ(
-                0xB4B91C40F3E3A6E5576B0413572B88D535CEE7B0, Op.ADDRESS
+                0xAE19A96CEB19090DDF010E6FEB9269BE0112136C, Op.ADDRESS
             ),
         )
         + Op.SSTORE(key=0x1, value=0x2)
@@ -171,7 +171,7 @@ def test_static_check_opcodes(
         + Op.JUMPDEST
         + Op.STOP,
         nonce=0,
-        address=Address(0xB4B91C40F3E3A6E5576B0413572B88D535CEE7B0),  # noqa: E501
+        address=Address(0xAE19A96CEB19090DDF010E6FEB9269BE0112136C),  # noqa: E501
     )
     # Source: lll
     # { (STATICCALL 100000 <contract:0x1000000000000000000000000000000000000003> 0 0 0 0) }  # noqa: E501
@@ -216,7 +216,7 @@ def test_static_check_opcodes(
         + Op.JUMPI(
             pc=0x74,
             condition=Op.EQ(
-                0xB4B91C40F3E3A6E5576B0413572B88D535CEE7B0, Op.ADDRESS
+                0xAE19A96CEB19090DDF010E6FEB9269BE0112136C, Op.ADDRESS
             ),
         )
         + Op.SSTORE(key=0x1, value=0x2)

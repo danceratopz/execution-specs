@@ -32,7 +32,7 @@ def test_random_statetest282(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest282."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0x5FC217A716D6BC227C0BFB9900E6907FA2FB18C5)
     sender = EOA(
         key=0xB1F4CBC3A50042184425A6F9E996D0910F7BA879457CE5DAC5C71E498AD3C005
     )
@@ -61,7 +61,7 @@ def test_random_statetest282(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0x5FC217A716D6BC227C0BFB9900E6907FA2FB18C5),  # noqa: E501
     )
     # Source: raw
     # 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>ff447f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff429d415560005155  # noqa: E501
@@ -70,7 +70,7 @@ def test_random_statetest282(
             0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
         ]
         + Op.SELFDESTRUCT(
-            address=Op.PUSH32[0x4F3F701464972E74606D6EA82D4D3080599A0E79]
+            address=Op.PUSH32[0x5FC217A716D6BC227C0BFB9900E6907FA2FB18C5]
         )
         + Op.PREVRANDAO
         + Op.PUSH32[0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF]
@@ -88,7 +88,7 @@ def test_random_statetest282(
         sender=sender,
         to=target,
         data=Bytes(
-            "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e79ff447f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff429d41"  # noqa: E501
+            "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000005fc217a716d6bc227c0bfb9900e6907fa2fb18c5ff447f000000000000000000000000ffffffffffffffffffffffffffffffffffffffff429d41"  # noqa: E501
         ),
         gas_limit=100000,
         value=0x7B3BE7A8,

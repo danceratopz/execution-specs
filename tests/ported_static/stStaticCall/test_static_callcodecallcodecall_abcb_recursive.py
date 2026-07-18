@@ -52,7 +52,7 @@ def test_static_callcodecallcodecall_abcb_recursive(
             key=0x0,
             value=Op.DELEGATECALL(
                 gas=0x17D7840,
-                address=0x2C81F66472668C71014CE3A9537B033DB57AF77B,
+                address=0x1AFC9445182A89E5857C45F6B82A7A06C1BA7B74,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -63,14 +63,14 @@ def test_static_callcodecallcodecall_abcb_recursive(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x56325D37CDCE6B5858E63B1F0A691DB81D65E6DD),  # noqa: E501
+        address=Address(0xF05C37C1D69C5FBCD7221B01771D0F294C50D40B),  # noqa: E501
     )
     # Source: lll
     # {  (DELEGATECALL 1000000 <contract:0x1000000000000000000000000000000000000002> 0 64 0 64 ) }  # noqa: E501
     addr = pre.deploy_contract(  # noqa: F841
         code=Op.DELEGATECALL(
             gas=0xF4240,
-            address=0x1E2229D0F325B81B81B8B14F2D239FF9742683C0,
+            address=0x588AC17C8FE0BD5C7604A41971351EA049AC7994,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,
@@ -79,14 +79,14 @@ def test_static_callcodecallcodecall_abcb_recursive(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x2C81F66472668C71014CE3A9537B033DB57AF77B),  # noqa: E501
+        address=Address(0x1AFC9445182A89E5857C45F6B82A7A06C1BA7B74),  # noqa: E501
     )
     # Source: lll
     # {  (STATICCALL 500000 <contract:0x1000000000000000000000000000000000000001> 0 64 0 64 ) }  # noqa: E501
     addr_2 = pre.deploy_contract(  # noqa: F841
         code=Op.STATICCALL(
             gas=0x7A120,
-            address=0x2C81F66472668C71014CE3A9537B033DB57AF77B,
+            address=0x1AFC9445182A89E5857C45F6B82A7A06C1BA7B74,
             args_offset=0x0,
             args_size=0x40,
             ret_offset=0x0,
@@ -95,7 +95,7 @@ def test_static_callcodecallcodecall_abcb_recursive(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x1E2229D0F325B81B81B8B14F2D239FF9742683C0),  # noqa: E501
+        address=Address(0x588AC17C8FE0BD5C7604A41971351EA049AC7994),  # noqa: E501
     )
 
     tx = Transaction(

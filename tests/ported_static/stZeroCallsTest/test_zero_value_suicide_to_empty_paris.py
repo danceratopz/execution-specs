@@ -57,7 +57,7 @@ def test_zero_value_suicide_to_empty_paris(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0x888748026558F849C1B2433EA5E1DAF1444DFC60),  # noqa: E501
+        address=Address(0xEAD720895580EC7CB65D03800A2816FA7B86355E),  # noqa: E501
     )
 
     tx = Transaction(

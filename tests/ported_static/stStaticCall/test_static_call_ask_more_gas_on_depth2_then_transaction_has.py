@@ -89,7 +89,7 @@ def test_static_call_ask_more_gas_on_depth2_then_transaction_has(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0x058ED798893492C38A38164FDCC5159738486318),  # noqa: E501
     )
     # Source: lll
     # { (SSTORE 8 1)}

@@ -49,7 +49,7 @@ def test_callcallcall_000_suicide_middle(
         code=Op.SSTORE(key=0x3, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x73B954EBC05BB0FF4A0F6A13A054D50AD1584099),  # noqa: E501
+        address=Address(0xDC41038D643DB76D340744231A630D57DD0D8C13),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (CALL 150000 <contract:0x1000000000000000000000000000000000000001> 0 0 64 0 64 ) }  # noqa: E501
@@ -58,7 +58,7 @@ def test_callcallcall_000_suicide_middle(
             key=0x0,
             value=Op.CALL(
                 gas=0x249F0,
-                address=0x77B749FFFF7EC61D31C79ED104F230A7959B2879,
+                address=0xE81E5895222C8E565137F56C8CB3D18F892F0C12,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -69,7 +69,7 @@ def test_callcallcall_000_suicide_middle(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x4353E77718BE108D4C149D88B34CACEDA42C5C66),  # noqa: E501
+        address=Address(0xE2453DDADC19B989FE01EE422FC38E717D97D841),  # noqa: E501
     )
     # Source: lll
     # {  [[ 1 ]] (CALL 100000 <contract:0x1000000000000000000000000000000000000002> 0 0 64 0 64 ) }  # noqa: E501
@@ -89,19 +89,19 @@ def test_callcallcall_000_suicide_middle(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x77B749FFFF7EC61D31C79ED104F230A7959B2879),  # noqa: E501
+        address=Address(0xE81E5895222C8E565137F56C8CB3D18F892F0C12),  # noqa: E501
     )
     # Source: lll
     # { (SELFDESTRUCT <contract:target:0x1000000000000000000000000000000000000000>) [[ 2 ]] (CALL 50000 <contract:0x1000000000000000000000000000000000000003> 0 0 64 0 64 ) }  # noqa: E501
     addr_2 = pre.deploy_contract(  # noqa: F841
         code=Op.SELFDESTRUCT(
-            address=0x4353E77718BE108D4C149D88B34CACEDA42C5C66
+            address=0xE2453DDADC19B989FE01EE422FC38E717D97D841
         )
         + Op.SSTORE(
             key=0x2,
             value=Op.CALL(
                 gas=0xC350,
-                address=0x73B954EBC05BB0FF4A0F6A13A054D50AD1584099,
+                address=0xDC41038D643DB76D340744231A630D57DD0D8C13,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,

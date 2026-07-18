@@ -56,7 +56,7 @@ def test_static_ab_acalls_suicide1(
 ) -> None:
     """Test_static_ab_acalls_suicide1."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0xE7E87F9BCF1205BB53443EA919A6C330E2ECFBC4)
     contract_1 = Address(0x945304EB96065B2A98B57A48A06AE28D285A71B5)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
@@ -87,7 +87,7 @@ def test_static_ab_acalls_suicide1(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0xE7E87F9BCF1205BB53443EA919A6C330E2ECFBC4),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 0 (CALLDATALOAD 0))  (STATICCALL (SUB (CALLDATALOAD 0) 50000) 0x095e7baea6a6c7c4c2dfeb977efac326af552d87 0 32 0 0) (SELFDESTRUCT 0x0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6) }  # noqa: E501
@@ -96,7 +96,7 @@ def test_static_ab_acalls_suicide1(
         + Op.POP(
             Op.STATICCALL(
                 gas=Op.SUB(Op.CALLDATALOAD(offset=0x0), 0xC350),
-                address=0x95E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87,
+                address=0xE7E87F9BCF1205BB53443EA919A6C330E2ECFBC4,
                 args_offset=0x0,
                 args_size=0x20,
                 ret_offset=0x0,

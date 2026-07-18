@@ -59,7 +59,7 @@ def test_zero_value_suicide_to_one_storage_key_oog_revert_paris(
         + Op.STOP,
         storage={0: 1},
         nonce=0,
-        address=Address(0x8D444744833C9B79FDFE630F155CF1F3BBEB92E3),  # noqa: E501
+        address=Address(0x801D18C026F3A567AF0EB9266DD18001D454ADB2),  # noqa: E501
     )
     # Source: lll
     # { (CALL 50000 <contract:0xd94f5374fce5edbc8e2a8697c15331677e6ebf0b> 0 0 0 0 0) [[2]]12 [[3]]12 [[4]]12 }  # noqa: E501
@@ -67,7 +67,7 @@ def test_zero_value_suicide_to_one_storage_key_oog_revert_paris(
         code=Op.POP(
             Op.CALL(
                 gas=0xC350,
-                address=0x8D444744833C9B79FDFE630F155CF1F3BBEB92E3,
+                address=0x801D18C026F3A567AF0EB9266DD18001D454ADB2,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,

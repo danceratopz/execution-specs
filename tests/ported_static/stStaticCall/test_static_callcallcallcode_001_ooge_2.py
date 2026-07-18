@@ -84,7 +84,7 @@ def test_static_callcallcallcode_001_ooge_2(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0x30383B9AA08D46C0C3E649B0794E0DA50A046BB3),  # noqa: E501
     )
     # Source: lll
     # {  (SSTORE 3 1) (MSTORE 3 1)}
@@ -93,7 +93,7 @@ def test_static_callcallcallcode_001_ooge_2(
         + Op.MSTORE(offset=0x3, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0x9D41CA9233D19D3202BEFCEF33F16AF7201F0EAA),  # noqa: E501
+        address=Address(0x96855465CD3F2705BD3B7C0E2D62DCFB0CD9DB4A),  # noqa: E501
     )
     # Source: lll
     # {  (def 'i 0x80) (for {} (< @i 50000) [i](+ @i 1) (EXTCODESIZE 1)  ) }
@@ -108,14 +108,14 @@ def test_static_callcallcallcode_001_ooge_2(
         + Op.JUMPDEST
         + Op.STOP,
         nonce=0,
-        address=Address(0x609E4DFE6190235B9A0362084C741D9EC330FB1E),  # noqa: E501
+        address=Address(0x8624779F34D653E1057AD7C67495E19E1119E4E2),  # noqa: E501
     )
     # Source: lll
     # {  (CALLCODE 120020 <contract:0x1000000000000000000000000000000000000003> 0 0 64 0 64 ) }  # noqa: E501
     addr_3 = pre.deploy_contract(  # noqa: F841
         code=Op.CALLCODE(
             gas=0x1D4D4,
-            address=0x9D41CA9233D19D3202BEFCEF33F16AF7201F0EAA,
+            address=0x96855465CD3F2705BD3B7C0E2D62DCFB0CD9DB4A,
             value=0x0,
             args_offset=0x0,
             args_size=0x40,
@@ -131,7 +131,7 @@ def test_static_callcallcallcode_001_ooge_2(
     addr_7 = pre.deploy_contract(  # noqa: F841
         code=Op.CALLCODE(
             gas=0x1D4D4,
-            address=0x609E4DFE6190235B9A0362084C741D9EC330FB1E,
+            address=0x8624779F34D653E1057AD7C67495E19E1119E4E2,
             value=0x0,
             args_offset=0x0,
             args_size=0x40,
@@ -189,7 +189,7 @@ def test_static_callcallcallcode_001_ooge_2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x071587C3E5F2EBF88B2A5B048733778605ADDB28),  # noqa: E501
+        address=Address(0x631581D0995808437BBED717F0327F0ED284C22A),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (STATICCALL 500000 <contract:0x2000000000000000000000000000000000000001> 0 64 0 64 ) }  # noqa: E501

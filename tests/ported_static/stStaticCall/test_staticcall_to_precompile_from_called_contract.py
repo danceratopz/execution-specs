@@ -41,8 +41,8 @@ def test_staticcall_to_precompile_from_called_contract(
 ) -> None:
     """STATICCALL to precompiled contracts from contract that called from..."""
     coinbase = Address(0xCAFE000000000000000000000000000000000001)
-    contract_0 = Address(0xB000000000000000000000000000000000000000)
-    contract_1 = Address(0xA000000000000000000000000000000000000000)
+    contract_0 = Address(0x02EF4140A86C8592B7EC8444A4E7834C394CCFAE)
+    contract_1 = Address(0x0732BB7196795E4C4CBA5B6A2F6E16AA6F97523E)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -337,7 +337,7 @@ def test_staticcall_to_precompile_from_called_contract(
         + Op.SSTORE(key=0x20, value=Op.MLOAD(offset=0x3E8))
         + Op.STOP,
         nonce=0,
-        address=Address(0xA000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x0732BB7196795E4C4CBA5B6A2F6E16AA6F97523E),  # noqa: E501
     )
     # Source: lll
     # {
@@ -358,7 +358,7 @@ def test_staticcall_to_precompile_from_called_contract(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0xB000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x02EF4140A86C8592B7EC8444A4E7834C394CCFAE),  # noqa: E501
     )
 
     gas_limit = 1000000

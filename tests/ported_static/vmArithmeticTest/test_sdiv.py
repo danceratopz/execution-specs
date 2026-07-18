@@ -149,24 +149,24 @@ def test_sdiv(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001006)
-    contract_7 = Address(0x0000000000000000000000000000000000001007)
-    contract_8 = Address(0x0000000000000000000000000000000000001008)
-    contract_9 = Address(0x0000000000000000000000000000000000001009)
-    contract_10 = Address(0x000000000000000000000000000000000000100A)
-    contract_11 = Address(0x000000000000000000000000000000000000100B)
-    contract_12 = Address(0x000000000000000000000000000000000000100C)
-    contract_13 = Address(0x000000000000000000000000000000000000100D)
-    contract_14 = Address(0x000000000000000000000000000000000000100E)
-    contract_15 = Address(0x000000000000000000000000000000000000100F)
-    contract_16 = Address(0x0000000000000000000000000000000000000110)
-    contract_17 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC3)
+    contract_1 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC4)
+    contract_2 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC5)
+    contract_3 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC6)
+    contract_4 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC7)
+    contract_5 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC8)
+    contract_6 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC9)
+    contract_7 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCA)
+    contract_8 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCB)
+    contract_9 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCC)
+    contract_10 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCD)
+    contract_11 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCE)
+    contract_12 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCF)
+    contract_13 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DD0)
+    contract_14 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DD1)
+    contract_15 = Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DD2)
+    contract_16 = Address(0x28CAAF53BE24B0BD7AAB00474005CE93FE29796B)
+    contract_17 = Address(0xBE9AEBF08D08DFC5C16C0A7102D54701B2AFCB94)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -202,7 +202,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC3),  # noqa: E501
     )
     # Source: lll
     # {  ; (-1) / (0 - (-1)) = (-1)/1 = -1
@@ -226,7 +226,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC4),  # noqa: E501
     )
     # Source: lll
     # {  ; (-2) / (-4) = 0
@@ -241,7 +241,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC5),  # noqa: E501
     )
     # Source: lll
     # {  ; 4 / (-2) = -2
@@ -253,7 +253,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC6),  # noqa: E501
     )
     # Source: lll
     # {  ; 5 / (-4) = -1
@@ -267,7 +267,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC7),  # noqa: E501
     )
     # Source: lll
     # {  ; (-2^255) / (-1) = 2^255
@@ -290,7 +290,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC8),  # noqa: E501
     )
     # Source: lll
     # {  ; (-2^255) / 0 = 0
@@ -314,7 +314,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001006),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC9),  # noqa: E501
     )
     # Source: lll
     # {  ; (-1)/25 = 0 (no fractions in evm)
@@ -326,7 +326,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001007),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCA),  # noqa: E501
     )
     # Source: lll
     # {  ; (-1)/(-1) = 1
@@ -340,7 +340,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001008),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCB),  # noqa: E501
     )
     # Source: lll
     # {  ; (-1)/1 = -1
@@ -352,7 +352,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001009),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCC),  # noqa: E501
     )
     # Source: lll
     # {  ; (-3)/0 = 0
@@ -367,7 +367,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100A),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCD),  # noqa: E501
     )
     # Source: lll
     # {  ; (0-(-1))/0 = 0
@@ -391,7 +391,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100B),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCE),  # noqa: E501
     )
     # Source: lll
     # {  ; (0-(-1))/0 + 1 = 1
@@ -418,7 +418,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100C),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DCF),  # noqa: E501
     )
     # Source: raw
     # 0x600560096000030560005500
@@ -427,7 +427,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100D),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DD0),  # noqa: E501
     )
     # Source: lll
     # {
@@ -453,7 +453,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100E),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DD1),  # noqa: E501
     )
     # Source: lll
     # {
@@ -476,7 +476,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100F),  # noqa: E501
+        address=Address(0x36D9B3F1145ACAB36715EFC682EF762A76AA7DD2),  # noqa: E501
     )
     # Source: lll
     # {
@@ -500,7 +500,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000000110),  # noqa: E501
+        address=Address(0x28CAAF53BE24B0BD7AAB00474005CE93FE29796B),  # noqa: E501
     )
     # Source: lll
     # {
@@ -509,7 +509,10 @@ def test_sdiv(
     contract_17 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x36D9B3F1145ACAB36715EFC682EF762A76AA7DC3,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -519,7 +522,7 @@ def test_sdiv(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0xBE9AEBF08D08DFC5C16C0A7102D54701B2AFCB94),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

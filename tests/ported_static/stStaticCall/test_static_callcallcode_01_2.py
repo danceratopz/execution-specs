@@ -88,7 +88,7 @@ def test_static_callcallcode_01_2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0xAAB59F13D96113334FAB5C68E4E62B61F6CBF647),  # noqa: E501
+        address=Address(0xA717130C32B344A59A704EF6E807A0EFFDD60136),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 0 0x11223344) }

@@ -36,8 +36,8 @@ def test_delegatecall_in_initcode_to_existing_contract(
 ) -> None:
     """Test_delegatecall_in_initcode_to_existing_contract."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x1000000000000000000000000000000000000000)
-    contract_1 = Address(0x1000000000000000000000000000000000000001)
+    contract_0 = Address(0x8A864D90E37A3296654AFAACA06685FFFB76CE8D)
+    contract_1 = Address(0x8A864D90E37A3296654AFAACA06685FFFB76CE8E)
     contract_2 = Address(0x945304EB96065B2A98B57A48A06AE28D285A71B5)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
@@ -68,7 +68,7 @@ def test_delegatecall_in_initcode_to_existing_contract(
         + Op.STOP,
         balance=10000,
         nonce=0,
-        address=Address(0x1000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x8A864D90E37A3296654AFAACA06685FFFB76CE8D),  # noqa: E501
     )
     # Source: lll
     # { (MSTORE 0 0x6001600055) (CREATE 1 27 5) }
@@ -78,7 +78,7 @@ def test_delegatecall_in_initcode_to_existing_contract(
         + Op.STOP,
         balance=1000,
         nonce=0,
-        address=Address(0x1000000000000000000000000000000000000001),  # noqa: E501
+        address=Address(0x8A864D90E37A3296654AFAACA06685FFFB76CE8E),  # noqa: E501
     )
     # Source: lll
     # { (SSTORE 2 1) [[ 11 ]] (CALLER) }

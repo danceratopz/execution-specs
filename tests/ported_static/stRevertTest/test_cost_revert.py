@@ -216,14 +216,14 @@ def test_cost_revert(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001006)
-    contract_7 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6A7)
+    contract_1 = Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6A8)
+    contract_2 = Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6A9)
+    contract_3 = Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6AA)
+    contract_4 = Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6AB)
+    contract_5 = Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6AC)
+    contract_6 = Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6AD)
+    contract_7 = Address(0x63E4490BE893FA4325277F1CB986DF458E9A1074)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -246,7 +246,7 @@ def test_cost_revert(
         code=Op.REVERT(offset=0x0, size=0x10) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6A7),  # noqa: E501
     )
     # Source: lll
     # {
@@ -261,7 +261,7 @@ def test_cost_revert(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6A8),  # noqa: E501
     )
     # Source: lll
     # {
@@ -271,7 +271,7 @@ def test_cost_revert(
         code=Op.SHA3(offset=0x0, size=Op.SUB(0x0, 0x1)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6A9),  # noqa: E501
     )
     # Source: raw
     # 0x610103600155600060006000600061dead6175305a03f450BA
@@ -281,7 +281,7 @@ def test_cost_revert(
         ),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6AA),  # noqa: E501
     )
     # Source: raw
     # 0x610104600155600060006000600061dead6175305a03f450600056
@@ -300,7 +300,7 @@ def test_cost_revert(
         + Op.JUMP(pc=0x0),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6AB),  # noqa: E501
     )
     # Source: raw
     # 0x1000
@@ -308,7 +308,7 @@ def test_cost_revert(
         code=Op.LT + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6AC),  # noqa: E501
     )
     # Source: raw
     # 0x5b586004580356
@@ -316,7 +316,7 @@ def test_cost_revert(
         code=Op.JUMPDEST + Op.PC + Op.JUMP(pc=Op.SUB(Op.PC, 0x4)),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001006),  # noqa: E501
+        address=Address(0xC7731A209ACAC5747D33A72F86D8933661CEA6AD),  # noqa: E501
     )
     # Source: lll
     # {
@@ -468,7 +468,7 @@ def test_cost_revert(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x63E4490BE893FA4325277F1CB986DF458E9A1074),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

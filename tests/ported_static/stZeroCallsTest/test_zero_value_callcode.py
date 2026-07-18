@@ -44,7 +44,7 @@ def test_zero_value_callcode(
 ) -> None:
     """Test_zero_value_callcode."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_0 = Address(0x1E93C38EC5EE492EA986734D790AD75054B75103)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -78,7 +78,7 @@ def test_zero_value_callcode(
         + Op.SSTORE(key=0x64, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0x1E93C38EC5EE492EA986734D790AD75054B75103),  # noqa: E501
     )
 
     # Preserve Cancun's post-intrinsic execution budget across

@@ -55,7 +55,7 @@ def test_extcodesize_to_non_existent(
         - 2200
     )
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_0 = Address(0x3A7BA1471792FD8126353F87921A34376E999D19)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -83,7 +83,7 @@ def test_extcodesize_to_non_existent(
         + Op.SSTORE(key=0x64, value=Op.SUB(Op.MLOAD(offset=0x0), Op.GAS))
         + Op.STOP,
         nonce=0,
-        address=Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0x3A7BA1471792FD8126353F87921A34376E999D19),  # noqa: E501
     )
 
     tx = Transaction(

@@ -107,17 +107,17 @@ def test_env_info(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001006)
-    contract_7 = Address(0x0000000000000000000000000000000000001007)
-    contract_8 = Address(0x0000000000000000000000000000000000001008)
-    contract_9 = Address(0x0000000000000000000000000000000000001009)
-    contract_10 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x893485A50ED265BCD6852E86F142551E29FC6058)
+    contract_1 = Address(0x893485A50ED265BCD6852E86F142551E29FC6059)
+    contract_2 = Address(0x893485A50ED265BCD6852E86F142551E29FC605A)
+    contract_3 = Address(0x893485A50ED265BCD6852E86F142551E29FC605B)
+    contract_4 = Address(0x893485A50ED265BCD6852E86F142551E29FC605C)
+    contract_5 = Address(0x893485A50ED265BCD6852E86F142551E29FC605D)
+    contract_6 = Address(0x893485A50ED265BCD6852E86F142551E29FC605E)
+    contract_7 = Address(0x893485A50ED265BCD6852E86F142551E29FC605F)
+    contract_8 = Address(0x893485A50ED265BCD6852E86F142551E29FC6060)
+    contract_9 = Address(0x893485A50ED265BCD6852E86F142551E29FC6061)
+    contract_10 = Address(0x7B45E4C7754DF150F62E588ECA8BCAB6ED9698AA)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -140,7 +140,7 @@ def test_env_info(
         code=Op.SSTORE(key=0x0, value=Op.ADDRESS) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x893485A50ED265BCD6852E86F142551E29FC6058),  # noqa: E501
     )
     # Source: lll
     # {   ; Copy first seven bytes of code to memory
@@ -154,7 +154,7 @@ def test_env_info(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x893485A50ED265BCD6852E86F142551E29FC6059),  # noqa: E501
     )
     # Source: lll
     # {
@@ -168,7 +168,7 @@ def test_env_info(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x893485A50ED265BCD6852E86F142551E29FC605A),  # noqa: E501
     )
     # Source: lll
     # {
@@ -189,7 +189,7 @@ def test_env_info(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x893485A50ED265BCD6852E86F142551E29FC605B),  # noqa: E501
     )
     # Source: lll
     # {
@@ -199,7 +199,7 @@ def test_env_info(
         code=Op.SSTORE(key=0x0, value=Op.CALLER) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x893485A50ED265BCD6852E86F142551E29FC605C),  # noqa: E501
     )
     # Source: lll
     # {
@@ -209,7 +209,7 @@ def test_env_info(
         code=Op.SSTORE(key=0x0, value=Op.CALLVALUE) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x893485A50ED265BCD6852E86F142551E29FC605D),  # noqa: E501
     )
     # Source: lll
     # {
@@ -219,7 +219,7 @@ def test_env_info(
         code=Op.SSTORE(key=0x0, value=Op.CODESIZE) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001006),  # noqa: E501
+        address=Address(0x893485A50ED265BCD6852E86F142551E29FC605E),  # noqa: E501
     )
     # Source: lll
     # {
@@ -229,7 +229,7 @@ def test_env_info(
         code=Op.SSTORE(key=0x0, value=Op.GASPRICE) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001007),  # noqa: E501
+        address=Address(0x893485A50ED265BCD6852E86F142551E29FC605F),  # noqa: E501
     )
     # Source: lll
     # {
@@ -239,7 +239,7 @@ def test_env_info(
         code=Op.SSTORE(key=0x0, value=Op.ORIGIN) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001008),  # noqa: E501
+        address=Address(0x893485A50ED265BCD6852E86F142551E29FC6060),  # noqa: E501
     )
     # Source: lll
     # {
@@ -249,7 +249,7 @@ def test_env_info(
         code=Op.SSTORE(key=0x0, value=Op.CALLDATASIZE) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001009),  # noqa: E501
+        address=Address(0x893485A50ED265BCD6852E86F142551E29FC6061),  # noqa: E501
     )
     # Source: lll
     # {
@@ -258,7 +258,10 @@ def test_env_info(
     contract_10 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x893485A50ED265BCD6852E86F142551E29FC6058,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x10,
             args_offset=0x0,
             args_size=0x0,
@@ -268,7 +271,7 @@ def test_env_info(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x7B45E4C7754DF150F62E588ECA8BCAB6ED9698AA),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

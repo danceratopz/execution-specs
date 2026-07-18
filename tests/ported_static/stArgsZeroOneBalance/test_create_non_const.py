@@ -58,7 +58,7 @@ def test_create_non_const(
 ) -> None:
     """Test_create_non_const."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87)
+    contract_0 = Address(0x1E886A39575F5DDF472074C691A47F91B4AB5B66)
     sender = pre.fund_eoa(amount=0xDE0B6B3A7640000)
 
     env = Environment(
@@ -77,19 +77,19 @@ def test_create_non_const(
             key=0x0,
             value=Op.CREATE(
                 value=Op.BALANCE(
-                    address=0x95E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87
+                    address=0x1E886A39575F5DDF472074C691A47F91B4AB5B66
                 ),
                 offset=Op.BALANCE(
-                    address=0x95E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87
+                    address=0x1E886A39575F5DDF472074C691A47F91B4AB5B66
                 ),
                 size=Op.BALANCE(
-                    address=0x95E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87
+                    address=0x1E886A39575F5DDF472074C691A47F91B4AB5B66
                 ),
             ),
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0x095E7BAEA6A6C7C4C2DFEB977EFAC326AF552D87),  # noqa: E501
+        address=Address(0x1E886A39575F5DDF472074C691A47F91B4AB5B66),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

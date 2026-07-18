@@ -83,13 +83,13 @@ def test_mod(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F4)
+    contract_1 = Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F5)
+    contract_2 = Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F6)
+    contract_3 = Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F7)
+    contract_4 = Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F8)
+    contract_5 = Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F9)
+    contract_6 = Address(0xA6FC916089AE70FC6CF09DFE45D89696EE1BFD2D)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -112,7 +112,7 @@ def test_mod(
         code=Op.SSTORE(key=0x0, value=Op.MOD(0x2, 0x3)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F4),  # noqa: E501
     )
     # Source: lll
     # {
@@ -130,7 +130,7 @@ def test_mod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F5),  # noqa: E501
     )
     # Source: lll
     # {
@@ -148,7 +148,7 @@ def test_mod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F6),  # noqa: E501
     )
     # Source: lll
     # {
@@ -158,7 +158,7 @@ def test_mod(
         code=Op.SSTORE(key=0x0, value=Op.MOD(0x3, 0x0)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F7),  # noqa: E501
     )
     # Source: lll
     # {
@@ -173,7 +173,7 @@ def test_mod(
         code=Op.SSTORE(key=0x0, value=Op.MOD(Op.SUB(0x0, 0x2), 0x3)) + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F8),  # noqa: E501
     )
     # Source: lll
     # {
@@ -187,7 +187,7 @@ def test_mod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0x89AEFE1B4AF639755181124BFD424E3F0411C2F9),  # noqa: E501
     )
     # Source: lll
     # {
@@ -196,7 +196,10 @@ def test_mod(
     contract_6 = pre.deploy_contract(  # noqa: F841
         code=Op.CALL(
             gas=0xFFFFFF,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x89AEFE1B4AF639755181124BFD424E3F0411C2F4,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             value=0x0,
             args_offset=0x0,
             args_size=0x0,
@@ -206,7 +209,7 @@ def test_mod(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0xA6FC916089AE70FC6CF09DFE45D89696EE1BFD2D),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

@@ -67,7 +67,7 @@ def test_static_call_identity_3(
         + Op.STOP,
         balance=0x1312D00,
         nonce=0,
-        address=Address(0xC23A3B84D36D8D9D3D045162C4C153465DE4816C),  # noqa: E501
+        address=Address(0x20FAFD8732A045F0347C27C51E649A6A4FC88BEB),  # noqa: E501
     )
 
     tx = Transaction(

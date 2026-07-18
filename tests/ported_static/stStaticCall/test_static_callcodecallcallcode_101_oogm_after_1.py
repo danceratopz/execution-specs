@@ -87,21 +87,21 @@ def test_static_callcodecallcallcode_101_oogm_after_1(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0xAAB59F13D96113334FAB5C68E4E62B61F6CBF647),  # noqa: E501
+        address=Address(0x40172FBFBF9B588F270EE1C71321A973F043CDE1),  # noqa: E501
     )
     # Source: lll
     # {  (MSTORE 3 1) }
     addr_4 = pre.deploy_contract(  # noqa: F841
         code=Op.MSTORE(offset=0x3, value=0x1) + Op.STOP,
         nonce=0,
-        address=Address(0x335C5531B84765A7626E6E76688F18B81BE5259C),  # noqa: E501
+        address=Address(0x321CA087398626E840892DD28BD310B402E2E78E),  # noqa: E501
     )
     # Source: lll
     # {  (SSTORE 3 1) }
     addr_8 = pre.deploy_contract(  # noqa: F841
         code=Op.SSTORE(key=0x3, value=0x1) + Op.STOP,
         nonce=0,
-        address=Address(0xB126C622075B1189FB6C45E851641CFADDF65B36),  # noqa: E501
+        address=Address(0x17BB51D7998A1E791E158FF038DADFC6F7F27B49),  # noqa: E501
     )
     # Source: lll
     # {  (CALLCODE 120020 <contract:0x1000000000000000000000000000000000000003> 0 0 64 0 64 ) (MSTORE 3 1) }  # noqa: E501
@@ -109,7 +109,7 @@ def test_static_callcodecallcallcode_101_oogm_after_1(
         code=Op.POP(
             Op.CALLCODE(
                 gas=0x1D4D4,
-                address=0x335C5531B84765A7626E6E76688F18B81BE5259C,
+                address=0x321CA087398626E840892DD28BD310B402E2E78E,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -128,7 +128,7 @@ def test_static_callcodecallcallcode_101_oogm_after_1(
         code=Op.POP(
             Op.CALLCODE(
                 gas=0x1D4D4,
-                address=0xB126C622075B1189FB6C45E851641CFADDF65B36,
+                address=0x17BB51D7998A1E791E158FF038DADFC6F7F27B49,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -164,7 +164,7 @@ def test_static_callcodecallcallcode_101_oogm_after_1(
         + Op.JUMPDEST
         + Op.STOP,
         nonce=0,
-        address=Address(0xF4645C150A8060778AD94DFFE302081FC222DEDB),  # noqa: E501
+        address=Address(0xD7A8A5FADCFF290B10D3D4D1F51D1E32DBA87F08),  # noqa: E501
     )
     # Source: lll
     # {  (STATICCALL 400080 <contract:0x2000000000000000000000000000000000000002> 0 64 0 64 ) (MSTORE 3 1) }  # noqa: E501
@@ -190,7 +190,7 @@ def test_static_callcodecallcallcode_101_oogm_after_1(
         code=Op.POP(
             Op.CALLCODE(
                 gas=0xAAEF6,
-                address=0xF4645C150A8060778AD94DFFE302081FC222DEDB,
+                address=0xD7A8A5FADCFF290B10D3D4D1F51D1E32DBA87F08,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,

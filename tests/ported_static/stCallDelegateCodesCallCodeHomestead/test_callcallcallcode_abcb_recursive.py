@@ -54,7 +54,7 @@ def test_callcallcallcode_abcb_recursive(
             key=0x0,
             value=Op.CALLCODE(
                 gas=0x17D7840,
-                address=0xE2AB9779F4FB1D9D39211CC2082083ADD172E69C,
+                address=0x86660AAAED98EB8014B4E23E747DE09C9940342D,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -65,7 +65,7 @@ def test_callcallcallcode_abcb_recursive(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x6D477A21D3906D4C0CD1EDBFA7D272E6E21F1CA1),  # noqa: E501
+        address=Address(0xC18E0299498CD9BB1AFFB013A01B3A4C5C1664D2),  # noqa: E501
     )
     # Source: lll
     # {  [[ 1 ]] (CALLCODE 1000000 <contract:0x1000000000000000000000000000000000000002> 0 0 64 0 64 ) }  # noqa: E501
@@ -74,7 +74,7 @@ def test_callcallcallcode_abcb_recursive(
             key=0x1,
             value=Op.CALLCODE(
                 gas=0xF4240,
-                address=0xA72F0E2F2FC5FD0878AF9B8E4AAED09983670929,
+                address=0x295AD3F8765D6A843FFA71C684A71A183EE65CF2,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x40,
@@ -85,7 +85,7 @@ def test_callcallcallcode_abcb_recursive(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0xE2AB9779F4FB1D9D39211CC2082083ADD172E69C),  # noqa: E501
+        address=Address(0x86660AAAED98EB8014B4E23E747DE09C9940342D),  # noqa: E501
     )
     # Source: lll
     # {  [[ 2 ]] (DELEGATECALL 500000 <contract:0x1000000000000000000000000000000000000001> 0 64 0 64 ) }  # noqa: E501
@@ -94,7 +94,7 @@ def test_callcallcallcode_abcb_recursive(
             key=0x2,
             value=Op.DELEGATECALL(
                 gas=0x7A120,
-                address=0xE2AB9779F4FB1D9D39211CC2082083ADD172E69C,
+                address=0x86660AAAED98EB8014B4E23E747DE09C9940342D,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
@@ -104,7 +104,7 @@ def test_callcallcallcode_abcb_recursive(
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0xA72F0E2F2FC5FD0878AF9B8E4AAED09983670929),  # noqa: E501
+        address=Address(0x295AD3F8765D6A843FFA71C684A71A183EE65CF2),  # noqa: E501
     )
 
     tx = Transaction(

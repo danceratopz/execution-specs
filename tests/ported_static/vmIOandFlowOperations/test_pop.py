@@ -58,9 +58,9 @@ def test_pop(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0x346A347BEE08A8442DDDF0ED2BDD98A693F75EA3)
+    contract_1 = Address(0x346A347BEE08A8442DDDF0ED2BDD98A693F75EA4)
+    contract_2 = Address(0x2E6D39C2F39988A40CE8DD88DA2AFC49BEFC9D05)
     sender = pre.fund_eoa(amount=0x100000000000)
 
     env = Environment(
@@ -78,7 +78,7 @@ def test_pop(
         code=Op.PUSH1[0x2] + Op.PUSH1[0x3] + Op.POP(0x4) + Op.SSTORE,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0x346A347BEE08A8442DDDF0ED2BDD98A693F75EA3),  # noqa: E501
     )
     # Source: raw
     # 0x5060026003600455
@@ -86,7 +86,7 @@ def test_pop(
         code=Op.POP + Op.PUSH1[0x2] + Op.SSTORE(key=0x4, value=0x3),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0x346A347BEE08A8442DDDF0ED2BDD98A693F75EA4),  # noqa: E501
     )
     # Source: lll
     # {
@@ -95,7 +95,10 @@ def test_pop(
     contract_2 = pre.deploy_contract(  # noqa: F841
         code=Op.DELEGATECALL(
             gas=Op.GAS,
-            address=Op.ADD(0x1000, Op.CALLDATALOAD(offset=0x4)),
+            address=Op.ADD(
+                0x346A347BEE08A8442DDDF0ED2BDD98A693F75EA3,
+                Op.CALLDATALOAD(offset=0x4),
+            ),
             args_offset=0x0,
             args_size=0x0,
             ret_offset=0x0,
@@ -104,7 +107,7 @@ def test_pop(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0x2E6D39C2F39988A40CE8DD88DA2AFC49BEFC9D05),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

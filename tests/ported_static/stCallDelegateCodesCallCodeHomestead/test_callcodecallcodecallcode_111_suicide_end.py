@@ -53,7 +53,7 @@ def test_callcodecallcodecallcode_111_suicide_end(
         code=Op.SSTORE(key=0x3, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0x73B954EBC05BB0FF4A0F6A13A054D50AD1584099),  # noqa: E501
+        address=Address(0xCB99D6DAD1593AE17E4557BA209BA3A552FD20C7),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (DELEGATECALL 150000 <contract:0x1000000000000000000000000000000000000001> 0 64 0 64 ) }  # noqa: E501
@@ -71,7 +71,7 @@ def test_callcodecallcodecallcode_111_suicide_end(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x2B30B637F37E3F5B8CA4AB846331D0779A3F4671),  # noqa: E501
+        address=Address(0x3B13B9DF7601DEDDBCBA557A245631567A05CFBF),  # noqa: E501
     )
     # Source: lll
     # {  [[ 1 ]] (CALL 100000 <contract:0x1000000000000000000000000000000000000002> 1 0 64 0 64) }  # noqa: E501
@@ -98,7 +98,7 @@ def test_callcodecallcodecallcode_111_suicide_end(
         code=Op.SSTORE(
             key=0x2,
             value=Op.CALLCODE(
-                address=0x73B954EBC05BB0FF4A0F6A13A054D50AD1584099,
+                address=0xCB99D6DAD1593AE17E4557BA209BA3A552FD20C7,
                 value=0x2,
                 args_offset=0x0,
                 args_size=0x40,

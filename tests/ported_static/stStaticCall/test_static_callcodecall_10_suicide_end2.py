@@ -75,7 +75,7 @@ def test_static_callcodecall_10_suicide_end2(
         code=Op.MSTORE(offset=0x2, value=0x1) + Op.STOP,
         balance=0x2540BE400,
         nonce=0,
-        address=Address(0xCFB5784A5E49924BECC2D5C5D2EE0A9B141E6216),  # noqa: E501
+        address=Address(0xBE38F0B8769BEFD6FA8C15BBF166876EF2CD88AE),  # noqa: E501
     )
     # Source: lll
     # {  [[ 0 ]] (CALLCODE 150000 <contract:0x1000000000000000000000000000000000000001> (CALLVALUE) 0 64 0 64 ) [[ 1 ]] (GAS) }  # noqa: E501
@@ -96,7 +96,7 @@ def test_static_callcodecall_10_suicide_end2(
         + Op.STOP,
         balance=0xDE0B6B3A7640000,
         nonce=0,
-        address=Address(0x44D09DDF088DD88C0E91FA7EF74973FF94AD7414),  # noqa: E501
+        address=Address(0x80175E6F9CE75A0FDFB1DB9BD168234A9B512684),  # noqa: E501
     )
     # Source: lll
     # {  (STATICCALL 50000 <contract:0x1000000000000000000000000000000000000002> 0 64 0 64 ) (SELFDESTRUCT <contract:target:0x1000000000000000000000000000000000000000>) }  # noqa: E501
@@ -104,14 +104,14 @@ def test_static_callcodecall_10_suicide_end2(
         code=Op.POP(
             Op.STATICCALL(
                 gas=0xC350,
-                address=0xCFB5784A5E49924BECC2D5C5D2EE0A9B141E6216,
+                address=0xBE38F0B8769BEFD6FA8C15BBF166876EF2CD88AE,
                 args_offset=0x0,
                 args_size=0x40,
                 ret_offset=0x0,
                 ret_size=0x40,
             )
         )
-        + Op.SELFDESTRUCT(address=0x44D09DDF088DD88C0E91FA7EF74973FF94AD7414)
+        + Op.SELFDESTRUCT(address=0x80175E6F9CE75A0FDFB1DB9BD168234A9B512684)
         + Op.STOP,
         balance=0x2540BE400,
         nonce=0,

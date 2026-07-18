@@ -88,7 +88,7 @@ def test_static_call1024_pre_calls2(
         + Op.SSTORE(key=0x1, value=0x1)
         + Op.STOP,
         nonce=0,
-        address=Address(0xC0E4183389EB57F779A986D8C878F89B9401DC8E),  # noqa: E501
+        address=Address(0x9245819E9EAC0E90113351D0032579BE362800E8),  # noqa: E501
     )
     # Source: lll
     # { (MSTORE 0 1)}

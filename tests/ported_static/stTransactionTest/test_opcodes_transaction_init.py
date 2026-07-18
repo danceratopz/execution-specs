@@ -839,8 +839,8 @@ def test_opcodes_transaction_init(
 ) -> None:
     """Test_opcodes_transaction_init."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
-    contract_1 = Address(0x0F572E5295C57F15886F9B263E2F6D2D6C7B5EC6)
+    contract_0 = Address(0x063CC6EE170B215D7896E73795743B9EEB22B7AF)
+    contract_1 = Address(0x5952BC4210309BA885BAC1108CD5EC16F912E586)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -860,7 +860,7 @@ def test_opcodes_transaction_init(
     contract_0 = pre.deploy_contract(  # noqa: F841
         code=Op.SSTORE(key=0x0, value=0x1) + Op.STOP,
         nonce=0,
-        address=Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0x063CC6EE170B215D7896E73795743B9EEB22B7AF),  # noqa: E501
     )
     # Source: raw
     # 0x61ffff5060046000f3
@@ -868,7 +868,7 @@ def test_opcodes_transaction_init(
         code=Op.POP(0xFFFF) + Op.RETURN(offset=0x0, size=0x4),
         balance=0xDE0B6B3A7640000,
         nonce=1,
-        address=Address(0x0F572E5295C57F15886F9B263E2F6D2D6C7B5EC6),  # noqa: E501
+        address=Address(0x5952BC4210309BA885BAC1108CD5EC16F912E586),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

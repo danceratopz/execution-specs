@@ -36,7 +36,7 @@ def test_create_e_contract_then_call_to_non_existent_acc(
 ) -> None:
     """Test_create_e_contract_then_call_to_non_existent_acc."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_0 = Address(0x4D9B3076C0D58D6E57C80BDE2AAC6980B3A22985)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -72,7 +72,7 @@ def test_create_e_contract_then_call_to_non_existent_acc(
         + Op.SSTORE(key=0x64, value=Op.GAS)
         + Op.STOP,
         nonce=0,
-        address=Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0x4D9B3076C0D58D6E57C80BDE2AAC6980B3A22985),  # noqa: E501
     )
 
     tx = Transaction(

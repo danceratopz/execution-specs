@@ -80,7 +80,7 @@ def test_call1024_oog(
                     Op.SUB(Op.GAS, 0x2710),
                     Op.SUB(0x1, Op.DIV(Op.SLOAD(key=0x0), 0x401)),
                 ),
-                address=0x62C5C9278DA01E6594D6FEDE061838CF5E597F2B,
+                address=0x3D3F9E8B76AE3736710E2BD34BBF7D3B97C64790,
                 args_offset=0x0,
                 args_size=0x0,
                 ret_offset=0x0,
@@ -93,7 +93,7 @@ def test_call1024_oog(
         + Op.STOP,
         balance=1024,
         nonce=0,
-        address=Address(0x62C5C9278DA01E6594D6FEDE061838CF5E597F2B),  # noqa: E501
+        address=Address(0x3D3F9E8B76AE3736710E2BD34BBF7D3B97C64790),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

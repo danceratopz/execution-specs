@@ -61,7 +61,7 @@ def test_call_zero_v_call_suicide(
         + Op.POP(
             Op.CALL(
                 gas=0xEA60,
-                address=0x79968A94DBEDB20475585E9DD4DAE6333ADD4C01,
+                address=0x5F81436E2723A7D4D3461F449F0169FE7AB30350,
                 value=0x0,
                 args_offset=0x0,
                 args_size=0x0,
@@ -82,7 +82,7 @@ def test_call_zero_v_call_suicide(
         )
         + Op.STOP,
         nonce=0,
-        address=Address(0x79968A94DBEDB20475585E9DD4DAE6333ADD4C01),  # noqa: E501
+        address=Address(0x5F81436E2723A7D4D3461F449F0169FE7AB30350),  # noqa: E501
     )
 
     tx = Transaction(

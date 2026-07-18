@@ -41,8 +41,8 @@ def test_callcode_to_precompile_from_transaction(
 ) -> None:
     """Contract B staticcalls contract A."""
     coinbase = Address(0xCAFE000000000000000000000000000000000001)
-    contract_0 = Address(0xB000000000000000000000000000000000000000)
-    contract_1 = Address(0xA000000000000000000000000000000000000000)
+    contract_0 = Address(0x8892DEC651557C61AEE69353C453F6796C96A4B7)
+    contract_1 = Address(0x5A21D05583398F00C843146284709F2FC45EFA9A)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -475,7 +475,7 @@ def test_callcode_to_precompile_from_transaction(
         + Op.STOP,
         balance=1000,
         nonce=0,
-        address=Address(0xA000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x5A21D05583398F00C843146284709F2FC45EFA9A),  # noqa: E501
     )
     # Source: lll
     # {
@@ -573,7 +573,7 @@ def test_callcode_to_precompile_from_transaction(
         },
         balance=1000,
         nonce=0,
-        address=Address(0xB000000000000000000000000000000000000000),  # noqa: E501
+        address=Address(0x8892DEC651557C61AEE69353C453F6796C96A4B7),  # noqa: E501
     )
 
     tx = Transaction(

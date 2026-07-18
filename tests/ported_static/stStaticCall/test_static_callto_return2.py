@@ -55,7 +55,7 @@ def test_static_callto_return2(
         + Op.RETURN(offset=0x0, size=0x2),
         balance=23,
         nonce=0,
-        address=Address(0xD5D9E9E0158920B17B6DF82FAC474B3E2691EE99),  # noqa: E501
+        address=Address(0x4BB75BA38A6103A3DCDBB7B78E6AEF0C6A5C9CF4),  # noqa: E501
     )
     # Source: lll
     # { (MSTORE 0 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff) (MSTORE 32 0xaaffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffaa ) [[ 0 ]] (STATICCALL 5000 <contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5> 0 64 0 2 ) [[ 1 ]] (MLOAD 0) }  # noqa: E501

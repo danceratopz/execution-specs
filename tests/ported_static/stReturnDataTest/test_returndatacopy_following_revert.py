@@ -80,7 +80,7 @@ def test_returndatacopy_following_revert(
         + Op.STOP,
         storage={0: 1},
         nonce=0,
-        address=Address(0x2FAF9D2A81304665C9A06A42935DDC42B24F488B),  # noqa: E501
+        address=Address(0x5C12ADFB4463657E22D232C46A0715957BC0CB08),  # noqa: E501
     )
 
     tx = Transaction(

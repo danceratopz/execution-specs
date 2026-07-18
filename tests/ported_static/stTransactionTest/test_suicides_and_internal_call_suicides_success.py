@@ -61,7 +61,7 @@ def test_suicides_and_internal_call_suicides_success(
     """Test_suicides_and_internal_call_suicides_success."""
     coinbase = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
     contract_0 = Address(0x0000000000000000000000000000000000000000)
-    contract_1 = Address(0xC94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_1 = Address(0xD5F5F54C9DB0A015CAC26A09DD712580D89BDA72)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -100,7 +100,7 @@ def test_suicides_and_internal_call_suicides_success(
         + Op.STOP,
         balance=1000,
         nonce=0,
-        address=Address(0xC94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0xD5F5F54C9DB0A015CAC26A09DD712580D89BDA72),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

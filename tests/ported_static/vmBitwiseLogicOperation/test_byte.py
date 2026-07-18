@@ -119,19 +119,19 @@ def test_byte(
 ) -> None:
     """Ori Pomerantz qbzzt1@gmail."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0x0000000000000000000000000000000000001000)
-    contract_1 = Address(0x0000000000000000000000000000000000001001)
-    contract_2 = Address(0x0000000000000000000000000000000000001002)
-    contract_3 = Address(0x0000000000000000000000000000000000001003)
-    contract_4 = Address(0x0000000000000000000000000000000000001004)
-    contract_5 = Address(0x0000000000000000000000000000000000001005)
-    contract_6 = Address(0x0000000000000000000000000000000000001006)
-    contract_7 = Address(0x0000000000000000000000000000000000001007)
-    contract_8 = Address(0x0000000000000000000000000000000000001008)
-    contract_9 = Address(0x0000000000000000000000000000000000001009)
-    contract_10 = Address(0x000000000000000000000000000000000000100A)
-    contract_11 = Address(0x0000000000000000000000000000000000000200)
-    contract_12 = Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+    contract_0 = Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948993)
+    contract_1 = Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948994)
+    contract_2 = Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948995)
+    contract_3 = Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948996)
+    contract_4 = Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948997)
+    contract_5 = Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948998)
+    contract_6 = Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948999)
+    contract_7 = Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C894899A)
+    contract_8 = Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C894899B)
+    contract_9 = Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C894899C)
+    contract_10 = Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C894899D)
+    contract_11 = Address(0x07B08226388D6968992B0656F0F8C2D0236722BA)
+    contract_12 = Address(0xB36739377364A96E177C02A04C30C1D738B8C71D)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
     )
@@ -157,7 +157,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001000),  # noqa: E501
+        address=Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948993),  # noqa: E501
     )
     # Source: lll
     # {
@@ -170,7 +170,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001001),  # noqa: E501
+        address=Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948994),  # noqa: E501
     )
     # Source: lll
     # {
@@ -183,7 +183,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001002),  # noqa: E501
+        address=Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948995),  # noqa: E501
     )
     # Source: lll
     # {
@@ -196,7 +196,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001003),  # noqa: E501
+        address=Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948996),  # noqa: E501
     )
     # Source: lll
     # {
@@ -209,7 +209,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001004),  # noqa: E501
+        address=Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948997),  # noqa: E501
     )
     # Source: lll
     # {
@@ -222,7 +222,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001005),  # noqa: E501
+        address=Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948998),  # noqa: E501
     )
     # Source: lll
     # {
@@ -235,7 +235,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001006),  # noqa: E501
+        address=Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C8948999),  # noqa: E501
     )
     # Source: lll
     # {
@@ -248,7 +248,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001007),  # noqa: E501
+        address=Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C894899A),  # noqa: E501
     )
     # Source: lll
     # {
@@ -261,7 +261,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001008),  # noqa: E501
+        address=Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C894899B),  # noqa: E501
     )
     # Source: lll
     # {
@@ -274,7 +274,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000001009),  # noqa: E501
+        address=Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C894899C),  # noqa: E501
     )
     # Source: raw
     # 0x641234523456601F1A8001600155
@@ -284,7 +284,7 @@ def test_byte(
         ),
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x000000000000000000000000000000000000100A),  # noqa: E501
+        address=Address(0xD5CF9191B8A1A1622647FE8A0BAF57B4C894899D),  # noqa: E501
     )
     # Source: lll
     # {
@@ -319,7 +319,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0x0000000000000000000000000000000000000200),  # noqa: E501
+        address=Address(0x07B08226388D6968992B0656F0F8C2D0236722BA),  # noqa: E501
     )
     # Source: lll
     # {
@@ -338,7 +338,7 @@ def test_byte(
         + Op.STOP,
         balance=0xBA1A9CE0BA1A9CE,
         nonce=0,
-        address=Address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),  # noqa: E501
+        address=Address(0xB36739377364A96E177C02A04C30C1D738B8C71D),  # noqa: E501
     )
 
     expect_entries_: list[dict] = [

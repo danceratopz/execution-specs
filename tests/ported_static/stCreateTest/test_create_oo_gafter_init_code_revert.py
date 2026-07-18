@@ -34,8 +34,8 @@ def test_create_oo_gafter_init_code_revert(
 ) -> None:
     """Calls a contract that runs CREATE which deploy a code."""
     coinbase = Address(0x2ADC25665018AA1FE0E6BC666DAC8FC2697FF9BA)
-    contract_0 = Address(0xC94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
-    contract_1 = Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
+    contract_0 = Address(0x21B7C18FBBA894FA5F4450E1274CAD251AF4481B)
+    contract_1 = Address(0xD45EB657AF69DC7DB5D334257B085A6AF721830C)
     contract_2 = Address(0x094F5374FCE5EDBC8E2A8697C15331677E6EBF0B)
     sender = EOA(
         key=0x45A915E4D060149EB4365960E6A7A45F334393093061116B197E3240065FF2D8
@@ -77,7 +77,7 @@ def test_create_oo_gafter_init_code_revert(
         + Op.REVERT(offset=0x0, size=0x20)
         + Op.STOP,
         nonce=0,
-        address=Address(0xB94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0xD45EB657AF69DC7DB5D334257B085A6AF721830C),  # noqa: E501
     )
     # Source: lll
     # { (CALL (GAS) 0xb94f5374fce5edbc8e2a8697c15331677e6ebf0b 0 0 0 0 32) [[ 1 ]] (MLOAD 0) }  # noqa: E501
@@ -96,7 +96,7 @@ def test_create_oo_gafter_init_code_revert(
         + Op.SSTORE(key=0x1, value=Op.MLOAD(offset=0x0))
         + Op.STOP,
         nonce=0,
-        address=Address(0xC94F5374FCE5EDBC8E2A8697C15331677E6EBF0B),  # noqa: E501
+        address=Address(0x21B7C18FBBA894FA5F4450E1274CAD251AF4481B),  # noqa: E501
     )
 
     tx = Transaction(

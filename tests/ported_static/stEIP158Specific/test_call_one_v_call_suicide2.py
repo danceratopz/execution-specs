@@ -95,7 +95,7 @@ def test_call_one_v_call_suicide2(
         + Op.STOP,
         balance=100,
         nonce=0,
-        address=Address(0xEA04224539257FBE043981AA6058FBC1D5E21B1A),  # noqa: E501
+        address=Address(0x2AEE390113842CF8C89DA40C1F649493E7890CA3),  # noqa: E501
     )
 
     tx = Transaction(

@@ -31,7 +31,7 @@ def test_random_statetest45(
     pre: Alloc,
 ) -> None:
     """Test_random_statetest45."""
-    coinbase = Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79)
+    coinbase = Address(0xB7DF8736A6B9F0FABEEBB9496BF8B262C5E1CBEB)
     sender = pre.fund_eoa(amount=0xDE0B6B3A7640000)
 
     env = Environment(
@@ -57,13 +57,13 @@ def test_random_statetest45(
         ),
         balance=46,
         nonce=0,
-        address=Address(0x4F3F701464972E74606D6EA82D4D3080599A0E79),  # noqa: E501
+        address=Address(0xB7DF8736A6B9F0FABEEBB9496BF8B262C5E1CBEB),  # noqa: E501
     )
     # Source: raw
     # 0x7f000000000000000000000000<contract:0x945304eb96065b2a98b57a48a06ae28d285a71b5>317fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000010000000000000000000000000000000000000000417ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe43147256a3130255  # noqa: E501
     target = pre.deploy_contract(  # noqa: F841
         code=bytes.fromhex(
-            "7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e79317fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000010000000000000000000000000000000000000000417ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe43147256a3130255"  # noqa: E501
+            "7f000000000000000000000000b7df8736a6b9f0fabeebb9496bf8b262c5e1cbeb317fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000010000000000000000000000000000000000000000417ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe43147256a3130255"  # noqa: E501
         ),
         nonce=0,
     )
@@ -72,7 +72,7 @@ def test_random_statetest45(
         sender=sender,
         to=target,
         data=Bytes(
-            "7f0000000000000000000000004f3f701464972e74606d6ea82d4d3080599a0e79317fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000010000000000000000000000000000000000000000417ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe43147256a31302"  # noqa: E501
+            "7f000000000000000000000000b7df8736a6b9f0fabeebb9496bf8b262c5e1cbeb317fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000010000000000000000000000000000000000000000417ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe43147256a31302"  # noqa: E501
         ),
         gas_limit=100000,
         value=0x771CEF12,

@@ -16,7 +16,7 @@ import threading
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from .chain import Chain
+from .chain import Chain, ServedChains
 from .protocol import (
     BLOCK_BODIES,
     BLOCK_HEADERS,
@@ -100,7 +100,7 @@ class MockPeer:
         self.network_id = network_id
 
         self._session: Optional[RLPxSession] = None
-        self._chain: Optional[Chain] = None
+        self._chains = ServedChains()
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._thread: Optional[threading.Thread] = None
@@ -115,7 +115,7 @@ class MockPeer:
         `chain` is the chain advertised in the eth Status message and the
         one served until `set_chain` replaces it.
         """
-        self._chain = chain
+        self._chains.install(chain)
         session = connect(
             self.host,
             self.port,
@@ -174,7 +174,7 @@ class MockPeer:
         chain from the same genesis.
         """
         with self._lock:
-            self._chain = chain
+            self._chains.install(chain)
             self.statistics = PeerStatistics()
             session = self._session
         if session is not None:
@@ -239,14 +239,18 @@ class MockPeer:
     ) -> None:
         """Answer a GetBlockHeaders request from the current chain."""
         with self._lock:
-            chain = self._chain
             self.statistics.header_requests += 1
-        assert chain is not None
-
-        if request.origin_hash is not None:
-            start = chain.number_of(request.origin_hash)
-        else:
-            start = request.origin_number
+            if request.origin_hash is None:
+                chain = self._chains.current
+                start = request.origin_number
+            else:
+                origin_chain = self._chains.chain_for_hash(request.origin_hash)
+                chain = (
+                    self._chains.current
+                    if origin_chain is None
+                    else origin_chain
+                )
+                start = chain.number_of(request.origin_hash)
 
         headers: List[bytes] = []
         if start is not None:
@@ -275,21 +279,29 @@ class MockPeer:
     ) -> None:
         """Answer a GetBlockBodies request from the current chain."""
         with self._lock:
-            chain = self._chain
             self.statistics.body_requests += 1
-        assert chain is not None
+            chain = self._chains.current
 
         bodies: List[bytes] = []
+        unknown: List[bytes] = []
         for block_hash in hashes[:MAX_BODIES_PER_RESPONSE]:
-            body = chain.body_rlp_by_hash(block_hash)
+            body = self._chains.body_rlp_by_hash(block_hash)
             if body is None:
+                unknown.append(block_hash)
                 break
             bodies.append(body)
 
         with self._lock:
             self.statistics.bodies_served += len(bodies)
+            detail = (
+                ""
+                if not unknown
+                else f", unknown 0x{unknown[0].hex()[:16]} (chain head "
+                f"#{chain.head.number} 0x{chain.head.block_hash.hex()[:16]})"
+            )
             self.statistics.record(
-                f"bodies for {len(hashes)} hashes -> {len(bodies)} served"
+                f"bodies for {len(hashes)} hashes -> "
+                f"{len(bodies)} served{detail}"
             )
         session.write_message(
             BLOCK_BODIES, encode_response(request_id, bodies)

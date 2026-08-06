@@ -24,6 +24,8 @@ emit one extra block per test purely as a sync target, which is what the
 existing `blockchain_test_sync` format already does.
 """
 
+import time
+
 import pytest
 from hive.client import Client
 
@@ -61,6 +63,7 @@ def test_blockchain_via_wirex(
     wirex_min_blocks: int,
     wirex_sync_timeout: float,
     wirex_poll_interval: float,
+    wirex_announce_interval: float,
 ) -> None:
     """
     Make a client full sync one test's chain from the mock peer.
@@ -113,6 +116,11 @@ def test_blockchain_via_wirex(
                 f"{response.payload_status.status}"
             )
 
+        # The client's canonical head does not move back to genesis here:
+        # a forkchoice update naming an ancestor of the current head is
+        # accepted but not acted on. What the rewind does is make the
+        # client willing to adopt a different chain from this genesis.
+
     if client.id not in genesis_verified_clients:
         with timing_data.time("Verify genesis"):
             genesis_block = eth_rpc.get_block_by_number(0)
@@ -127,18 +135,16 @@ def test_blockchain_via_wirex(
 
     expected_head = "0x" + chain.head.block_hash.hex()
 
-    with timing_data.time("Announce sync target"):
-        logger.info(
-            f"Announcing head block {chain.head.number} to trigger a sync "
-            f"of {len(chain.blocks) - 1} ancestor block(s) over devp2p"
-        )
+    head_state = ForkchoiceState(
+        head_block_hash=head_hash,
+        safe_block_hash=genesis_header.block_hash,
+        finalized_block_hash=genesis_header.block_hash,
+    )
+
+    def announce() -> None:
+        """Tell the client which block to sync to."""
         engine_rpc.new_payload(
             *head_payload.params, version=head_payload.new_payload_version
-        )
-        head_state = ForkchoiceState(
-            head_block_hash=head_hash,
-            safe_block_hash=genesis_header.block_hash,
-            finalized_block_hash=genesis_header.block_hash,
         )
         engine_rpc.forkchoice_updated(
             forkchoice_state=head_state,
@@ -146,20 +152,52 @@ def test_blockchain_via_wirex(
             version=head_payload.forkchoice_updated_version,
         )
 
+    with timing_data.time("Announce sync target"):
+        logger.info(
+            f"Announcing head block {chain.head.number} to trigger a sync "
+            f"of {len(chain.blocks) - 1} ancestor block(s) over devp2p"
+        )
+        announce()
+
     with timing_data.time("Sync from peer"):
-        attempts = max(1, int(wirex_sync_timeout / wirex_poll_interval))
+        # Wait by watching for the block rather than by repeating the
+        # forkchoice update. A repeated update restarts the client's sync
+        # cycle, and repeating it faster than a cycle takes prevents the
+        # sync from ever finishing. The announcement is repeated on a much
+        # slower cadence, as a consensus client would each slot, because a
+        # client whose sync state was still settling may have ignored the
+        # first one.
+        deadline = time.monotonic() + wirex_sync_timeout
+        next_announcement = time.monotonic() + wirex_announce_interval
+        synced = False
+        while time.monotonic() < deadline:
+            if eth_rpc.get_block_by_hash(head_hash, full_txs=False):
+                synced = True
+                break
+            if time.monotonic() >= next_announcement:
+                logger.info("Re-announcing the sync target")
+                announce()
+                next_announcement = time.monotonic() + wirex_announce_interval
+            time.sleep(wirex_poll_interval)
+        if not synced:
+            raise LoggedError(
+                f"Client never imported the fixture head {expected_head} "
+                f"within {wirex_sync_timeout}s. Peer transcript: "
+                f"{mock_peer.statistics.transcript}"
+            )
+
+    with timing_data.time("Confirm head"):
         try:
             response = engine_rpc.forkchoice_updated_with_retry(
                 forkchoice_state=head_state,
                 forkchoice_version=head_payload.forkchoice_updated_version,
-                max_attempts=attempts,
-                wait_fixed=wirex_poll_interval,
+                max_attempts=10,
+                wait_fixed=0.5,
             )
         except ForkchoiceUpdateTimeoutError as error:
             raise LoggedError(
-                f"Client never reached the fixture head {expected_head}: "
-                f"{error}. Peer transcript: "
-                f"{mock_peer.statistics.transcript}"
+                f"Client imported {expected_head} but never made it "
+                f"canonical: {error}"
             ) from None
         if response.payload_status.status != PayloadStatusEnum.VALID:
             raise LoggedError(

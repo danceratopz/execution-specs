@@ -82,6 +82,17 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         help="Seconds to wait for a client to reach the fixture head.",
     )
     group.addoption(
+        "--wirex-announce-interval",
+        action="store",
+        dest="wirex_announce_interval",
+        type=float,
+        default=3.0,
+        help=(
+            "Seconds between repeats of the sync target announcement "
+            "while waiting for a client to reach it."
+        ),
+    )
+    group.addoption(
         "--wirex-poll-interval",
         action="store",
         dest="wirex_poll_interval",
@@ -226,6 +237,12 @@ def wirex_min_blocks(request: pytest.FixtureRequest) -> int:
 def wirex_sync_timeout(request: pytest.FixtureRequest) -> float:
     """Return how long to wait for a client to reach the fixture head."""
     return float(request.config.getoption("wirex_sync_timeout"))
+
+
+@pytest.fixture(scope="session")
+def wirex_announce_interval(request: pytest.FixtureRequest) -> float:
+    """Return how often to repeat the sync target announcement."""
+    return float(request.config.getoption("wirex_announce_interval"))
 
 
 @pytest.fixture(scope="session")

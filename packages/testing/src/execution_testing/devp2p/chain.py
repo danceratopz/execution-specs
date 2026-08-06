@@ -204,6 +204,59 @@ class Chain:
         return None if block is None else block.body_rlp()
 
 
+class ServedChains:
+    """
+    Every chain a peer has served over one connection.
+
+    A client is reused across the tests of a pre-allocation group, and
+    each test installs its own chain. The client's downloader does not
+    forget the previous one that fast: it keeps asking for blocks of the
+    chain it was syncing when the test ended. A real peer would still
+    hold those blocks, so this one does too, and answers from whichever
+    installed chain a requested hash belongs to.
+
+    Requests that name a block by number are answered from the current
+    chain only, since a number alone does not identify a chain.
+    """
+
+    def __init__(self) -> None:
+        """Start with no chain installed."""
+        self._chains: List[Chain] = []
+        self._chain_by_hash: Dict[bytes, Chain] = {}
+        self._current: Chain | None = None
+
+    def install(self, chain: Chain) -> None:
+        """Serve `chain` from now on, keeping earlier chains available."""
+        self._current = chain
+        self._chains.append(chain)
+        for block in chain.blocks:
+            self._chain_by_hash.setdefault(block.block_hash, chain)
+
+    @property
+    def current(self) -> Chain:
+        """Return the chain currently being served."""
+        assert self._current is not None, "no chain installed"
+        return self._current
+
+    def chain_for_hash(self, block_hash: bytes) -> Chain | None:
+        """Return the chain holding `block_hash`, if any."""
+        if self._current is not None and block_hash == bytes(
+            self._current.genesis.block_hash
+        ):
+            return self._current
+        return self._chain_by_hash.get(block_hash)
+
+    def header_rlp_by_hash(self, block_hash: bytes) -> bytes | None:
+        """Return the RLP of the header with `block_hash`, if held."""
+        chain = self.chain_for_hash(block_hash)
+        return None if chain is None else chain.header_rlp_by_hash(block_hash)
+
+    def body_rlp_by_hash(self, block_hash: bytes) -> bytes | None:
+        """Return the RLP of the body with `block_hash`, if held."""
+        chain = self.chain_for_hash(block_hash)
+        return None if chain is None else chain.body_rlp_by_hash(block_hash)
+
+
 def chain_from_payloads(
     genesis: FixtureHeader, payloads: Sequence[FixtureEngineNewPayload]
 ) -> Chain:

@@ -1131,6 +1131,37 @@ class BlockchainTest(BaseTest):
             print_traces(t8n.get_traces())
             raise e
 
+    def blocks_to_build(self) -> List[Block]:
+        """
+        Return the chain's block list, honoring ``prepend_empty_block``.
+
+        When ``prepend_empty_block`` is set, one empty block is
+        inserted between genesis and the test's first block so that the
+        chain is always at least two blocks long and sync-based
+        consumers can trigger a devp2p sync (see the field's
+        documentation in ``BaseTest``).
+
+        The empty block's timestamp is pinned to one second after
+        genesis, below any timestamp a test is likely to pin on its own
+        blocks. Blocks that pin an absolute ``number`` (state tests
+        converted to blockchain tests always do) are shifted up by one
+        so the chain stays contiguous; deliberately wrong numbers in
+        invalid-block tests stay wrong relative to the shifted chain.
+        """
+        if not self.prepend_empty_block:
+            return self.blocks
+        genesis_timestamp = int(self.get_genesis_environment().timestamp)
+        blocks: List[Block] = [
+            Block(timestamp=HexNumber(genesis_timestamp + 1))
+        ]
+        for block in self.blocks:
+            if block.number is not None:
+                block = block.model_copy(
+                    update={"number": HexNumber(block.number + 1)}
+                )
+            blocks.append(block)
+        return blocks
+
     def make_fixture(
         self,
         t8n: FillerBackend,
@@ -1148,7 +1179,8 @@ class BlockchainTest(BaseTest):
         benchmark_gas_used: int | None = None
         benchmark_block_gas_used: int | None = None
         benchmark_opcode_count: OpcodeCount | None = None
-        for block in self.blocks:
+        blocks = self.blocks_to_build()
+        for block in blocks:
             # This is the most common case, the RLP needs to be constructed
             # based on the transactions to be included in the block.
             # Set the environment according to the block to execute.
@@ -1159,7 +1191,7 @@ class BlockchainTest(BaseTest):
                 previous_alloc=alloc,
             )
             block_number = int(built_block.header.number)
-            is_last_block = block is self.blocks[-1]
+            is_last_block = block is blocks[-1]
             if is_last_block and self.operation_mode == OpMode.BENCHMARKING:
                 benchmark_gas_used = built_block.cumulative_gas_used()
                 benchmark_block_gas_used = built_block.block_gas_used()
@@ -1253,7 +1285,8 @@ class BlockchainTest(BaseTest):
         benchmark_gas_used: int | None = None
         benchmark_block_gas_used: int | None = None
         benchmark_opcode_count: OpcodeCount | None = None
-        for block in self.blocks:
+        blocks = self.blocks_to_build()
+        for block in blocks:
             built_block = self.generate_block_data(
                 t8n=t8n,
                 block=block,
@@ -1261,7 +1294,7 @@ class BlockchainTest(BaseTest):
                 previous_alloc=alloc,
             )
             block_number = int(built_block.header.number)
-            is_last_block = block is self.blocks[-1]
+            is_last_block = block is blocks[-1]
             if is_last_block and self.operation_mode == OpMode.BENCHMARKING:
                 benchmark_gas_used = built_block.cumulative_gas_used()
                 benchmark_block_gas_used = built_block.block_gas_used()

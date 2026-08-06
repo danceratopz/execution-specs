@@ -113,6 +113,22 @@ class BaseTest(BaseModel):
         # instead of each test having to set it
     )
     operation_mode: OpMode | None = None
+    prepend_empty_block: bool = False
+    """
+    Prepend one empty block between genesis and the test's first block
+    when building a blockchain test's chain.
+
+    This guarantees every chain is at least two blocks long, so
+    sync-based consumers can trigger a devp2p sync even for
+    single-block tests: a client only starts a sync when the head's
+    parent is unknown to it, which is never the case for a single
+    block built directly on the client's own genesis.
+
+    Set by the filler's ``--prepend-empty-block`` option; ignored by
+    test specs that do not build a chain of blocks. Prepending shifts
+    every block number and hash, so fixtures filled with this option
+    are not comparable with normally filled ones.
+    """
     gas_optimization_max_gas_limit: int | None = None
     expected_benchmark_gas_used: int | None = None
     skip_gas_used_validation: bool = False

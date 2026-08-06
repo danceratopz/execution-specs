@@ -1,5 +1,6 @@
 """Ethereum blockchain test spec definition and filler."""
 
+from hashlib import sha256
 from pprint import pprint
 from typing import (
     Any,
@@ -1143,16 +1144,28 @@ class BlockchainTest(BaseTest):
 
         The empty block's timestamp is pinned to one second after
         genesis, below any timestamp a test is likely to pin on its own
-        blocks. Blocks that pin an absolute ``number`` (state tests
-        converted to blockchain tests always do) are shifted up by one
-        so the chain stays contiguous; deliberately wrong numbers in
-        invalid-block tests stay wrong relative to the shifted chain.
+        blocks. Its ``extra_data`` carries a digest of
+        ``prepend_empty_block_salt`` so that its hash is unique to this
+        test: a sync is only triggered when the head's parent is
+        unknown to the client, and the tests of a pre-allocation group
+        share one client (see the salt field's documentation in
+        ``BaseTest``). Blocks that pin an absolute ``number`` (state
+        tests converted to blockchain tests always do) are shifted up
+        by one so the chain stays contiguous; deliberately wrong
+        numbers in invalid-block tests stay wrong relative to the
+        shifted chain.
         """
         if not self.prepend_empty_block:
             return self.blocks
         genesis_timestamp = int(self.get_genesis_environment().timestamp)
+        extra_data = sha256(self.prepend_empty_block_salt.encode()).digest()[
+            :16
+        ]
         blocks: List[Block] = [
-            Block(timestamp=HexNumber(genesis_timestamp + 1))
+            Block(
+                timestamp=HexNumber(genesis_timestamp + 1),
+                extra_data=Bytes(extra_data),
+            )
         ]
         for block in self.blocks:
             if block.number is not None:

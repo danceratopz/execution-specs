@@ -129,6 +129,20 @@ class BaseTest(BaseModel):
     every block number and hash, so fixtures filled with this option
     are not comparable with normally filled ones.
     """
+    prepend_empty_block_salt: str = ""
+    """
+    Value mixed into the prepended empty block's ``extra_data`` so its
+    hash is unique to this test.
+
+    The tests of a pre-allocation group share a genesis and are served
+    to one reused client. If they also shared the prepended block, the
+    first synced test would make that block known to the client and
+    every later head would have a *known* parent - executed on arrival
+    via the Engine API, with no sync triggered at all. A per-test
+    ``extra_data`` keeps the block's state identical while giving each
+    test's chain an unknown parent. The filler sets this to the pytest
+    node id.
+    """
     gas_optimization_max_gas_limit: int | None = None
     expected_benchmark_gas_used: int | None = None
     skip_gas_used_validation: bool = False

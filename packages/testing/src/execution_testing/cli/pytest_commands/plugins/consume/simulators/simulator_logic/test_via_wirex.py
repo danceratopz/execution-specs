@@ -19,9 +19,10 @@ The control plane and the data plane are deliberately separate:
 
 Because only the blocks before the head travel over devp2p, a fixture
 whose chain is a single block would exercise no sync at all, and is
-skipped by default. Removing that limitation means having the fill step
-emit one extra block per test purely as a sync target, which is what the
-existing `blockchain_test_sync` format already does.
+skipped by default. Fixtures filled with the `--prepend-empty-block`
+fill option have an empty block inserted between genesis and the test's
+first block, so every chain is at least two blocks long and every
+test's own blocks travel over devp2p.
 """
 
 import time

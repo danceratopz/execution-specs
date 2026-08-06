@@ -225,10 +225,18 @@ def test_blockchain_via_wirex(
         f"{statistics.bodies_served} body/bodies in "
         f"{statistics.body_requests} request(s)"
     )
-    if statistics.bodies_served == 0:
+    non_empty_bodies = sum(
+        1 for block in chain.blocks if block.transactions or block.withdrawals
+    )
+    if statistics.bodies_served == 0 and non_empty_bodies > 0:
+        # A client may derive an empty body from its header (empty
+        # transactions trie, empty withdrawals root) without asking the
+        # peer, so zero body requests is only a finding when the chain
+        # actually has bodies worth fetching.
         raise LoggedError(
             "The client reached the expected head without downloading any "
-            "block body from the peer, so nothing was verified over devp2p."
+            f"of the chain's {non_empty_bodies} non-empty block bodies "
+            "from the peer, so nothing was verified over devp2p."
         )
     if statistics.receipt_requests:
         logger.warning(

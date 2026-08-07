@@ -71,14 +71,21 @@ def test_blockchain_via_wirex(
 
     The sequence is:
 
-    1. Rewind the client to genesis, which is what makes the tests of a
-       pre-allocation group independent of each other.
-    2. Verify the client's genesis matches the group's, once per client.
-    3. Deliver the head block over the Engine API so the client knows
+    1. Verify the client's genesis matches the group's, once per client.
+    2. Deliver the head block over the Engine API so the client knows
        which chain to sync to, and name it in a forkchoice update.
-    4. Wait for the client to download and execute the ancestors from the
+    3. Wait for the client to download and execute the ancestors from the
        mock peer, polling the same forkchoice update until it is VALID.
-    5. Check the client's head really is the expected block.
+    4. Check the client's head really is the expected block.
+
+    There is deliberately no rewind between tests. Every test's chain
+    forks at genesis, so announcing the new head is all a consensus
+    client would do, and a backwards forkchoice update is actively
+    harmful to clients that act on it: nethermind moves its head back
+    to genesis while its persisted state stays at the previous chain's
+    tip, which lands it in a crash-recovery edge case where it fetches
+    receipts instead of executing blocks (`BlockDownloader.
+    ReceiptEdgeCase`); geth ignores the rewind entirely.
     """
     if any(not payload.valid() for payload in fixture.payloads):
         pytest.skip(
@@ -95,32 +102,6 @@ def test_blockchain_via_wirex(
 
     head_payload = fixture.payloads[-1]
     head_hash = head_payload.params[0].block_hash
-    genesis_state = ForkchoiceState(head_block_hash=genesis_header.block_hash)
-
-    with timing_data.time("Rewind to genesis"):
-        try:
-            response = engine_rpc.forkchoice_updated_with_retry(
-                forkchoice_state=genesis_state,
-                forkchoice_version=fixture.payloads[
-                    0
-                ].forkchoice_updated_version,
-                max_attempts=30,
-                wait_fixed=1.0,
-            )
-        except ForkchoiceUpdateTimeoutError as error:
-            raise LoggedError(
-                f"Timed out rewinding the client to genesis: {error}"
-            ) from None
-        if response.payload_status.status != PayloadStatusEnum.VALID:
-            raise LoggedError(
-                "Unexpected status rewinding to genesis: "
-                f"{response.payload_status.status}"
-            )
-
-        # The client's canonical head does not move back to genesis here:
-        # a forkchoice update naming an ancestor of the current head is
-        # accepted but not acted on. What the rewind does is make the
-        # client willing to adopt a different chain from this genesis.
 
     if client.id not in genesis_verified_clients:
         with timing_data.time("Verify genesis"):

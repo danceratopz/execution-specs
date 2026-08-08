@@ -242,6 +242,14 @@ def pytest_configure(config: pytest.Config) -> None:
     )
     config.addinivalue_line(
         "markers",
+        "absolute_block_position: Marks a test whose logic or expectations "
+        "depend on absolute block numbers or block hashes; filling with "
+        "--prepend-empty-block skips it because the prepended block would "
+        "shift every block position and silently change what the test "
+        "verifies.",
+    )
+    config.addinivalue_line(
+        "markers",
         "fixture_format_id: ID used to describe the fixture format.",
     )
     config.addinivalue_line(

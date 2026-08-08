@@ -1908,6 +1908,7 @@ def pytest_collection_modifyitems(
     # Track specs with no fixture formats for warning message
     specs_without_fixture_formats: Dict[str, Set[str]] = {}
 
+    prepend_empty_block = config.getoption("prepend_empty_block", False)
     items_for_removal = []
     for i, item in enumerate(items):
         item.name = item.name.strip().replace(" ", "-")
@@ -1954,6 +1955,19 @@ def pytest_collection_modifyitems(
             if marker.name == "fill":
                 for mark in marker.args:
                     item.add_marker(mark)
+
+        if prepend_empty_block and any(
+            marker.name == "absolute_block_position" for marker in markers
+        ):
+            item.add_marker(
+                pytest.mark.skip(
+                    reason=(
+                        "test depends on absolute block positions; the "
+                        "prepended empty block would shift them and "
+                        "silently change what the test verifies"
+                    )
+                )
+            )
 
         # Update test ID for state tests that use a transition fork
         if fork in get_transition_forks():

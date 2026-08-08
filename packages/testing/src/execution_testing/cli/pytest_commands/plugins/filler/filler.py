@@ -1969,6 +1969,22 @@ def pytest_collection_modifyitems(
                 )
             )
 
+        if prepend_empty_block and any(
+            marker.name == "pre_state_affects_empty_block"
+            for marker in markers
+        ):
+            item.add_marker(
+                pytest.mark.skip(
+                    reason=(
+                        "the test's pre-state changes what any block "
+                        "executes (e.g. a broken system contract called "
+                        "by every block), so the prepended empty block "
+                        "would fail on it or consume its one-shot "
+                        "behavior"
+                    )
+                )
+            )
+
         # Update test ID for state tests that use a transition fork
         if fork in get_transition_forks():
             has_state_test = any(

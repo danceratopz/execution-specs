@@ -3702,7 +3702,19 @@ def test_bal_lexicographic_address_ordering(
     [
         pytest.param(0, id="at_boundary"),
         pytest.param(
-            -1, marks=pytest.mark.exception_test, id="below_boundary"
+            -1,
+            marks=(
+                pytest.mark.exception_test,
+                # The genesis gas limit is sized one BAL item below the
+                # empty block's own system work, so the prepended empty
+                # block cannot be valid here. Only the no_tx,
+                # no_cl_withdrawal combination is actually affected -
+                # the variants that add items leave the prepended block
+                # room - but a mark cannot name a parameter
+                # combination, so three variants are over-skipped.
+                pytest.mark.pre_state_affects_empty_block,
+            ),
+            id="below_boundary",
         ),
     ],
 )

@@ -124,6 +124,7 @@ def test_slotnum_gas_cost(
 
 @EIPChecklist.Opcode.Test.ExecutionContext.BlockContext()
 @EIPChecklist.BlockHeaderField.Test.ValueBehavior.Accept()
+@pytest.mark.absolute_block_position
 def test_slotnum_distinct_per_block(
     blockchain_test: BlockchainTestFiller,
     pre: Alloc,

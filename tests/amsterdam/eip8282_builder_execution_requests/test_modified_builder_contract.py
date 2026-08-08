@@ -211,6 +211,9 @@ def test_extra_builder_exits(
         ),
     ],
 )
+# Every block calls the (deliberately broken or gas-hungry one-shot)
+# builder contract, so a prepended empty block cannot be neutral.
+@pytest.mark.pre_state_affects_empty_block
 @generate_system_contract_error_test(  # type: ignore[arg-type]
     max_gas_limit=Spec.SYSTEM_CALL_GAS_LIMIT,
 )

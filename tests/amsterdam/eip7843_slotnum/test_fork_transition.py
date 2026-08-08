@@ -28,6 +28,7 @@ FORK_TIMESTAMP = 15_000
 @EIPChecklist.Opcode.Test.ForkTransition.At()
 @EIPChecklist.BlockHeaderField.Test.ForkTransition.Initial()
 @pytest.mark.valid_at_transition_to("EIP7843")
+@pytest.mark.absolute_block_position
 def test_slotnum_at_fork_transition(
     blockchain_test: BlockchainTestFiller,
     pre: Alloc,

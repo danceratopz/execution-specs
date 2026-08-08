@@ -140,6 +140,66 @@ def apply_new_parent(
     return env.copy(**updated)
 
 
+def empty_block_base_fee_preimage(
+    *, fork: Fork, base_fee_per_gas: int, gas_limit: int
+) -> int:
+    """
+    Return the parent base fee from which an empty block derives
+    ``base_fee_per_gas``.
+
+    An empty parent is below target, so the EIP-1559 progression is a
+    pure decay step; every value has an exact preimage at or near
+    ``value * d // (d - 1)`` for change denominator ``d``. Scan the
+    candidates and verify each with the fork's own calculator so the
+    result is exact by construction, never approximated.
+    """
+    calculate_base_fee = fork.base_fee_per_gas_calculator()
+    denominator = fork.base_fee_max_change_denominator()
+    guess = base_fee_per_gas * denominator // (denominator - 1)
+    for candidate in range(max(base_fee_per_gas, guess - 2), guess + 3):
+        derived = calculate_base_fee(
+            parent_base_fee_per_gas=candidate,
+            parent_gas_used=0,
+            parent_gas_limit=gas_limit,
+        )
+        if derived == base_fee_per_gas:
+            return candidate
+    raise ValueError(
+        f"no parent base fee decays to {base_fee_per_gas} on an empty "
+        f"block at fork {fork.name()}; the prepended empty block cannot "
+        "preserve this test's fee environment"
+    )
+
+
+def empty_block_excess_blob_gas_preimage(
+    *, fork: Fork, excess_blob_gas: int, parent_base_fee_per_gas: int
+) -> int:
+    """
+    Return the parent excess blob gas from which an empty block derives
+    ``excess_blob_gas``.
+
+    An empty parent uses no blob gas, so the progression either decays
+    the excess by one target (EIP-4844) or, on forks where a fee floor
+    holds the value in place, leaves it unchanged; the preimage is one
+    of two candidates, each verified with the fork's own calculator.
+    """
+    calculate_excess_blob_gas = fork.excess_blob_gas_calculator()
+    target = fork.target_blobs_per_block() * fork.blob_gas_per_blob()
+    for candidate in (excess_blob_gas + target, excess_blob_gas):
+        derived = calculate_excess_blob_gas(
+            parent_excess_blob_gas=candidate,
+            parent_blob_gas_used=0,
+            parent_base_fee_per_gas=parent_base_fee_per_gas,
+        )
+        if derived == excess_blob_gas:
+            return candidate
+    raise ValueError(
+        f"no parent excess blob gas decays to {excess_blob_gas} on an "
+        f"empty block at fork {fork.name()}; the prepended empty block "
+        "cannot preserve this test's fee environment"
+    )
+
+
 def count_blobs(txs: List[Transaction]) -> int:
     """Return number of blobs in a list of transactions."""
     return sum(
@@ -792,11 +852,79 @@ class BlockchainTest(BaseTest):
         return False
 
     def get_genesis_environment(self) -> Environment:
-        """Get the genesis environment for pre-allocation groups."""
+        """
+        Get the genesis environment for pre-allocation groups.
+
+        When ``prepend_empty_block`` is set, the genesis fee fields are
+        wound one progression step up so that the prepended empty block
+        consumes exactly the step it introduces (see
+        ``_compensate_genesis_fees``). This must happen here rather
+        than in ``make_genesis``: phase 1 of the two-phase fill hashes
+        this environment for pre-allocation grouping, so both phases
+        must see the same compensated genesis.
+        """
         modified_values = self.genesis_environment.set_fork_requirements(
             self.fork.transitions_from()
         ).model_dump(exclude_unset=True)
-        return Environment(**(GENESIS_ENVIRONMENT_DEFAULTS | modified_values))
+        env = Environment(**(GENESIS_ENVIRONMENT_DEFAULTS | modified_values))
+        if self.prepend_empty_block:
+            env = self._compensate_genesis_fees(env)
+        return env
+
+    def _compensate_genesis_fees(self, env: Environment) -> Environment:
+        """
+        Wind the genesis fee fields one progression step up to cancel
+        the prepended empty block's step.
+
+        The prepended block (see ``blocks_to_build``) sits between
+        genesis and the test's first block and participates in fee
+        mechanics: it decays the base fee by one EIP-1559 step and the
+        excess blob gas by one target. Starting genesis one exact
+        preimage step higher makes the prepended block land precisely
+        on the fee values the test author gave for genesis, so the
+        first test block derives its fee context from an identical
+        parent and executes in exactly the environment the author
+        specified. State tests compose transparently: their conversion
+        already winds genesis one step up from the pinned block
+        environment, and this adds the one further step the prepended
+        block consumes.
+
+        Fee fields the genesis fork does not require are left alone; a
+        value with no preimage fails the fill loudly rather than
+        producing a semantically shifted fixture.
+        """
+        fork = self.fork.fork_at(
+            block_number=int(env.number) + 1,
+            timestamp=int(env.timestamp) + 1,
+        )
+        updates: Dict[str, Any] = {}
+        base_fee_per_gas: int | None = (
+            None if env.base_fee_per_gas is None else int(env.base_fee_per_gas)
+        )
+        if base_fee_per_gas is not None and fork.header_base_fee_required():
+            base_fee_per_gas = empty_block_base_fee_preimage(
+                fork=fork,
+                base_fee_per_gas=base_fee_per_gas,
+                gas_limit=int(env.gas_limit),
+            )
+            updates["base_fee_per_gas"] = HexNumber(base_fee_per_gas)
+        if (
+            env.excess_blob_gas is not None
+            and fork.header_excess_blob_gas_required()
+        ):
+            assert base_fee_per_gas is not None, (
+                "excess blob gas compensation requires a genesis base fee"
+            )
+            updates["excess_blob_gas"] = HexNumber(
+                empty_block_excess_blob_gas_preimage(
+                    fork=fork,
+                    excess_blob_gas=int(env.excess_blob_gas),
+                    parent_base_fee_per_gas=base_fee_per_gas,
+                )
+            )
+        if not updates:
+            return env
+        return env.copy(**updates)
 
     def make_genesis(
         self, *, apply_pre_allocation_blockchain: bool

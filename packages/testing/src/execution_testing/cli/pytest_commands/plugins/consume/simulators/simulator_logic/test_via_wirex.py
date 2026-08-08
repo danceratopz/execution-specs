@@ -87,12 +87,8 @@ def test_blockchain_via_wirex(
     receipts instead of executing blocks (`BlockDownloader.
     ReceiptEdgeCase`); geth ignores the rewind entirely.
     """
-    if any(not payload.valid() for payload in fixture.payloads):
-        pytest.skip(
-            "fixtures with invalid payloads cannot be served as a canonical "
-            "chain: a full syncing client rejects the whole chain rather "
-            "than reporting a per-block verdict"
-        )
+    # Invalid-payload fixtures are skipped by the `chain` fixture,
+    # before reconstruction can refuse a deliberately corrupted header.
     if len(fixture.payloads) < wirex_min_blocks:
         pytest.skip(
             f"chain has {len(fixture.payloads)} block(s); at least "

@@ -328,7 +328,21 @@ def genesis_header(pre_alloc_group: PreAllocGroup) -> FixtureHeader:
 def chain(
     genesis_header: FixtureHeader, fixture: BlockchainEngineXFixture
 ) -> Chain:
-    """Rebuild the chain of blocks this test expects a client to hold."""
+    """
+    Rebuild the chain of blocks this test expects a client to hold.
+
+    Invalid-payload fixtures are skipped here, before reconstruction:
+    an intentionally corrupted header (``rlp_modifier``) rightly
+    refuses to reconstruct into a block whose hash matches the
+    payload's, and letting that refusal happen would report a setup
+    error for a fixture this simulator can never serve anyway.
+    """
+    if any(not payload.valid() for payload in fixture.payloads):
+        pytest.skip(
+            "fixtures with invalid payloads cannot be served as a canonical "
+            "chain: a full syncing client rejects the whole chain rather "
+            "than reporting a per-block verdict"
+        )
     return chain_from_payloads(genesis_header, fixture.payloads)
 
 

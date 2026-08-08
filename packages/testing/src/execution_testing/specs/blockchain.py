@@ -1365,13 +1365,13 @@ class BlockchainTest(BaseTest):
         """
         previous_timestamp = genesis_timestamp + 1
         for index, block in enumerate(self.blocks):
+            if block.exception is not None:
+                continue
             if block.timestamp is None:
                 previous_timestamp += 12
                 continue
             pinned = int(block.timestamp)
             if pinned <= previous_timestamp:
-                if block.exception is not None:
-                    continue
                 raise ValueError(
                     f"block {index + 1} pins timestamp {pinned}, which "
                     "does not clear its parent's "

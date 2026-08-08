@@ -86,9 +86,18 @@ def test_blockchain_via_wirex(
     tip, which lands it in a crash-recovery edge case where it fetches
     receipts instead of executing blocks (`BlockDownloader.
     ReceiptEdgeCase`); geth ignores the rewind entirely.
+
+    Fixtures containing an intentionally invalid block are rejection
+    tests: the peer serves the chain as-is and the client passes by
+    refusing it - `engine_newPayload` for the head must answer INVALID
+    once the ancestry is available over devp2p, and answering VALID
+    fails the test. Only the fact of rejection is asserted: a devp2p
+    peer observes acceptance or rejection, not error causes, so
+    matching the fixture's specific exception over the wire is
+    deliberately left for later. Fixtures whose invalid block cannot
+    even be represented on the wire (declared hash inconsistent with
+    the header) are skipped by the `chain` fixture.
     """
-    # Invalid-payload fixtures are skipped by the `chain` fixture,
-    # before reconstruction can refuse a deliberately corrupted header.
     if len(fixture.payloads) < wirex_min_blocks:
         pytest.skip(
             f"chain has {len(fixture.payloads)} block(s); at least "
@@ -136,6 +145,60 @@ def test_blockchain_via_wirex(
             f"of {len(chain.blocks) - 1} ancestor block(s) over devp2p"
         )
         announce()
+
+    if any(not payload.valid() for payload in fixture.payloads):
+        with timing_data.time("Reject invalid chain"):
+            deadline = time.monotonic() + wirex_sync_timeout
+            next_announcement = time.monotonic() + wirex_announce_interval
+            status: PayloadStatusEnum | None = None
+            validation_error: object = None
+            while time.monotonic() < deadline:
+                # Once the ancestry has arrived over devp2p the client
+                # can judge the head; until then it answers SYNCING (or
+                # ACCEPTED if it merely stored the payload).
+                payload_status = engine_rpc.new_payload(
+                    *head_payload.params,
+                    version=head_payload.new_payload_version,
+                )
+                status = payload_status.status
+                validation_error = payload_status.validation_error
+                if status in (
+                    PayloadStatusEnum.INVALID,
+                    PayloadStatusEnum.INVALID_BLOCK_HASH,
+                ):
+                    break
+                if status == PayloadStatusEnum.VALID:
+                    raise LoggedError(
+                        f"Client accepted the invalid chain: head "
+                        f"{expected_head} returned VALID but the fixture "
+                        "expects the block to be rejected"
+                    )
+                if time.monotonic() >= next_announcement:
+                    logger.info("Re-announcing the invalid sync target")
+                    announce()
+                    next_announcement = (
+                        time.monotonic() + wirex_announce_interval
+                    )
+                time.sleep(wirex_poll_interval)
+            if status not in (
+                PayloadStatusEnum.INVALID,
+                PayloadStatusEnum.INVALID_BLOCK_HASH,
+            ):
+                raise LoggedError(
+                    f"Client never rejected the invalid head "
+                    f"{expected_head} within {wirex_sync_timeout}s (last "
+                    f"status: {status}). Peer transcript: "
+                    f"{mock_peer.statistics.transcript}"
+                )
+        statistics = mock_peer.statistics
+        logger.info(
+            f"Client rejected the invalid head at block "
+            f"{chain.head.number} with {status} "
+            f"(validationError: {validation_error}) after the peer "
+            f"served {statistics.headers_served} header(s) and "
+            f"{statistics.bodies_served} body/bodies"
+        )
+        return
 
     with timing_data.time("Sync from peer"):
         # Wait by watching for the block rather than by repeating the

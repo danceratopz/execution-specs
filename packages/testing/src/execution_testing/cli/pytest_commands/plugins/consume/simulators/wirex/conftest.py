@@ -23,7 +23,11 @@ import pytest
 from hive.client import Client, ClientType
 from hive.testing import HiveTest
 
-from execution_testing.devp2p.chain import Chain, chain_from_payloads
+from execution_testing.devp2p.chain import (
+    Chain,
+    ChainReconstructionError,
+    chain_from_payloads,
+)
 from execution_testing.devp2p.peer import MockPeer
 from execution_testing.fixtures import BlockchainEngineXFixture
 from execution_testing.fixtures.blockchain import FixtureHeader
@@ -331,19 +335,23 @@ def chain(
     """
     Rebuild the chain of blocks this test expects a client to hold.
 
-    Invalid-payload fixtures are skipped here, before reconstruction:
-    an intentionally corrupted header (``rlp_modifier``) rightly
-    refuses to reconstruct into a block whose hash matches the
-    payload's, and letting that refusal happen would report a setup
-    error for a fixture this simulator can never serve anyway.
+    Fixtures whose payloads are flagged invalid still reconstruct and
+    are served as rejection tests (see ``test_blockchain_via_wirex``):
+    their blocks are semantically invalid but hash-consistent, so they
+    travel the wire like any other block. The exception is a payload
+    whose declared block hash does not match its own header (a header
+    corrupted at fill via ``rlp_modifier``): devp2p has no way to
+    present a block whose hash differs from its header's keccak, so
+    such fixtures are skipped rather than reported as setup errors.
     """
-    if any(not payload.valid() for payload in fixture.payloads):
-        pytest.skip(
-            "fixtures with invalid payloads cannot be served as a canonical "
-            "chain: a full syncing client rejects the whole chain rather "
-            "than reporting a per-block verdict"
-        )
-    return chain_from_payloads(genesis_header, fixture.payloads)
+    try:
+        return chain_from_payloads(genesis_header, fixture.payloads)
+    except ChainReconstructionError as error:
+        if any(not payload.valid() for payload in fixture.payloads):
+            pytest.skip(
+                f"invalid fixture cannot be represented over devp2p: {error}"
+            )
+        raise
 
 
 @pytest.fixture(scope="session")

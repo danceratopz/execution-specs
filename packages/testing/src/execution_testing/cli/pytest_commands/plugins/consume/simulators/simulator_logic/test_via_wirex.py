@@ -96,7 +96,11 @@ def test_blockchain_via_wirex(
     matching the fixture's specific exception over the wire is
     deliberately left for later. Fixtures whose invalid block cannot
     even be represented on the wire (declared hash inconsistent with
-    the header) are skipped by the `chain` fixture.
+    the header) are skipped by the `chain` fixture. When the rejection
+    target sits below the reused client's head, the valid ancestry is
+    delivered over the Engine API instead of the wire - the known
+    skeleton poisoning would otherwise starve the verdict (see the
+    comment at the rejection block).
     """
     if len(fixture.payloads) < wirex_min_blocks:
         pytest.skip(
@@ -148,6 +152,31 @@ def test_blockchain_via_wirex(
 
     if any(not payload.valid() for payload in fixture.payloads):
         with timing_data.time("Reject invalid chain"):
+            # A rejection target below the client's current head hits
+            # the known skeleton poisoning on geth-like clients: the
+            # sync machinery refuses to walk its head backwards, the
+            # ancestry never arrives, and the verdict never comes.
+            # Equal-height targets sync fine (the reused-client common
+            # case), so only when the target is strictly below the head
+            # is the valid ancestry delivered over the Engine API
+            # instead of the wire; the head's verdict then still comes
+            # from the same poll below.
+            head_block = eth_rpc.get_block_by_number("latest")
+            client_head_number = (
+                int(head_block["number"], 16) if head_block else 0
+            )
+            if chain.head.number < client_head_number:
+                logger.info(
+                    f"Rejection target {chain.head.number} is below the "
+                    f"client head {client_head_number}; delivering the "
+                    f"{len(fixture.payloads) - 1} valid ancestor(s) over "
+                    "the Engine API instead of the wire"
+                )
+                for ancestor_payload in fixture.payloads[:-1]:
+                    engine_rpc.new_payload(
+                        *ancestor_payload.params,
+                        version=ancestor_payload.new_payload_version,
+                    )
             deadline = time.monotonic() + wirex_sync_timeout
             next_announcement = time.monotonic() + wirex_announce_interval
             status: PayloadStatusEnum | None = None

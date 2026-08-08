@@ -1985,6 +1985,20 @@ def pytest_collection_modifyitems(
                 )
             )
 
+        if prepend_empty_block and any(
+            marker.name == "no_empty_block_fee_preimage" for marker in markers
+        ):
+            item.add_marker(
+                pytest.mark.skip(
+                    reason=(
+                        "the test pins a fee value no parent value decays "
+                        "to across the prepended empty block, so no "
+                        "genesis compensation preserves its fee "
+                        "environment"
+                    )
+                )
+            )
+
         # Update test ID for state tests that use a transition fork
         if fork in get_transition_forks():
             has_state_test = any(

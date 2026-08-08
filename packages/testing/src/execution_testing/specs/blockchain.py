@@ -1137,7 +1137,41 @@ class BlockchainTest(BaseTest):
         if block.rlp_modifier is not None:
             # Modify any parameter specified in the `rlp_modifier` after
             # transition tool processing.
-            header = block.rlp_modifier.apply(header)
+            modified_header = block.rlp_modifier.apply(header)
+            expected_exceptions = (
+                block.exception
+                if isinstance(block.exception, list)
+                else [block.exception]
+            )
+            if (
+                block.exception is not None
+                and all(
+                    isinstance(exception, BlockException)
+                    for exception in expected_exceptions
+                )
+                and modified_header.model_dump() == header.model_dump()
+            ):
+                # A block whose expected invalidity is purely header
+                # level rests on the modifier corrupting the header; a
+                # modifier that changes nothing means the "wrong" value
+                # the test pinned has become the correct one, so the
+                # fixture would claim an invalidity the chain does not
+                # have. This happens when the chain context shifts
+                # under the test, e.g. a fee progression moved by the
+                # prepended empty block. Blocks whose exception list
+                # names a transaction exception are excluded: their
+                # invalidity comes from a transaction, and the state
+                # test conversion routinely pins header fields to
+                # values that legitimately match the computed ones.
+                raise ValueError(
+                    f"block {header.number}'s `rlp_modifier` changed "
+                    "nothing: the block expects "
+                    f"`{block.exception}` but its header already holds "
+                    "the pinned values, so the block is valid in this "
+                    "chain context and the fixture's invalidity "
+                    "expectation no longer tests anything"
+                )
+            header = modified_header
             header.fork = fork  # Deleted during `apply` because `exclude=True`
 
         # Process block access list - apply transformer if present for invalid

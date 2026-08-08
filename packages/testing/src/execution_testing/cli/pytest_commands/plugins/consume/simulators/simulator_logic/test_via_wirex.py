@@ -40,7 +40,11 @@ from execution_testing.rpc import (
     EthRPC,
     ForkchoiceUpdateTimeoutError,
 )
-from execution_testing.rpc.rpc_types import ForkchoiceState, PayloadStatusEnum
+from execution_testing.rpc.rpc_types import (
+    ForkchoiceState,
+    JSONRPCError,
+    PayloadStatusEnum,
+)
 
 from ..helpers.exceptions import (
     GenesisBlockMismatchExceptionError,
@@ -143,14 +147,31 @@ def test_blockchain_via_wirex(
             version=head_payload.forkchoice_updated_version,
         )
 
+    expect_rejection = any(not payload.valid() for payload in fixture.payloads)
+
     with timing_data.time("Announce sync target"):
         logger.info(
             f"Announcing head block {chain.head.number} to trigger a sync "
             f"of {len(chain.blocks) - 1} ancestor block(s) over devp2p"
         )
-        announce()
+        try:
+            announce()
+        except JSONRPCError as error:
+            if expect_rejection and head_payload.error_code is not None:
+                # A head payload that violates the Engine API's rules
+                # for the fork (e.g. a pre-fork block carrying blob
+                # fields) is refused at the RPC layer before any chain
+                # context matters - that refusal is this fixture's
+                # rejection.
+                logger.info(
+                    f"Client refused the invalid head at the RPC layer "
+                    f"(expected error {head_payload.error_code}, got "
+                    f"{error})"
+                )
+                return
+            raise
 
-    if any(not payload.valid() for payload in fixture.payloads):
+    if expect_rejection:
         with timing_data.time("Reject invalid chain"):
             # A rejection target below the client's current head hits
             # the known skeleton poisoning on geth-like clients: the
@@ -185,10 +206,20 @@ def test_blockchain_via_wirex(
                 # Once the ancestry has arrived over devp2p the client
                 # can judge the head; until then it answers SYNCING (or
                 # ACCEPTED if it merely stored the payload).
-                payload_status = engine_rpc.new_payload(
-                    *head_payload.params,
-                    version=head_payload.new_payload_version,
-                )
+                try:
+                    payload_status = engine_rpc.new_payload(
+                        *head_payload.params,
+                        version=head_payload.new_payload_version,
+                    )
+                except JSONRPCError as error:
+                    if head_payload.error_code is not None:
+                        logger.info(
+                            f"Client refused the invalid head at the "
+                            f"RPC layer (expected error "
+                            f"{head_payload.error_code}, got {error})"
+                        )
+                        return
+                    raise
                 status = payload_status.status
                 validation_error = payload_status.validation_error
                 if status in (

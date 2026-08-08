@@ -10,6 +10,7 @@ present; there is no support for acting as the recipient of a dial.
 import logging
 import os
 import socket
+import threading
 from typing import Tuple
 
 import ethereum_rlp as eth_rlp
@@ -122,6 +123,7 @@ class RLPxSession:
         self._egress_mac = _Mac(mac_secret, egress_seed)
         self._ingress_mac = _Mac(mac_secret, ingress_seed)
         self._snappy = False
+        self._write_lock = threading.Lock()
 
     def enable_snappy(self) -> None:
         """
@@ -145,7 +147,14 @@ class RLPxSession:
         return buffer
 
     def write_message(self, code: int, payload: bytes) -> None:
-        """Write one devp2p message as a single RLPx frame."""
+        """
+        Write one devp2p message as a single RLPx frame.
+
+        Serialized with a lock: the peer's serving thread and the test
+        thread (chain announcements) both write to the session, and the
+        egress cipher and MAC are stateful - an interleaved write would
+        corrupt the running MAC and the frame stream.
+        """
         if self._snappy:
             payload = compress(payload)
         frame = eth_rlp.encode(Uint(code)) + payload
@@ -153,14 +162,15 @@ class RLPxSession:
             len(frame).to_bytes(3, "big") + eth_rlp.encode([Uint(0), Uint(0)])
         )
 
-        header_ciphertext = self._egress_aes.update(header)
-        header_mac = self._egress_mac.update_header(header_ciphertext)
-        frame_ciphertext = self._egress_aes.update(_pad_to_block(frame))
-        frame_mac = self._egress_mac.update_body(frame_ciphertext)
+        with self._write_lock:
+            header_ciphertext = self._egress_aes.update(header)
+            header_mac = self._egress_mac.update_header(header_ciphertext)
+            frame_ciphertext = self._egress_aes.update(_pad_to_block(frame))
+            frame_mac = self._egress_mac.update_body(frame_ciphertext)
 
-        self._connection.sendall(
-            header_ciphertext + header_mac + frame_ciphertext + frame_mac
-        )
+            self._connection.sendall(
+                header_ciphertext + header_mac + frame_ciphertext + frame_mac
+            )
 
     def read_message(self) -> Tuple[int, bytes]:
         """Read one devp2p message and return its code and payload."""

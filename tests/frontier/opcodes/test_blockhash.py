@@ -23,6 +23,7 @@ from execution_testing.forks.helpers import Fork
     ],
 )
 @pytest.mark.slow()
+@pytest.mark.absolute_block_position
 def test_genesis_hash_available(
     blockchain_test: BlockchainTestFiller,
     pre: Alloc,

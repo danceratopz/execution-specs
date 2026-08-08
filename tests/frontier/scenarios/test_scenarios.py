@@ -178,7 +178,10 @@ def scenarios(
         ),
         ProgramCoinbase(),
         ProgramTimestamp(),
-        ProgramNumber(),
+        pytest.param(
+            ProgramNumber(),
+            marks=pytest.mark.absolute_block_position,
+        ),
         ProgramDifficultyRandao(),
         ProgramGasLimit(),
         ProgramChainid(),

@@ -632,9 +632,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             "Prepend one empty block between genesis and every "
             "blockchain test's first block, so that sync-based "
             "consumers can trigger a devp2p sync even for single-block "
-            "tests. Shifts every block number and hash: fixtures "
-            "filled with this option are not comparable with normally "
-            "filled ones, so do not use it for release fixtures."
+            "tests. Spec types that opt out (benchmark tests) are "
+            "filled without it. Shifts every block number and hash: "
+            "fixtures filled with this option are not comparable with "
+            "normally filled ones, so do not use it for release "
+            "fixtures."
         ),
     )
     test_group.addoption(
@@ -1628,8 +1630,9 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
                 kwargs["fork"] = fork
                 op_mode: OpMode = request.config.op_mode  # type: ignore
                 kwargs["operation_mode"] = op_mode
-                kwargs["prepend_empty_block"] = request.config.getoption(
-                    "prepend_empty_block", False
+                kwargs["prepend_empty_block"] = (
+                    request.config.getoption("prepend_empty_block", False)
+                    and cls.supports_prepend_empty_block
                 )
                 kwargs["prepend_empty_block_salt"] = request.node.nodeid
                 kwargs["is_tx_gas_heavy_test"] = is_tx_gas_heavy_test

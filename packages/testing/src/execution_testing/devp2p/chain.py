@@ -11,6 +11,7 @@ The reconstruction is self checking: a rebuilt header is only accepted if
 its hash equals the block hash the payload already claims.
 """
 
+import hashlib
 import logging
 from dataclasses import dataclass
 from typing import Dict, List, Sequence
@@ -41,6 +42,20 @@ EMPTY_OMMERS_RLP = b"\xc0"
 
 class ChainReconstructionError(Exception):
     """Raised when a payload cannot be turned back into a valid block."""
+
+
+def _requests_hash(execution_requests: Sequence[Bytes]) -> Hash:
+    """
+    Return the EIP-7685 requests hash over `execution_requests`.
+
+    Each request arrives from the payload as its type byte followed by
+    the request data, and the header commits to the flat sha256 scheme:
+    `sha256(sha256(r_0) ++ sha256(r_1) ++ ...)`.
+    """
+    digest = hashlib.sha256()
+    for request in execution_requests:
+        digest.update(hashlib.sha256(bytes(request)).digest())
+    return Hash(digest.digest())
 
 
 def _transactions_root(transactions: Sequence[Bytes]) -> bytes:
@@ -106,6 +121,8 @@ def block_from_payload(payload: FixtureEngineNewPayload) -> Block:
 
     withdrawals = execution_payload.withdrawals
     beacon_root = payload.params[2] if len(payload.params) > 2 else None
+    execution_requests = payload.params[3] if len(payload.params) > 3 else None
+    block_access_list = execution_payload.block_access_list
 
     header = FixtureHeader(
         parent_hash=execution_payload.parent_hash,
@@ -134,6 +151,17 @@ def block_from_payload(payload: FixtureEngineNewPayload) -> Block:
         blob_gas_used=execution_payload.blob_gas_used,
         excess_blob_gas=execution_payload.excess_blob_gas,
         parent_beacon_block_root=beacon_root,
+        requests_hash=(
+            None
+            if execution_requests is None
+            else _requests_hash(execution_requests)
+        ),
+        block_access_list_hash=(
+            None
+            if block_access_list is None
+            else block_access_list.keccak256()
+        ),
+        slot_number=execution_payload.slot_number,
     )
 
     if header.block_hash != execution_payload.block_hash:

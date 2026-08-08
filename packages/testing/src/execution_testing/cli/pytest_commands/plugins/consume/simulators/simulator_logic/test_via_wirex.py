@@ -174,6 +174,11 @@ def test_blockchain_via_wirex(
                         "expects the block to be rejected"
                     )
                 if time.monotonic() >= next_announcement:
+                    if not mock_peer.alive:
+                        # A client may drop a peer that served it a bad
+                        # chain; a real peer would simply redial.
+                        logger.warning("Peer dropped mid-rejection; redialing")
+                        mock_peer.reconnect(chain)
                     logger.info("Re-announcing the invalid sync target")
                     announce()
                     next_announcement = (
@@ -216,6 +221,12 @@ def test_blockchain_via_wirex(
                 synced = True
                 break
             if time.monotonic() >= next_announcement:
+                if not mock_peer.alive:
+                    # A mid-sync drop would otherwise strand the test
+                    # peerless until its timeout; redial like a real
+                    # peer would.
+                    logger.warning("Peer dropped mid-sync; redialing")
+                    mock_peer.reconnect(chain)
                 logger.info("Re-announcing the sync target")
                 announce()
                 next_announcement = time.monotonic() + wirex_announce_interval

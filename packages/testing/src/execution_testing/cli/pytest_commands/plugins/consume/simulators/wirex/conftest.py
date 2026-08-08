@@ -83,11 +83,14 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         dest="wirex_sort_by_chain_length",
         default=False,
         help=(
-            "Order the tests inside each pre-allocation group by "
-            "ascending chain length, so a reused client's head number "
-            "never decreases over the client's lifetime. Geth's beacon "
-            "sync has been observed to stall when asked to sync a "
-            "chain shorter than one the same client already synced."
+            "Order the tests inside each pre-allocation group: valid "
+            "chains before invalid ones, each by ascending chain "
+            "length, so a reused client's head number never decreases "
+            "and no valid sync follows a served bad block. Geth's "
+            "beacon sync has been observed to stall when asked to "
+            "sync a chain shorter than one the same client already "
+            "synced, and to back off after syncing a chain with a bad "
+            "block in a way that starves the next sync."
         ),
     )
     group.addoption(
@@ -128,17 +131,18 @@ def pytest_configure(config: pytest.Config) -> None:
     config.supported_fixture_formats = [BlockchainEngineXFixture]  # type: ignore[attr-defined]
 
 
-def _payload_counts(
+def _chain_properties(
     config: pytest.Config, items: list[pytest.Item]
-) -> Dict[str, int]:
+) -> Dict[str, tuple[bool, int]]:
     """
-    Count each collected test case's payloads, i.e. its chain length.
+    Read each collected test case's chain properties for ordering: does
+    the chain contain an invalid payload, and how long is it.
 
-    The fixture index does not record chain lengths, so the fixture
-    files are read directly; each file is parsed once and holds every
-    fixture of its test module.
+    The fixture index does not record either, so the fixture files are
+    read directly; each file is parsed once and holds every fixture of
+    its test module.
     """
-    counts: Dict[str, int] = {}
+    properties: Dict[str, tuple[bool, int]] = {}
     file_cache: Dict[str, dict] = {}
     source_path = getattr(config, "fixtures_source", None)
     for item in items:
@@ -148,7 +152,10 @@ def _payload_counts(
         test_case = callspec.params.get("test_case")
         fixture = getattr(test_case, "fixture", None)
         if fixture is not None:  # stdin: the fixture is already loaded
-            counts[item.nodeid] = len(fixture.payloads)
+            properties[item.nodeid] = (
+                any(not payload.valid() for payload in fixture.payloads),
+                len(fixture.payloads),
+            )
             continue
         json_path = getattr(test_case, "json_path", None)
         if json_path is None or source_path is None:
@@ -161,8 +168,15 @@ def _payload_counts(
             file_cache[path] = raw
         raw_fixture = raw.get(test_case.id)
         if raw_fixture is not None:
-            counts[item.nodeid] = len(raw_fixture.get("engineNewPayloads", []))
-    return counts
+            payloads = raw_fixture.get("engineNewPayloads", [])
+            properties[item.nodeid] = (
+                any(
+                    payload.get("validationError") is not None
+                    for payload in payloads
+                ),
+                len(payloads),
+            )
+    return properties
 
 
 @pytest.hookimpl(trylast=True)
@@ -189,30 +203,41 @@ def pytest_collection_modifyitems(
         f"{sum(group_counts.values())} total tests"
     )
 
-    chain_lengths: Dict[str, int] = {}
+    chain_properties: Dict[str, tuple[bool, int]] = {}
     if config.getoption("wirex_sort_by_chain_length", False):
-        chain_lengths = _payload_counts(config, items)
+        chain_properties = _chain_properties(config, items)
         logger.info(
-            "Ordering tests inside each pre-allocation group by "
-            "ascending chain length"
+            "Ordering tests inside each pre-allocation group: valid "
+            "chains before invalid ones, each by ascending chain length"
         )
 
-    def sort_key(item: pytest.Item) -> tuple[int, str, int, str]:
+    def sort_key(item: pytest.Item) -> tuple[int, str, bool, int, str]:
         """
         Return sort key: largest group first, then by group id, then
-        (when enabled) by ascending chain length inside the group.
+        (when enabled) valid chains before invalid ones, each by
+        ascending chain length inside the group.
+
+        Invalid chains run last because serving a chain with a bad
+        block leaves a client's sync machinery in a failure state that
+        a following valid sync on the same client collides with
+        (observed on geth as a backfill backoff whose delayed header
+        retries race the peer's chain switches); once the group's
+        valid tests are done, that state poisons nothing.
         """
-        chain_length = chain_lengths.get(item.nodeid, 0)
+        has_invalid, chain_length = chain_properties.get(
+            item.nodeid, (False, 0)
+        )
         for marker in item.iter_markers("xdist_group"):
             if "name" in marker.kwargs:
                 group = marker.kwargs["name"]
                 return (
                     -group_counts[group],
                     group,
+                    has_invalid,
                     chain_length,
                     item.nodeid,
                 )
-        return (0, "", chain_length, item.nodeid)
+        return (0, "", has_invalid, chain_length, item.nodeid)
 
     items.sort(key=sort_key)
 

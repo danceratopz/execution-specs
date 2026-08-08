@@ -250,12 +250,14 @@ def pytest_configure(config: pytest.Config) -> None:
     )
     config.addinivalue_line(
         "markers",
-        "pre_state_affects_empty_block: Marks a test whose pre-state changes "
-        "what any block executes - e.g. a deliberately broken system "
-        "contract that every post-Prague block calls; filling with "
-        "--prepend-empty-block skips it because the framework's prepended "
-        "empty block would either fail on that pre-state or consume its "
-        "one-shot behavior before the test's own blocks run.",
+        "pre_state_affects_empty_block: Marks a test whose pre-state or "
+        "genesis environment changes what any block executes - e.g. a "
+        "deliberately broken system contract that every post-Prague block "
+        "calls, or a genesis gas limit too small for a minimal block's own "
+        "system work; filling with --prepend-empty-block skips it because "
+        "the framework's prepended empty block would either fail on that "
+        "setup or consume its one-shot behavior before the test's own "
+        "blocks run.",
     )
     config.addinivalue_line(
         "markers",

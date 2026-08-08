@@ -1976,11 +1976,11 @@ def pytest_collection_modifyitems(
             item.add_marker(
                 pytest.mark.skip(
                     reason=(
-                        "the test's pre-state changes what any block "
-                        "executes (e.g. a broken system contract called "
-                        "by every block), so the prepended empty block "
-                        "would fail on it or consume its one-shot "
-                        "behavior"
+                        "the test's pre-state or genesis environment "
+                        "changes what any block executes (e.g. a broken "
+                        "system contract called by every block), so the "
+                        "prepended empty block would fail on it or "
+                        "consume its one-shot behavior"
                     )
                 )
             )

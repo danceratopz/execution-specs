@@ -305,6 +305,17 @@ class MockPeer:
 
                 try:
                     self._handle(session, code, payload)
+                except OSError as error:
+                    # The client closed the socket while the answer was
+                    # being written. Ending the loop lets the owner
+                    # notice via `alive` and redial, rather than leaving
+                    # a traceback in a thread nobody joins.
+                    logger.info(
+                        "Peer connection ended while answering message %d: %s",
+                        code,
+                        error,
+                    )
+                    return
                 except (ProtocolError, RLPxError) as error:
                     logger.warning(
                         "Failed to answer message %d: %s", code, error

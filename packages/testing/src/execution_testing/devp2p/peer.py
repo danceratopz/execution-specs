@@ -61,6 +61,19 @@ MAX_HEADERS_PER_RESPONSE = 1024
 MAX_BODIES_PER_RESPONSE = 256
 """Cap on bodies served in one response."""
 
+SOFT_RESPONSE_LIMIT = 2 * 1024 * 1024
+"""
+Target ceiling on the serialized bytes of one response.
+
+A count of items is no bound at all when one item may be megabytes, and
+a client caps the size of every message it reads: geth refuses anything
+over ten mebibytes and drops the peer rather than truncating it. Two
+EIP-7934 blocks are roughly sixteen, so stop filling a response once it
+reaches this many bytes and let the client ask for the rest. The value
+is the one clients themselves stop at, and it is a target rather than a
+cap: a single body is always served, however large it is alone.
+"""
+
 EMPTY_LIST_PAYLOAD = b"\xc0"
 
 
@@ -399,12 +412,16 @@ class MockPeer:
 
         bodies: List[bytes] = []
         unknown: List[bytes] = []
+        served_bytes = 0
         for block_hash in hashes[:MAX_BODIES_PER_RESPONSE]:
+            if served_bytes >= SOFT_RESPONSE_LIMIT:
+                break
             body = self._chains.body_rlp_by_hash(block_hash)
             if body is None:
                 unknown.append(block_hash)
                 break
             bodies.append(body)
+            served_bytes += len(body)
 
         with self._lock:
             self.statistics.bodies_served += len(bodies)
@@ -416,7 +433,7 @@ class MockPeer:
             )
             self.statistics.record(
                 f"bodies for {len(hashes)} hashes -> "
-                f"{len(bodies)} served{detail}"
+                f"{len(bodies)} served ({served_bytes} bytes){detail}"
             )
         session.write_message(
             BLOCK_BODIES, encode_response(request_id, bodies)

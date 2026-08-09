@@ -91,14 +91,19 @@ def pytest_collection_modifyitems(
 
             # Find the last hyphen followed by client name pattern and replace
             if "-" in nodeid:
-                # Split by the last hyphen to separate the client suffix
-                parts = nodeid.rsplit("]-", 1)
-                assert len(parts) == 2, (
+                # Strip the known client suffix rather than searching for
+                # "]-": a marker can sit between the parameter list and
+                # the client name, as ``@bigmem`` does on every EIP-7934
+                # test, and those are the only tests marked verify_sync.
+                client_suffix = f"-{item.callspec.params['client_type'].name}"
+                assert nodeid.endswith(client_suffix), (
                     # expect "..._end_of_test]-client_name" suffix...
                     f"Unexpected format to parse client name: {nodeid}"
                 )
 
-                base = parts[0]
+                base = nodeid[: -len(client_suffix)]
+                if base.endswith("]"):
+                    base = base[:-1]
                 if base.endswith("sync_test"):
                     # Insert suffix before the closing bracket
                     base = base + new_suffix + "]"

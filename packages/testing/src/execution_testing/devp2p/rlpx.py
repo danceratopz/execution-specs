@@ -34,8 +34,9 @@ AUTH_VERSION = 4
 """RLPx handshake version advertised in auth and ack messages."""
 
 MAX_FRAME_SIZE = 1 << 24
-"""Largest frame this peer is willing to read, as a denial of service
-guard rather than a protocol limit."""
+"""Largest frame this peer will read or write. Reading treats it as a
+denial of service guard; writing cannot exceed it at all, because a frame
+header expresses its length in three bytes."""
 
 _MAC_LENGTH = 16
 
@@ -154,10 +155,20 @@ class RLPxSession:
         thread (chain announcements) both write to the session, and the
         egress cipher and MAC are stateful - an interleaved write would
         corrupt the running MAC and the frame stream.
+
+        A frame too large to describe in the header's three byte length
+        field is refused here. Without this the length would overflow
+        inside a serving thread, far from the caller that assembled an
+        oversized response.
         """
         if self._snappy:
             payload = compress(payload)
         frame = eth_rlp.encode(Uint(code)) + payload
+        if len(frame) >= MAX_FRAME_SIZE:
+            raise RLPxError(
+                f"frame of {len(frame)} bytes exceeds the "
+                f"{MAX_FRAME_SIZE - 1} bytes a frame header can express"
+            )
         header = _pad_to_block(
             len(frame).to_bytes(3, "big") + eth_rlp.encode([Uint(0), Uint(0)])
         )

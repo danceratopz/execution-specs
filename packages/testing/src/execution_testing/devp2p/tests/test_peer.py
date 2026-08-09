@@ -10,8 +10,11 @@ them in one response over that cap, and blocks that large are exactly
 what the `eip7934_block_rlp_limit` fixtures serve.
 """
 
+import socket
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Tuple, cast
+
+import pytest
 
 from ..peer import (
     BLOCK_BODIES,
@@ -19,7 +22,7 @@ from ..peer import (
     SOFT_RESPONSE_LIMIT,
     MockPeer,
 )
-from ..rlpx import RLPxSession
+from ..rlpx import MAX_FRAME_SIZE, RLPxError, RLPxSession
 
 LARGE_BODY_SIZE = 8 * 1024 * 1024
 """A body the size EIP-7934 allows a block to reach."""
@@ -132,3 +135,28 @@ class TestBodyResponseSize:
         hashes = [_hash(index) for index in range(wanted)]
         assert _serve(bodies, hashes) == MAX_BODIES_PER_RESPONSE
 
+
+class TestFrameSizeGuard:
+    """A frame too large to describe is refused, not silently mangled."""
+
+    def test_oversized_frame_is_refused(self) -> None:
+        """A frame at the three byte length ceiling raises."""
+
+        class _RefusingSocket:
+            """A socket that fails the test if it is ever written to."""
+
+            def sendall(self, data: bytes) -> None:
+                """Reject a write the size guard should have stopped."""
+                del data
+                raise AssertionError("oversized frame reached the socket")
+
+        session = RLPxSession(
+            cast(socket.socket, _RefusingSocket()),
+            aes_secret=b"\x02" * 32,
+            mac_secret=b"\x03" * 32,
+            egress_seed=b"\x04" * 32,
+            ingress_seed=b"\x05" * 32,
+        )
+        # One byte for the message code brings the frame to the ceiling.
+        with pytest.raises(RLPxError, match="frame of"):
+            session.write_message(0x10, b"\x00" * (MAX_FRAME_SIZE - 1))

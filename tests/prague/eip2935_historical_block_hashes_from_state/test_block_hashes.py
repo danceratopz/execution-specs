@@ -118,6 +118,7 @@ def generate_block_check_code(
 )
 @pytest.mark.slow()
 @pytest.mark.valid_at_transition_to("Prague")
+@pytest.mark.absolute_block_position
 def test_block_hashes_history_at_transition(
     blockchain_test: BlockchainTestFiller,
     pre: Alloc,
@@ -395,8 +396,23 @@ def test_block_hashes_call_opcodes(
 @pytest.mark.parametrize(
     "block_number,reverts",
     [
-        pytest.param(1, True, id="current_block"),
-        pytest.param(2, True, id="future_block"),
+        pytest.param(
+            1,
+            True,
+            id="current_block",
+            # "Current" is an absolute position: the prepended empty
+            # block makes block 1 a servable past block instead.
+            marks=pytest.mark.absolute_block_position,
+        ),
+        pytest.param(
+            2,
+            True,
+            id="future_block",
+            # Block 2 is the current block once the prepended empty
+            # block shifts the query block up, so this param would
+            # silently repeat the current_block case above.
+            marks=pytest.mark.absolute_block_position,
+        ),
         pytest.param(2**64 - 1, True, id="2**64-1"),
         pytest.param(2**64, True, id="2**64"),
     ],

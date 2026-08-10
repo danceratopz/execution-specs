@@ -140,6 +140,9 @@ def test_extra_consolidations(
     "system_contract",
     [Address(Spec_EIP7251.CONSOLIDATION_REQUEST_PREDEPLOY_ADDRESS)],
 )
+# Every block calls the (deliberately broken or gas-hungry one-shot)
+# consolidation contract, so a prepended empty block cannot be neutral.
+@pytest.mark.pre_state_affects_empty_block
 @generate_system_contract_error_test(  # type: ignore[arg-type]
     max_gas_limit=Spec_EIP7251.SYSTEM_CALL_GAS_LIMIT,
 )

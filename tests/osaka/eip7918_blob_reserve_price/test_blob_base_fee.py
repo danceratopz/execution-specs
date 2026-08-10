@@ -133,6 +133,9 @@ def post(
     "parent_excess_blobs",
     lambda fork: range(0, fork.target_blobs_per_block() + 1),
 )
+# Under the reserve price a small nonzero excess blob gas has no
+# parent value that decays to it across an empty block.
+@pytest.mark.no_empty_block_fee_preimage
 def test_reserve_price_various_base_fee_scenarios(
     blockchain_test: BlockchainTestFiller,
     env: Environment,
@@ -225,6 +228,9 @@ def get_boundary_scenarios(fork: Fork) -> Iterator[Any]:
     get_boundary_scenarios,
 )
 @pytest.mark.eels_base_coverage
+# Under the reserve price a small nonzero excess blob gas has no
+# parent value that decays to it across an empty block.
+@pytest.mark.no_empty_block_fee_preimage
 def test_reserve_price_boundary(
     blockchain_test: BlockchainTestFiller,
     env: Environment,

@@ -1163,7 +1163,13 @@ class BlockchainTest(BaseTest):
         if block.rlp_modifier is not None:
             # Modify any parameter specified in the `rlp_modifier` after
             # transition tool processing.
-            header = block.rlp_modifier.apply(header)
+            modified_header = block.rlp_modifier.apply(header)
+            self._verify_modifier_still_invalidates(
+                block=block,
+                header=header,
+                modified_header=modified_header,
+            )
+            header = modified_header
             header.fork = fork  # Deleted during `apply` because `exclude=True`
 
         # Process block access list - apply transformer if present for invalid
@@ -1269,6 +1275,54 @@ class BlockchainTest(BaseTest):
             )
 
         return built_block
+
+    def _verify_modifier_still_invalidates(
+        self,
+        *,
+        block: Block,
+        header: FixtureHeader,
+        modified_header: FixtureHeader,
+    ) -> None:
+        """
+        Refuse an expected-invalid block whose ``rlp_modifier`` is a
+        no-op.
+
+        A block whose expected invalidity is purely header level rests
+        on the modifier corrupting the header, so exception
+        verification is skipped for it. A modifier that changes nothing
+        therefore means the "wrong" value the test pinned has become
+        the correct one: the block is valid in this chain context while
+        the fixture still claims it is invalid. This happens when the
+        chain context shifts under the test, e.g. a fee progression
+        moved by the prepended empty block.
+
+        Blocks whose exception list names a transaction exception are
+        excluded: their invalidity comes from a transaction, and the
+        state test conversion routinely pins header fields to values
+        that legitimately match the computed ones.
+        """
+        if block.exception is None:
+            return
+        expected_exceptions = (
+            block.exception
+            if isinstance(block.exception, list)
+            else [block.exception]
+        )
+        if not all(
+            isinstance(exception, BlockException)
+            for exception in expected_exceptions
+        ):
+            return
+        if modified_header.model_dump() != header.model_dump():
+            return
+        raise ValueError(
+            f"block {header.number}'s `rlp_modifier` changed "
+            "nothing: the block expects "
+            f"`{block.exception}` but its header already holds "
+            "the pinned values, so the block is valid in this "
+            "chain context and the fixture's invalidity "
+            "expectation no longer tests anything"
+        )
 
     def verify_post_state(
         self,

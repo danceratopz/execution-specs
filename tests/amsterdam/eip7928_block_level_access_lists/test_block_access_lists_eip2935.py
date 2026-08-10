@@ -52,6 +52,7 @@ def block_hash_system_call_expectations(block_number: int) -> dict:
     }
 
 
+@pytest.mark.absolute_block_position
 def test_bal_2935_simple(
     pre: Alloc,
     blockchain_test: BlockchainTestFiller,
@@ -109,6 +110,7 @@ def test_bal_2935_simple(
     )
 
 
+@pytest.mark.absolute_block_position
 def test_bal_2935_empty_block(
     pre: Alloc,
     blockchain_test: BlockchainTestFiller,
@@ -147,6 +149,7 @@ def test_bal_2935_empty_block(
         pytest.param(100, id="with_value"),
     ],
 )
+@pytest.mark.absolute_block_position
 def test_bal_2935_query(
     pre: Alloc,
     blockchain_test: BlockchainTestFiller,
@@ -274,6 +277,7 @@ def test_bal_2935_query(
     )
 
 
+@pytest.mark.absolute_block_position
 def test_bal_2935_selfdestruct_to_history_storage(
     pre: Alloc,
     blockchain_test: BlockchainTestFiller,
@@ -350,6 +354,7 @@ def test_bal_2935_selfdestruct_to_history_storage(
         pytest.param(100, id="with_value"),
     ],
 )
+@pytest.mark.absolute_block_position
 def test_bal_2935_invalid_calldata_size(
     pre: Alloc,
     blockchain_test: BlockchainTestFiller,

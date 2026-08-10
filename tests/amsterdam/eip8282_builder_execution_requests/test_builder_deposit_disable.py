@@ -60,6 +60,7 @@ def deposit_request() -> BuilderDepositRequest:
     )
 
 
+@pytest.mark.pre_state_affects_empty_block
 def test_builder_deposit_inhibited(
     blockchain_test: BlockchainTestFiller,
     inhibited_pre: Alloc,

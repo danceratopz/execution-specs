@@ -55,6 +55,7 @@ def exit_request() -> BuilderExitRequest:
     )
 
 
+@pytest.mark.pre_state_affects_empty_block
 def test_builder_exit_inhibited(
     blockchain_test: BlockchainTestFiller,
     inhibited_pre: Alloc,

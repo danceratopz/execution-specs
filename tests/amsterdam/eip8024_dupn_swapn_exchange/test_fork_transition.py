@@ -43,6 +43,7 @@ def marker_storing_code(opcode: Op) -> tuple[Bytecode, int]:
 @EIPChecklist.Opcode.Test.ForkTransition.Invalid()
 @EIPChecklist.Opcode.Test.ForkTransition.At()
 @pytest.mark.valid_at_transition_to("EIP8024")
+@pytest.mark.absolute_block_position
 @pytest.mark.parametrize("opcode", [Op.DUPN, Op.SWAPN, Op.EXCHANGE])
 def test_opcode_at_fork_transition(
     blockchain_test: BlockchainTestFiller,
@@ -95,6 +96,7 @@ def test_opcode_at_fork_transition(
 @EIPChecklist.Opcode.Test.ForkTransition.At()
 @EIPChecklist.Opcode.Test.DataPortion.Jump()
 @pytest.mark.valid_at_transition_to("EIP8024")
+@pytest.mark.absolute_block_position
 @pytest.mark.parametrize("opcode", [Op.DUPN, Op.SWAPN, Op.EXCHANGE])
 def test_jumpdest_in_immediate_at_fork_transition(
     blockchain_test: BlockchainTestFiller,

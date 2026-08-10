@@ -16,6 +16,7 @@ import pytest
 
 from execution_testing.base_types import HexNumber
 from execution_testing.forks import Cancun, Fork, London, Osaka, Shanghai
+from execution_testing.specs.benchmark import BenchmarkTest
 from execution_testing.specs.blockchain import (
     Block,
     BlockchainTest,
@@ -286,6 +287,16 @@ def test_state_test_composition() -> None:
         excess = new_excess
     assert base_fee == 10
     assert excess == 0xE0000
+
+
+def test_benchmark_tests_opt_out_of_prepend() -> None:
+    """
+    Benchmark tests must never receive the prepended block: an extra
+    block would distort their per-block gas and timing measurements.
+    """
+    assert BenchmarkTest.supports_prepend_empty_block is False
+    assert BlockchainTest.supports_prepend_empty_block is True
+    assert StateTest.supports_prepend_empty_block is True
 
 
 def test_state_test_conversion_unchanged_without_prepend() -> None:

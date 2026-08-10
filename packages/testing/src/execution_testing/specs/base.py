@@ -124,8 +124,9 @@ class BaseTest(BaseModel):
     parent is unknown to it, which is never the case for a single
     block built directly on the client's own genesis.
 
-    Set by the filler's ``--prepend-empty-block`` option only when the
-    fixture format being filled opts in via
+    Set by the filler's ``--prepend-empty-block`` option only for
+    spec types whose ``supports_prepend_empty_block`` is true and when
+    the fixture format being filled opts in via
     ``BaseFixture.prepend_empty_block`` (currently
     ``blockchain_test_engine_x``); ignored by test specs that do not
     build a chain of blocks, and by stateful fixtures, whose chains
@@ -157,6 +158,16 @@ class BaseTest(BaseModel):
     is_exception_test: bool = False
 
     # Class variables, to be set by subclasses
+    supports_prepend_empty_block: ClassVar[bool] = True
+    """
+    Whether the filler's ``--prepend-empty-block`` option applies to
+    this spec type.
+
+    Consensus test specs support it so sync-based consumers can always
+    trigger a devp2p sync. Spec types whose measurements the extra
+    block would distort (benchmark tests) set this to false and are
+    filled without the prepended block even when the option is given.
+    """
     spec_types: ClassVar[Dict[str, Type["BaseTest"]]] = {}
     supported_fixture_formats: ClassVar[
         Sequence[FixtureFormat | LabeledFixtureFormat]

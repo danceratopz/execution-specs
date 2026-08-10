@@ -341,6 +341,13 @@ class BenchmarkTest(BaseTest):
     include_full_post_state_in_output: bool = False
     include_tx_receipts_in_output: bool = False
 
+    supports_prepend_empty_block: ClassVar[bool] = False
+    """
+    Benchmark tests measure per-block gas and timing; an extra block
+    would distort those measurements, so the filler's
+    ``--prepend-empty-block`` option never applies to them.
+    """
+
     supported_fixture_formats: ClassVar[
         Sequence[FixtureFormat | LabeledFixtureFormat]
     ] = [

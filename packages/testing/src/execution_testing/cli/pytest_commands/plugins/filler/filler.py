@@ -632,9 +632,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             "Prepend one empty block between genesis and every "
             "blockchain test's first block, so that sync-based "
             "consumers can trigger a devp2p sync even for single-block "
-            "tests. Shifts every block number and hash: fixtures "
-            "filled with this option are not comparable with normally "
-            "filled ones, so do not use it for release fixtures."
+            "tests. Spec types that opt out (benchmark tests) are "
+            "filled without it. Shifts every block number and hash: "
+            "fixtures filled with this option are not comparable with "
+            "normally filled ones, so do not use it for release "
+            "fixtures."
         ),
     )
     test_group.addoption(
@@ -1645,12 +1647,15 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
                 kwargs["fork"] = fork
                 op_mode: OpMode = request.config.op_mode  # type: ignore
                 kwargs["operation_mode"] = op_mode
-                # The extra block only applies to fixture formats that
-                # opt in: sync-based consumers need it, and only
-                # engine_x fixtures reach them.
+                # The extra block only applies to fixture formats
+                # that opt in (sync-based consumers need it); it is
+                # further withheld from spec types that measure
+                # per-block and from any session that is measuring.
                 kwargs["prepend_empty_block"] = (
                     request.config.getoption("prepend_empty_block", False)
                     and fixture_format.prepend_empty_block
+                    and cls.supports_prepend_empty_block
+                    and op_mode != OpMode.BENCHMARKING
                 )
                 # Salt with the test's own id, not with the raw node
                 # id: the fixture format and the xdist group suffix

@@ -57,6 +57,7 @@ REFERENCE_SPEC_VERSION = "N/A"
             0,
             0,
             id="number",
+            marks=pytest.mark.absolute_block_position,
         ),
         pytest.param(
             4,

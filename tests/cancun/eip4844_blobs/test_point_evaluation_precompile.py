@@ -711,6 +711,7 @@ def test_tx_entry_point(
     ids=[""],
 )
 @pytest.mark.valid_at_transition_to("Cancun")
+@pytest.mark.absolute_block_position
 def test_precompile_before_fork(
     state_test: StateTestFiller,
     pre: Alloc,
@@ -767,6 +768,7 @@ PRE_FORK_BLOCK_RANGE = range(999, FORK_TIMESTAMP, 1_000)
     ids=[""],
 )
 @pytest.mark.valid_at_transition_to("Cancun")
+@pytest.mark.absolute_block_position
 def test_precompile_during_fork(
     blockchain_test: BlockchainTestFiller,
     pre: Alloc,

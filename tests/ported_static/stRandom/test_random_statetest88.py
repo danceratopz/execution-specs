@@ -29,6 +29,7 @@ REFERENCE_SPEC_VERSION = "N/A"
 )
 @pytest.mark.valid_from("Cancun")
 @pytest.mark.pre_alloc_mutable
+@pytest.mark.absolute_block_position
 def test_random_statetest88(
     state_test: StateTestFiller,
     pre: Alloc,

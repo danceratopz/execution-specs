@@ -145,6 +145,7 @@ class TestUseValueInTx:
         blockchain_test(pre=pre, post=post, blocks=blocks)
 
 
+@pytest.mark.absolute_block_position
 def test_use_value_in_contract(
     blockchain_test: BlockchainTestFiller,
     pre: Alloc,
@@ -199,6 +200,7 @@ def test_use_value_in_contract(
     blockchain_test(pre=pre, post=post, blocks=blocks)
 
 
+@pytest.mark.absolute_block_position
 def test_balance_within_block(
     blockchain_test: BlockchainTestFiller, pre: Alloc
 ) -> None:
@@ -516,6 +518,7 @@ def test_newly_created_contract(
     blockchain_test(pre=pre, post=post, blocks=[block])
 
 
+@pytest.mark.absolute_block_position
 def test_no_evm_execution(
     blockchain_test: BlockchainTestFiller,
     pre: Alloc,

@@ -15,6 +15,7 @@ from typing import List
 import pytest
 
 from execution_testing.base_types import HexNumber
+from execution_testing.exceptions import BlockException
 from execution_testing.forks import Cancun, Fork, London, Osaka, Shanghai
 from execution_testing.specs.benchmark import BenchmarkTest
 from execution_testing.specs.blockchain import (
@@ -93,6 +94,33 @@ def test_blocks_to_build_without_the_option_is_a_no_op() -> None:
     """
     test = make_prepend_test(blocks=[Block(timestamp=1)], prepend=False)
     assert test.blocks_to_build() is test.blocks
+
+
+def test_pinned_timestamp_the_prepended_block_occupies_is_refused() -> None:
+    """
+    A block pinned to genesis + 1 cannot follow the prepended block, so
+    the fill is refused instead of building a non-monotonic chain.
+    """
+    test = make_prepend_test(blocks=[Block(timestamp=1)])
+    with pytest.raises(ValueError, match="does not clear its parent"):
+        test.blocks_to_build()
+
+
+def test_rolled_back_block_does_not_advance_the_timestamp_walk() -> None:
+    """
+    A block declaring an exception is rolled back and never becomes the
+    parent of its successor, so the next block may reuse its timestamp.
+    """
+    test = make_prepend_test(
+        blocks=[
+            Block(
+                timestamp=1_000,
+                exception=BlockException.INCORRECT_BLOCK_FORMAT,
+            ),
+            Block(timestamp=1_000),
+        ]
+    )
+    assert len(test.blocks_to_build()) == 3
 
 
 @pytest.mark.parametrize(

@@ -104,6 +104,12 @@ from .base import BaseTest, FillResult, OpMode, verify_result
 from .debugging import print_traces
 from .helpers import verify_block, verify_transactions
 
+DEFAULT_TIMESTAMP_INCREMENT = 12
+"""
+Seconds added to the parent's timestamp for a block that does not pin one
+of its own.
+"""
+
 
 def environment_from_parent_header(parent: "FixtureHeader") -> "Environment":
     """Instantiate new environment with the provided header as parent."""
@@ -516,7 +522,7 @@ class Block(Header):
         else:
             assert env.parent_timestamp is not None
             new_env_values["timestamp"] = int(
-                Number(env.parent_timestamp) + 12
+                Number(env.parent_timestamp) + DEFAULT_TIMESTAMP_INCREMENT
             )
 
         return env.copy(**new_env_values)
@@ -1362,10 +1368,21 @@ class BlockchainTest(BaseTest):
         by one so the chain stays contiguous; deliberately wrong
         numbers in invalid-block tests stay wrong relative to the
         shifted chain.
+
+        A test that pins a timestamp the empty block's own timestamp
+        does not clear fails the fill loudly: timestamps are semantic
+        (fork activation, TIMESTAMP expectations), so they are never
+        shifted, and building the chain anyway would produce a
+        non-monotonic - consensus-invalid - sequence that every client
+        rightly rejects at sync time. The Prague sweep found this
+        class in the wild: the shared system-contract request fixtures
+        pin their first block to timestamp 1, exactly the slot the
+        empty block occupies above a timestamp-0 genesis.
         """
         if not self.prepend_empty_block:
             return self.blocks
         genesis_timestamp = int(self.get_genesis_environment().timestamp)
+        self._verify_timestamps_clear_prepended_block(genesis_timestamp)
         extra_data = sha256(self.prepend_empty_block_salt.encode()).digest()[
             :16
         ]
@@ -1382,6 +1399,53 @@ class BlockchainTest(BaseTest):
                 )
             blocks.append(block)
         return blocks
+
+    def _verify_timestamps_clear_prepended_block(
+        self, genesis_timestamp: int
+    ) -> None:
+        """
+        Refuse to prepend when a pinned timestamp cannot follow the
+        empty block.
+
+        The walk mirrors the block builder: an unpinned block gets its
+        parent's timestamp plus ``DEFAULT_TIMESTAMP_INCREMENT``, which
+        can never violate monotonicity, so only pinned timestamps can
+        collide. A block that declares a block exception is exempt - a
+        deliberately invalid timestamp stays invalid relative to the
+        shifted chain - and does not advance the walk, since an invalid
+        block is rolled back and its successor builds on the previous
+        head.
+
+        The exemption is deliberately blunt: an expected-invalid block
+        whose pinned timestamp collides is left to fill, so it becomes
+        invalid for the collision as well as for the reason the test
+        pins. No test in the tree pins a timestamp that low, and
+        refusing such blocks would refuse the tests that pin an
+        older-than-parent timestamp on purpose, so telling the two
+        apart needs the block's expected exceptions and a refill to
+        size.
+        """
+        previous_timestamp = genesis_timestamp + 1
+        for index, block in enumerate(self.blocks):
+            if block.exception is not None:
+                continue
+            if block.timestamp is None:
+                previous_timestamp += DEFAULT_TIMESTAMP_INCREMENT
+                continue
+            pinned = int(block.timestamp)
+            if pinned <= previous_timestamp:
+                raise ValueError(
+                    f"the test's block {index + 1} pins timestamp "
+                    f"{pinned}, which does not clear its parent's "
+                    f"{previous_timestamp}: the chain would be "
+                    "non-monotonic and consensus-invalid. The prepended "
+                    "empty block occupies timestamp "
+                    f"{genesis_timestamp + 1} (genesis + 1) and every "
+                    "block above it must clear its own parent, so raise "
+                    "the pinned timestamps to leave the extra block "
+                    "room."
+                )
+            previous_timestamp = pinned
 
     def make_fixture(
         self,

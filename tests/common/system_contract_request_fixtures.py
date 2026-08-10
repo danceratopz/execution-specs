@@ -161,8 +161,16 @@ def included_requests(
 
 @pytest.fixture
 def timestamp() -> int:
-    """Return the timestamp for the first block."""
-    return 1
+    """
+    Return the timestamp for the first block.
+
+    The value is arbitrary for these tests - they verify request
+    mechanics, not time - so it leaves headroom above genesis for the
+    framework's `--prepend-empty-block` block at genesis + 1; a first
+    block pinned to timestamp 1 would collide with it and make the
+    chain non-monotonic.
+    """
+    return 1_000
 
 
 @pytest.fixture

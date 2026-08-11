@@ -3,7 +3,8 @@ Test the eligibility markers' interaction with the prepended empty
 block.
 
 A marked test cannot survive the prepend transformation: the prepended
-block shifts every position, so the fixture would verify something
+block shifts every position or executes the test's own setup, so the
+fixture would verify something
 other than what the test author wrote. A marked test is not skipped -
 it fills without the extra block, so no test ever leaves the fixture
 release; sync-based consumers skip its single-block chain at consume
@@ -99,6 +100,7 @@ def engine_x_fixtures(output: Path) -> Dict[str, Dict[str, Any]]:
     "marker",
     [
         "absolute_block_position",
+        "pre_state_affects_empty_block",
     ],
 )
 def test_marked_test_fills_without_the_prepended_block(

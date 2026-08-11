@@ -1935,10 +1935,13 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
 
 PREPEND_EMPTY_BLOCK_INELIGIBILITY_MARKERS: Set[str] = {
     "absolute_block_position",
+    "pre_state_affects_empty_block",
 }
 """
 Markers declaring a test permanently ineligible for the prepended
-empty block: its expectations depend on absolute block positions.
+empty block: its expectations depend on absolute block positions, or
+its pre-state changes what any block (including an empty one)
+executes.
 
 A marked test is not skipped - it fills without the extra block, so no
 test ever leaves the fixture release. Its chain is then only syncable

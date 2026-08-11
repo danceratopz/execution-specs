@@ -249,6 +249,16 @@ def pytest_configure(config: pytest.Config) -> None:
     )
     config.addinivalue_line(
         "markers",
+        "pre_state_affects_empty_block: Marks a test whose pre-state or "
+        "genesis environment changes what any block executes - e.g. a "
+        "deliberately broken system contract that every post-Prague block "
+        "calls, or a genesis gas limit too small for a minimal block's own "
+        "system work; it fills without the prepended empty block because "
+        "the extra block would either fail on that setup or consume its "
+        "one-shot behavior before the test's own blocks run.",
+    )
+    config.addinivalue_line(
+        "markers",
         "fixture_format_id: ID used to describe the fixture format.",
     )
     config.addinivalue_line(

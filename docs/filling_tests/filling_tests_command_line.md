@@ -107,6 +107,23 @@ This flag automatically performs a two-phase execution:
     uv run fill --generate-all-formats --output=fixtures.tar.gz tests/shanghai/
     ```
 
+## Prepending an Empty Block
+
+By default the filler inserts one empty block between genesis and every blockchain test's first block **in `blockchain_test_engine_x` fixtures only**, so that each engine_x chain is at least two blocks long; every other fixture format's chains are exactly what the test defines. `--no-prepend-empty-block` disables it:
+
+```console
+uv run fill --no-prepend-empty-block --generate-all-formats tests/cancun/
+```
+
+A consumer that makes the client download and execute a test's own blocks over devp2p needs the client to actually sync, and a client only starts a sync when the announced head's parent is unknown to it. A single-block chain is built directly on the client's own genesis, so its head executes immediately over the Engine API and no sync happens at all. ([`consume sync`](../running_tests/running.md#sync) does not need the extra block: its fixture format carries a sync-trigger block of its own, built on top of the test's last block.)
+
+The prepended block is a real block, built through the same machinery as every other block, and carries a per-test digest in its `extra_data` so that tests sharing a pre-allocation group do not share it. In the fixture, its payload is tagged with the `sync` phase (`"phase": "sync"` on the first `engineNewPayloads` entry), so consumers can tell the framework-injected payload from the test's own; consumers that replay payloads through the Engine API can treat it like any other block. Genesis fee fields are wound one progression step up to cancel the step the extra block introduces, so the test's own blocks execute in the fee environment their author specified. Timestamps are never shifted: a test pinning a timestamp the prepended block cannot clear fails the fill instead of producing a non-monotonic chain.
+
+!!! note "Only engine_x fixtures are affected"
+    Prepending shifts every block number and hash, so engine_x fixtures filled with and without it are not comparable. The other blockchain formats never carry the extra block: they share a positional `t8n` output cache and must build byte-identical chains, while engine_x fixtures opt out of that cache and pay no extra `t8n` work for the divergence.
+
+Spec types the extra block would distort opt out and are filled without it (benchmark tests), so a combined fill needs no extra options. Tests that cannot survive the transformation are marked in the tree and fill without the extra block instead of being skipped - no test leaves the fixture release; sync-based consumers skip chains too short to sync at consume time. See [`absolute_block_position`](../writing_tests/test_markers.md#pytestmarkabsolute_block_position) and its sibling markers.
+
 ## Debugging the `t8n` Command
 
 The `--evm-dump-dir` flag can be used to dump the inputs and outputs of every call made to the `t8n` command for debugging purposes, see [Debugging Transition Tools](./debugging_t8n_tools.md).

@@ -371,6 +371,24 @@ Examples of this include:
 - Contracts having zero-nonce
 - Deploying a contract to a hard-coded address
 
+### `@pytest.mark.absolute_block_position`
+
+This marker is used to mark tests whose logic or expectations depend on absolute block numbers or block hashes, e.g. `BLOCKHASH` lookups with static expectations, storage keyed by `NUMBER`, or EIP-2935 history contents.
+
+Such tests fill without the [prepended empty block](../filling_tests/filling_tests_command_line.md#prepending-an-empty-block): the prepended block shifts every block position, and the expectations are derived from the position rather than merely equal to it, so no fill transformation can preserve what the test verifies. The marker only affects `blockchain_test_engine_x` fixtures (the only format that carries the extra block); the test itself always fills.
+
+### `@pytest.mark.pre_state_affects_empty_block`
+
+This marker is used to mark tests whose pre-state or genesis environment changes what *any* block executes, for example a deliberately broken system contract that every post-Prague block calls, one-shot pre-state that an extra block would consume, or a genesis gas limit too small for a minimal block's own system work.
+
+Such tests fill without the prepended empty block: it would either fail on that setup or consume its one-shot behavior before the test's own blocks run.
+
+### `@pytest.mark.no_empty_block_fee_preimage`
+
+This marker is used to mark tests pinning a fee value that no parent value decays to across an empty block, e.g. a small nonzero excess blob gas while EIP-7918's reserve price is active.
+
+Such tests fill without the prepended empty block: no genesis compensation preserves their fee environment, so the fill would otherwise refuse them loudly.
+
 ### `@pytest.mark.skip()`
 
 This marker can be used to skip a test.

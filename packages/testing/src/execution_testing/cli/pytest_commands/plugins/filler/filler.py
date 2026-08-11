@@ -1647,15 +1647,24 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
                 kwargs["fork"] = fork
                 op_mode: OpMode = request.config.op_mode  # type: ignore
                 kwargs["operation_mode"] = op_mode
-                # The extra block only applies to fixture formats
-                # that opt in (sync-based consumers need it); it is
-                # further withheld from spec types that measure
-                # per-block and from any session that is measuring.
+                # The extra block only applies to fixture formats that
+                # opt in (sync-based consumers need it); it is further
+                # withheld from spec types that measure per-block, from
+                # any session that is measuring, and from tests marked
+                # permanently ineligible - those fill without the extra
+                # block rather than being skipped, so no test leaves
+                # the fixture release.
                 kwargs["prepend_empty_block"] = (
                     request.config.getoption("prepend_empty_block", False)
                     and fixture_format.prepend_empty_block
                     and cls.supports_prepend_empty_block
                     and op_mode != OpMode.BENCHMARKING
+                    and not any(
+                        request.node.get_closest_marker(marker) is not None
+                        for marker in (
+                            PREPEND_EMPTY_BLOCK_INELIGIBILITY_MARKERS
+                        )
+                    )
                 )
                 # Salt with the test's own id, not with the raw node
                 # id: the fixture format and the xdist group suffix
@@ -1922,6 +1931,21 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
                 scope="function",
                 indirect=True,
             )
+
+
+PREPEND_EMPTY_BLOCK_INELIGIBILITY_MARKERS: Set[str] = {
+    "absolute_block_position",
+}
+"""
+Markers declaring a test permanently ineligible for the prepended
+empty block: its expectations depend on absolute block positions.
+
+A marked test is not skipped - it fills without the extra block, so no
+test ever leaves the fixture release. Its chain is then only syncable
+if the test's own blocks number at least two; sync-based consumers
+skip the rest at consume time, which is honest: a single-block chain
+cannot trigger a devp2p sync no matter how it is filled.
+"""
 
 
 @pytest.hookimpl(tryfirst=True)

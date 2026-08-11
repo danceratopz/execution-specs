@@ -129,7 +129,6 @@ def run_fill(pytester: Any, test_module: Any) -> Any:
         "--fork",
         "Cancun",
         "--generate-all-formats",
-        "--prepend-empty-block",
         "--skip-index",
         "--no-html",
         f"--output={output}",

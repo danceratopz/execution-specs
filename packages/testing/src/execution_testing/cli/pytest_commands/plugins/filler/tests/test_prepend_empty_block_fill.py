@@ -4,12 +4,12 @@ formats that opt in.
 
 The prepend is scoped per fixture format: only
 ``blockchain_test_engine_x`` declares ``prepend_empty_block`` true, so
-a fill with the option must emit engine_x chains with one extra
-leading block - tagged with the ``sync`` phase - while every other
-format's chains are byte-for-byte what the test defines. These tests
-fill a single-block test and read the fixtures back, so a prepend
-that leaks into the wrong format, loses its phase tag, or fails to
-salt per test fails here rather than in a consumer.
+an all-formats fill must emit engine_x chains with one extra leading
+block - tagged with the ``sync`` phase - while every other format's
+chains are byte-for-byte what the test defines. These tests fill a
+single-block test and read the fixtures back, so a prepend that leaks
+into the wrong format, loses its phase tag, or fails to salt per test
+fails here rather than in a consumer.
 """
 
 import json
@@ -56,8 +56,7 @@ def make_test_module(pytester: Any) -> Any:
 
 def fill(pytester: Any, test_module: Any, *args: str) -> Path:
     """
-    Fill the module's engine_x fixtures into a fresh output directory
-    and return it.
+    Fill the module into a fresh output directory and return it.
 
     An all-formats fill is two pytest sessions - the `fill` CLI runs
     phase 1 (pre-allocation grouping) and phase 2 (fixture filling)
@@ -70,8 +69,6 @@ def fill(pytester: Any, test_module: Any, *args: str) -> Path:
         "--fork",
         "Cancun",
         "--generate-all-formats",
-        "-m",
-        "blockchain_test_engine_x",
         "--skip-index",
         "--no-html",
         f"--output={output}",
@@ -87,28 +84,54 @@ def fill(pytester: Any, test_module: Any, *args: str) -> Path:
     return output
 
 
-def engine_x_fixtures(output: Path) -> Dict[str, Dict[str, Any]]:
-    """Return the emitted engine_x fixtures keyed by test id."""
+# Fixture directory to the format name that appears in a test id.
+FORMATS = {
+    "blockchain_tests": "blockchain_test",
+    "blockchain_tests_engine": "blockchain_test_engine",
+    "blockchain_tests_engine_x": "blockchain_test_engine_x",
+}
+
+
+def fixtures_of_format(
+    output: Path, format_dir: str
+) -> Dict[str, Dict[str, Any]]:
+    """
+    Return the fixtures emitted in a format's directory, keyed by test
+    id with the format's own name stripped out so the same test's
+    fixtures line up across formats.
+    """
     fixtures: Dict[str, Dict[str, Any]] = {}
-    for path in sorted((output / "blockchain_tests_engine_x").rglob("*.json")):
+    for path in sorted((output / format_dir).rglob("*.json")):
         if "pre_alloc" in path.parts:
             continue
-        fixtures.update(json.loads(path.read_text()))
-    assert fixtures, "no engine_x fixtures were emitted"
+        for test_id, fixture in json.loads(path.read_text()).items():
+            key = test_id.replace(f"-{FORMATS[format_dir]}", "")
+            fixtures[key] = fixture
+    assert fixtures, f"no {format_dir} fixtures were emitted"
     return fixtures
 
 
-def test_prepended_block_reaches_the_engine_x_fixtures(
-    pytester: Any,
-) -> None:
+def test_prepended_block_reaches_only_engine_x(pytester: Any) -> None:
     """
     Engine X chains gain one empty block ahead of the test's own,
-    tagged with the sync phase.
+    tagged with the sync phase; every other format's chains are
+    exactly the test's.
     """
     test_module = make_test_module(pytester)
-    output = fill(pytester, test_module, "--prepend-empty-block")
+    output = fill(pytester, test_module)
 
-    for fixture in engine_x_fixtures(output).values():
+    for fixture in fixtures_of_format(output, "blockchain_tests").values():
+        assert len(fixture["blocks"]) == 1
+    for fixture in fixtures_of_format(
+        output, "blockchain_tests_engine"
+    ).values():
+        payloads = fixture["engineNewPayloads"]
+        assert len(payloads) == 1
+        assert payloads[0].get("phase") is None
+
+    for fixture in fixtures_of_format(
+        output, "blockchain_tests_engine_x"
+    ).values():
         payloads = fixture["engineNewPayloads"]
         assert len(payloads) == 2
         prepended, own = (payload["params"][0] for payload in payloads)
@@ -133,21 +156,29 @@ def test_prepended_block_is_salted_per_test(pytester: Any) -> None:
     test's head parent and no sync is triggered.
     """
     test_module = make_test_module(pytester)
-    output = fill(pytester, test_module, "--prepend-empty-block")
+    output = fill(pytester, test_module)
 
     salted = {
         fixture["engineNewPayloads"][0]["params"][0]["extraData"]
-        for fixture in engine_x_fixtures(output).values()
+        for fixture in fixtures_of_format(
+            output, "blockchain_tests_engine_x"
+        ).values()
     }
     assert len(salted) == 2
 
 
-def test_fixtures_are_unchanged_without_the_option(pytester: Any) -> None:
-    """Without the option no format gains the extra block."""
+def test_no_prepend_empty_block_disables_the_prepend(pytester: Any) -> None:
+    """With the opt-out no format gains the extra block."""
     test_module = make_test_module(pytester)
-    output = fill(pytester, test_module)
+    output = fill(pytester, test_module, "--no-prepend-empty-block")
 
-    for fixture in engine_x_fixtures(output).values():
-        payloads = fixture["engineNewPayloads"]
-        assert len(payloads) == 1
-        assert payloads[0].get("phase") is None
+    for fixture in fixtures_of_format(output, "blockchain_tests").values():
+        assert len(fixture["blocks"]) == 1
+    for format_dir in (
+        "blockchain_tests_engine",
+        "blockchain_tests_engine_x",
+    ):
+        for fixture in fixtures_of_format(output, format_dir).values():
+            payloads = fixture["engineNewPayloads"]
+            assert len(payloads) == 1
+            assert payloads[0].get("phase") is None

@@ -124,17 +124,18 @@ class BaseTest(BaseModel):
     parent is unknown to it, which is never the case for a single
     block built directly on the client's own genesis.
 
-    Set by the filler's ``--prepend-empty-block`` option only for
-    spec types whose ``supports_prepend_empty_block`` is true and when
-    the fixture format being filled opts in via
-    ``BaseFixture.prepend_empty_block`` (currently
-    ``blockchain_test_engine_x``); ignored by test specs that do not
-    build a chain of blocks, and by stateful fixtures, whose chains
-    continue a live client's own head instead of a genesis the
-    framework builds. Prepending shifts every block number and hash,
-    so fixtures filled with it are not comparable with fixtures filled
-    without. The prepended payload is tagged ``TestPhase.SYNC`` in the
-    fixture.
+    Set by the filler (on by default, disabled with
+    ``--no-prepend-empty-block``) only when the fixture format being
+    filled opts in via ``BaseFixture.prepend_empty_block`` (currently
+    ``blockchain_test_engine_x``), the spec type's
+    ``supports_prepend_empty_block`` is true, and the test carries no
+    ineligibility marker - marked tests fill without the extra block
+    instead of being skipped. Ignored by test specs that do not build
+    a chain of blocks, and by stateful fixtures, whose chains continue
+    a live client's own head instead of a genesis the framework
+    builds. Prepending shifts every block number and hash, so fixtures
+    filled with it are not comparable with fixtures filled without.
+    The prepended payload is tagged ``TestPhase.SYNC`` in the fixture.
     """
     prepend_empty_block_salt: str = ""
     """

@@ -627,16 +627,28 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         "--prepend-empty-block",
         action="store_true",
         dest="prepend_empty_block",
-        default=False,
+        default=True,
         help=(
             "Prepend one empty block between genesis and every "
-            "blockchain test's first block, so that sync-based "
+            "blockchain test's first block for fixture formats that "
+            "opt in (blockchain_test_engine_x), so that sync-based "
             "consumers can trigger a devp2p sync even for single-block "
-            "tests. Spec types that opt out (benchmark tests) are "
-            "filled without it. Shifts every block number and hash: "
-            "fixtures filled with this option are not comparable with "
-            "normally filled ones, so do not use it for release "
-            "fixtures."
+            "tests. On by default; --no-prepend-empty-block disables "
+            "it. Spec types that opt out (benchmark tests) and tests "
+            "marked ineligible are filled without the extra block. "
+            "The prepended payload is tagged with the `sync` phase in "
+            "the fixture. Prepending shifts every block number and "
+            "hash, so engine_x fixtures filled with and without it are "
+            "not comparable."
+        ),
+    )
+    test_group.addoption(
+        "--no-prepend-empty-block",
+        action="store_false",
+        dest="prepend_empty_block",
+        help=(
+            "Do not prepend the empty block to any fixture format; "
+            "every chain is built exactly as the test defines it."
         ),
     )
     test_group.addoption(

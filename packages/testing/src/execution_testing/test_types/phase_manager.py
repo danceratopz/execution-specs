@@ -15,6 +15,15 @@ class TestPhase(str, Enum):
     # compatibility
     EXECUTION = "testing"
     CLEANUP = "cleanup"
+    SYNC = "sync"
+    """
+    A framework-injected payload that exists only to make the chain
+    syncable, such as the empty block the filler prepends between
+    genesis and a test's first block so that sync-based consumers can
+    trigger a devp2p sync. Unlike ``SETUP``, a sync payload prepares no
+    state a test depends on; consumers that replay payloads through the
+    Engine API can treat it like any other block.
+    """
 
 
 class TestPhaseManager:

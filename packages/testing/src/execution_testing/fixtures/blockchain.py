@@ -922,6 +922,16 @@ class BlockchainEngineXFixture(BlockchainEngineFixtureCommon):
         FixtureFillingPhase.PRE_ALLOC_GENERATION,
     }
     transition_tool_cache_key: ClassVar[str] = ""
+    prepend_empty_block: ClassVar[bool] = True
+    """
+    Engine X fixtures may be consumed by sync-based simulators, which
+    can only trigger a devp2p sync on a chain of at least two blocks;
+    the filler therefore prepends an empty block to this format's
+    chains (see the ``BaseFixture`` field documentation). The format
+    opts out of the t8n output cache (its phase-2 chains build on a
+    group genesis), so its chains diverging from the other blockchain
+    formats' costs no extra t8n work.
+    """
 
     pre_hash: str
     """Hash of the pre-allocation group this test belongs to."""
@@ -936,6 +946,19 @@ class BlockchainEngineXFixture(BlockchainEngineFixtureCommon):
         ..., alias="engineNewPayloads"
     )
     """Engine API payloads for blockchain execution."""
+
+    @property
+    def has_sync_payload(self) -> bool:
+        """
+        Return whether the chain starts with a framework-injected
+        payload that exists only to make the chain syncable.
+
+        Derived from the first payload's ``phase`` tag rather than
+        stored, so the JSON schema carries no separate switch.
+        """
+        return (
+            len(self.payloads) > 0 and self.payloads[0].phase == TestPhase.SYNC
+        )
 
 
 class BlockchainEngineStatefulFixture(BlockchainEngineFixtureCommon):

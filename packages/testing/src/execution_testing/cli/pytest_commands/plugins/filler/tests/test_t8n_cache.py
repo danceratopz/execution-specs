@@ -17,7 +17,7 @@ from execution_testing.fixtures import (
 )
 
 from ...shared.helpers import labeled_format_parameter_set
-from ..filler import _strip_xdist_group_suffix
+from ..filler import _node_id_without_xdist_group, _strip_xdist_group_suffix
 
 
 class MockItem:
@@ -236,6 +236,40 @@ class TestStripXdistGroupSuffix:
         nodeid = "test.py::test[email@example.com]@t8n-cache-abc"
         expected = "test.py::test[email@example.com]"
         assert _strip_xdist_group_suffix(nodeid) == expected
+
+
+class TestNodeIdWithoutXdistGroup:
+    """
+    Test cases for _node_id_without_xdist_group.
+
+    Values derived from the node id must not change when the same fill
+    runs in parallel, so every group suffix is stripped here, unlike
+    _strip_xdist_group_suffix which preserves the deliberate ones.
+    """
+
+    @pytest.mark.parametrize(
+        "group", ["t8n-cache-12345678", "bigmem", "custom_group"]
+    )
+    def test_strips_every_group_suffix(self, group: str) -> None:
+        """Test that any group xdist appends is stripped."""
+        expected = "test.py::test[params]"
+        assert _node_id_without_xdist_group(f"{expected}@{group}") == expected
+
+    def test_no_suffix_unchanged(self) -> None:
+        """Test that nodeids without @ are unchanged."""
+        nodeid = "test.py::test[params]"
+        assert _node_id_without_xdist_group(nodeid) == nodeid
+
+    def test_at_in_params_preserved(self) -> None:
+        """Test that a parameter's own @ is not mistaken for a group."""
+        nodeid = "test.py::test[email@example.com]"
+        assert _node_id_without_xdist_group(nodeid) == nodeid
+
+    def test_at_in_params_with_group_suffix(self) -> None:
+        """Test that a group is stripped from a parameter containing @."""
+        nodeid = "test.py::test[email@example.com]@bigmem"
+        expected = "test.py::test[email@example.com]"
+        assert _node_id_without_xdist_group(nodeid) == expected
 
 
 class TestCacheExecutionOrder:

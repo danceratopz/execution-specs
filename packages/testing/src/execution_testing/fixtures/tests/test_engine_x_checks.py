@@ -211,3 +211,72 @@ def test_no_matching_siblings_reports_skip_count(tmp_path: Path) -> None:
     assert result is not None
     assert result.compared == 0
     assert result.skipped == 1
+
+
+def _sync_payload() -> Dict[str, Any]:
+    """Build the prepended empty block's newPayload entry."""
+    payload = _payload(gas_used="0x0", state_root="0x33", block_hash="0x44")
+    payload["params"][0]["transactions"] = []
+    payload["phase"] = "sync"
+    return payload
+
+
+def _shifted(
+    payload: Dict[str, Any], *, number: str, timestamp: str
+) -> Dict[str, Any]:
+    """Return a copy of `payload` at a shifted chain position."""
+    shifted = json.loads(json.dumps(payload))
+    shifted["params"][0]["blockNumber"] = number
+    shifted["params"][0]["timestamp"] = timestamp
+    return shifted
+
+
+def test_sync_payload_is_ignored(tmp_path: Path) -> None:
+    """
+    An Engine X fixture prepended with a sync-phase payload compares
+    clean against its unprepended sibling: the extra payload is
+    dropped and the block numbers and timestamps it shifts are
+    scrubbed.
+    """
+    base = _payload(gas_used="0x5208", state_root="0x01", block_hash="0x02")
+    _write_fixture(
+        tmp_path,
+        SIBLING_FIXTURES_DIR,
+        SIBLING_ID,
+        [_shifted(base, number="0x1", timestamp="0xc")],
+    )
+    _write_fixture(
+        tmp_path,
+        ENGINE_X_FIXTURES_DIR,
+        ENGINE_X_ID,
+        [_sync_payload(), _shifted(base, number="0x2", timestamp="0xd")],
+    )
+
+    result = verify_engine_x_execution(tmp_path)
+
+    assert result is not None
+    assert result.compared == 1
+
+
+def test_sync_payload_does_not_mask_drift(tmp_path: Path) -> None:
+    """A real execution difference still fails on a prepended fixture."""
+    _write_fixture(
+        tmp_path,
+        SIBLING_FIXTURES_DIR,
+        SIBLING_ID,
+        [_payload(gas_used="0x5208", state_root="0x01", block_hash="0x02")],
+    )
+    _write_fixture(
+        tmp_path,
+        ENGINE_X_FIXTURES_DIR,
+        ENGINE_X_ID,
+        [
+            _sync_payload(),
+            _payload(gas_used="0xbeef", state_root="0xaa", block_hash="0xbb"),
+        ],
+    )
+
+    with pytest.raises(EngineXExecutionDriftError) as exc_info:
+        verify_engine_x_execution(tmp_path)
+
+    assert "gasUsed" in str(exc_info.value)

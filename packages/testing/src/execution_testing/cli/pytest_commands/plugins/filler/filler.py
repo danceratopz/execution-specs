@@ -624,6 +624,20 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         help="Fill tests using existing pre-allocation groups (phase 2 only).",
     )
     test_group.addoption(
+        "--prepend-empty-block",
+        action="store_true",
+        dest="prepend_empty_block",
+        default=False,
+        help=(
+            "Prepend one empty block between genesis and every "
+            "blockchain test's first block, so that sync-based "
+            "consumers can trigger a devp2p sync even for single-block "
+            "tests. Shifts every block number and hash: fixtures "
+            "filled with this option are not comparable with normally "
+            "filled ones, so do not use it for release fixtures."
+        ),
+    )
+    test_group.addoption(
         "--generate-all-formats",
         action="store_true",
         dest="generate_all_formats",
@@ -1504,6 +1518,23 @@ def _strip_xdist_group_suffix(s: str) -> str:
     return s
 
 
+def _node_id_without_xdist_group(nodeid: str) -> str:
+    """
+    Return the node id without any xdist group suffix.
+
+    Under ``--dist=loadgroup`` the xdist worker appends ``@<group>`` to
+    every grouped item's node id, so anything derived from the raw id
+    depends on whether the fill ran in parallel. Every group name the
+    fill sets is a bare word, while a parametrized node id always ends
+    in ``]``, so a trailing ``@`` segment without one is a group name
+    and never part of the test's own id.
+    """
+    base, separator, suffix = nodeid.rpartition("@")
+    if separator and base and "]" not in suffix:
+        return base
+    return nodeid
+
+
 def node_to_test_info(node: pytest.Item) -> TestInfo:
     """Return test info of the current node item."""
     # Strip xdist group suffix (@groupname) that may be added during execution.
@@ -1614,6 +1645,24 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
                 kwargs["fork"] = fork
                 op_mode: OpMode = request.config.op_mode  # type: ignore
                 kwargs["operation_mode"] = op_mode
+                # The extra block only applies to fixture formats that
+                # opt in: sync-based consumers need it, and only
+                # engine_x fixtures reach them.
+                kwargs["prepend_empty_block"] = (
+                    request.config.getoption("prepend_empty_block", False)
+                    and fixture_format.prepend_empty_block
+                )
+                # Salt with the test's own id, not with the raw node
+                # id: the fixture format and the xdist group suffix
+                # both ride along in the latter, and every format of
+                # one test must build the same chain (they share a
+                # t8n output cache) whether or not the fill ran in
+                # parallel.
+                kwargs["prepend_empty_block_salt"] = (
+                    _node_id_without_xdist_group(
+                        strip_fixture_format_from_node(request.node)
+                    )
+                )
                 kwargs["is_tx_gas_heavy_test"] = is_tx_gas_heavy_test
                 kwargs["is_exception_test"] = is_exception_test
                 if (

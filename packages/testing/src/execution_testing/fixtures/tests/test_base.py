@@ -159,3 +159,35 @@ def test_base_fixtures_parsing(fixture: BaseFixture) -> None:
     json_dump = fixture.json_dict_with_info()
     assert json_dump is not None
     Fixtures.model_validate({"fixture": json_dump})
+
+
+def test_formats_sharing_a_cache_key_agree_on_prepend() -> None:
+    """
+    Fixture formats sharing a non-empty t8n cache key must agree on
+    ``prepend_empty_block``.
+
+    The t8n output cache is positional: formats sharing a key replay
+    each other's transition results call by call, so they must build
+    byte-identical chains. A format that prepends an empty block while
+    a cache-sharing sibling does not would consume the sibling's
+    results one position off and emit chains no client can execute.
+    """
+    formats_by_cache_key: dict[str, list[type[BaseFixture]]] = {}
+    for format_class in BaseFixture.formats.values():
+        cache_key = format_class.transition_tool_cache_key
+        if cache_key:
+            formats_by_cache_key.setdefault(cache_key, []).append(format_class)
+    assert formats_by_cache_key, "no fixture format declares a cache key"
+    for cache_key, format_classes in formats_by_cache_key.items():
+        prepend_values = {
+            format_class.prepend_empty_block for format_class in format_classes
+        }
+        assert len(prepend_values) == 1, (
+            f"formats sharing the t8n cache key {cache_key!r} disagree "
+            "on prepend_empty_block: "
+            + ", ".join(
+                f"{format_class.format_name}="
+                f"{format_class.prepend_empty_block}"
+                for format_class in format_classes
+            )
+        )

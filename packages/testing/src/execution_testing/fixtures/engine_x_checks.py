@@ -12,6 +12,15 @@ SIBLING_FIXTURES_DIR = "blockchain_tests_engine"
 # payload is a pure function of the test's execution.
 _STATE_ROOT_DERIVED_FIELDS = ("stateRoot", "blockHash", "parentHash")
 
+# Fields the prepended empty block additionally shifts in every payload
+# above it: block numbers move up by one and unpinned timestamps move by
+# the empty block's own second. Scrubbed only when the compared Engine X
+# fixture carries a sync payload, so unprepended fills keep the stricter
+# comparison.
+_SYNC_SHIFTED_FIELDS = ("blockNumber", "timestamp")
+
+_SYNC_PHASE = "sync"
+
 
 class EngineXExecutionDriftError(Exception):
     """
@@ -67,14 +76,31 @@ class EngineXCheckResult(NamedTuple):
         return summary
 
 
-def _scrubbed_payloads(fixture: Dict[str, Any]) -> List[Any]:
-    """Return the fixture's payload entries minus state-root-derived fields."""
+def _scrubbed_payloads(
+    fixture: Dict[str, Any], *, scrub_sync_shift: bool = False
+) -> List[Any]:
+    """
+    Return the fixture's payload entries minus state-root-derived
+    fields, and minus the position-derived fields when
+    ``scrub_sync_shift`` is set (the prepended empty block shifts them
+    in every payload above it).
+
+    A leading sync-phase payload (the prepended empty block) is
+    dropped: it is framework-injected and has no sibling to compare
+    against.
+    """
+    entries = fixture.get("engineNewPayloads", [])
+    if entries and entries[0].get("phase") == _SYNC_PHASE:
+        entries = entries[1:]
+    scrubbed_fields = _STATE_ROOT_DERIVED_FIELDS + (
+        _SYNC_SHIFTED_FIELDS if scrub_sync_shift else ()
+    )
     payloads = []
-    for entry in fixture.get("engineNewPayloads", []):
+    for entry in entries:
         entry = json.loads(json.dumps(entry))
         params = entry.get("params")
         if params and isinstance(params[0], dict):
-            for field in _STATE_ROOT_DERIVED_FIELDS:
+            for field in scrubbed_fields:
                 params[0].pop(field, None)
         payloads.append(entry)
     return payloads
@@ -116,6 +142,13 @@ def verify_engine_x_execution(
     Engine X fixtures never share the transition tool output cache). All
     payload fields except the state-root-derived ones must match exactly.
 
+    An Engine X fixture whose chain starts with a sync-phase payload (the
+    empty block the filler prepends for sync-based consumers - the sibling
+    formats never carry it) is compared without that payload, and without
+    the position-derived fields (`blockNumber`, unpinned `timestamp`) the
+    shift changes in every payload above it; the genesis fee compensation
+    makes everything else identical.
+
     Return the comparison counts, or ``None`` when one of the two fixture
     format trees was not generated at all (e.g. when filling with
     ``-m blockchain_test_engine_x``, which produces no siblings).
@@ -156,8 +189,17 @@ def verify_engine_x_execution(
                 skipped += 1
                 continue
             compared += 1
-            base = _scrubbed_payloads(sibling)
-            packed = _scrubbed_payloads(fixture)
+            payload_entries = fixture.get("engineNewPayloads", [])
+            has_sync_payload = bool(
+                payload_entries
+                and payload_entries[0].get("phase") == _SYNC_PHASE
+            )
+            base = _scrubbed_payloads(
+                sibling, scrub_sync_shift=has_sync_payload
+            )
+            packed = _scrubbed_payloads(
+                fixture, scrub_sync_shift=has_sync_payload
+            )
             if base != packed:
                 mismatches.append((test_id, _describe_mismatch(base, packed)))
 

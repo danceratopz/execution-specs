@@ -1,5 +1,6 @@
 """Ethereum blockchain test spec definition and filler."""
 
+from hashlib import sha256
 from pprint import pprint
 from typing import (
     Any,
@@ -577,8 +578,20 @@ class BuiltBlock(CamelModel):
             )
         return None
 
-    def get_fixture_engine_new_payload(self) -> FixtureEngineNewPayload:
-        """Get a FixtureEngineNewPayload from the built block."""
+    def get_fixture_engine_new_payload(
+        self, phase: TestPhase | None = None
+    ) -> FixtureEngineNewPayload:
+        """
+        Get a FixtureEngineNewPayload from the built block.
+
+        ``phase`` overrides the phase auto-derived from the block's
+        transactions; the filler passes ``TestPhase.SYNC`` for the
+        empty block it prepends, which carries no transactions to
+        derive a phase from.
+        """
+        kwargs: Dict[str, Any] = {}
+        if phase is not None:
+            kwargs["phase"] = phase
         return FixtureEngineNewPayload.from_fixture_header(
             fork=self.fork,
             header=self.header,
@@ -591,6 +604,7 @@ class BuiltBlock(CamelModel):
             execution_payload_modifier=self.engine_payload_modifier(),
             validation_error=self.expected_exception,
             error_code=self.engine_api_error_code,
+            **kwargs,
         )
 
     def verify_transactions(
@@ -1131,6 +1145,49 @@ class BlockchainTest(BaseTest):
             print_traces(t8n.get_traces())
             raise e
 
+    def blocks_to_build(self) -> List[Block]:
+        """
+        Return the chain's block list, honoring ``prepend_empty_block``.
+
+        When ``prepend_empty_block`` is set, one empty block is
+        inserted between genesis and the test's first block so that the
+        chain is always at least two blocks long and sync-based
+        consumers can trigger a devp2p sync (see the field's
+        documentation in ``BaseTest``).
+
+        The empty block's timestamp is pinned to one second after
+        genesis, below any timestamp a test is likely to pin on its own
+        blocks. Its ``extra_data`` carries a digest of
+        ``prepend_empty_block_salt`` so that its hash is unique to this
+        test: a sync is only triggered when the head's parent is
+        unknown to the client, and the tests of a pre-allocation group
+        share one client (see the salt field's documentation in
+        ``BaseTest``). Blocks that pin an absolute ``number`` (state
+        tests converted to blockchain tests always do) are shifted up
+        by one so the chain stays contiguous; deliberately wrong
+        numbers in invalid-block tests stay wrong relative to the
+        shifted chain.
+        """
+        if not self.prepend_empty_block:
+            return self.blocks
+        genesis_timestamp = int(self.get_genesis_environment().timestamp)
+        extra_data = sha256(self.prepend_empty_block_salt.encode()).digest()[
+            :16
+        ]
+        blocks: List[Block] = [
+            Block(
+                timestamp=HexNumber(genesis_timestamp + 1),
+                extra_data=Bytes(extra_data),
+            )
+        ]
+        for block in self.blocks:
+            if block.number is not None:
+                block = block.model_copy(
+                    update={"number": HexNumber(block.number + 1)}
+                )
+            blocks.append(block)
+        return blocks
+
     def make_fixture(
         self,
         t8n: FillerBackend,
@@ -1148,7 +1205,8 @@ class BlockchainTest(BaseTest):
         benchmark_gas_used: int | None = None
         benchmark_block_gas_used: int | None = None
         benchmark_opcode_count: OpcodeCount | None = None
-        for block in self.blocks:
+        blocks = self.blocks_to_build()
+        for index, block in enumerate(blocks):
             # This is the most common case, the RLP needs to be constructed
             # based on the transactions to be included in the block.
             # Set the environment according to the block to execute.
@@ -1159,7 +1217,7 @@ class BlockchainTest(BaseTest):
                 previous_alloc=alloc,
             )
             block_number = int(built_block.header.number)
-            is_last_block = block is self.blocks[-1]
+            is_last_block = index == len(blocks) - 1
             if is_last_block and self.operation_mode == OpMode.BENCHMARKING:
                 benchmark_gas_used = built_block.cumulative_gas_used()
                 benchmark_block_gas_used = built_block.block_gas_used()
@@ -1253,7 +1311,8 @@ class BlockchainTest(BaseTest):
         benchmark_gas_used: int | None = None
         benchmark_block_gas_used: int | None = None
         benchmark_opcode_count: OpcodeCount | None = None
-        for block in self.blocks:
+        blocks = self.blocks_to_build()
+        for index, block in enumerate(blocks):
             built_block = self.generate_block_data(
                 t8n=t8n,
                 block=block,
@@ -1261,7 +1320,7 @@ class BlockchainTest(BaseTest):
                 previous_alloc=alloc,
             )
             block_number = int(built_block.header.number)
-            is_last_block = block is self.blocks[-1]
+            is_last_block = index == len(blocks) - 1
             if is_last_block and self.operation_mode == OpMode.BENCHMARKING:
                 benchmark_gas_used = built_block.cumulative_gas_used()
                 benchmark_block_gas_used = built_block.block_gas_used()
@@ -1272,7 +1331,14 @@ class BlockchainTest(BaseTest):
                     block_number=block_number,
                 )
             fixture_payloads.append(
-                built_block.get_fixture_engine_new_payload()
+                built_block.get_fixture_engine_new_payload(
+                    # The prepended empty block is always the first
+                    # block built; tag it so consumers can tell the
+                    # framework-injected payload from the test's own.
+                    phase=TestPhase.SYNC
+                    if self.prepend_empty_block and index == 0
+                    else None
+                )
             )
             if block.exception is None:
                 alloc = built_block.alloc
@@ -1335,8 +1401,12 @@ class BlockchainTest(BaseTest):
             )
             fixture = BlockchainEngineXFixture(**fixture_data)
         elif fixture_format == BlockchainEngineSyncFixture:
-            # Sync fixture format
-            assert genesis.header.block_hash != head_hash, (
+            # Sync fixture format. The head must have advanced past
+            # anything the framework built itself: a prepended empty
+            # block is always valid, so comparing against the genesis
+            # hash would no longer notice a test whose own blocks are
+            # all invalid.
+            assert invalid_blocks < len(self.blocks), (
                 "Invalid payload tests negative test via sync is not "
                 "supported yet."
             )

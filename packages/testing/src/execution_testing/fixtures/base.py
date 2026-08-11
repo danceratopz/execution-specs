@@ -91,6 +91,18 @@ class BaseFixture(CamelModel):
         FixtureFillingPhase.FILL_AFTER_PRE_ALLOC_GENERATION,
     }
     transition_tool_cache_key: ClassVar[str] = ""
+    prepend_empty_block: ClassVar[bool] = False
+    """
+    Whether the filler's prepend-empty-block option applies to fixtures
+    of this format.
+
+    Only formats whose consumers may need to trigger a devp2p sync
+    (``blockchain_test_engine_x``) opt in; every other format builds
+    the test's chain exactly as written. Formats that share a non-empty
+    ``transition_tool_cache_key`` must agree on this value: the t8n
+    output cache is positional, so formats sharing a key must build
+    byte-identical chains.
+    """
 
     @classmethod
     def output_base_dir_name(cls) -> str:

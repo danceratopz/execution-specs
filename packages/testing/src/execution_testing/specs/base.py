@@ -113,6 +113,42 @@ class BaseTest(BaseModel):
         # instead of each test having to set it
     )
     operation_mode: OpMode | None = None
+    prepend_empty_block: bool = False
+    """
+    Prepend one empty block between genesis and the test's first block
+    when building a blockchain test's chain.
+
+    This guarantees every chain is at least two blocks long, so
+    sync-based consumers can trigger a devp2p sync even for
+    single-block tests: a client only starts a sync when the head's
+    parent is unknown to it, which is never the case for a single
+    block built directly on the client's own genesis.
+
+    Set by the filler's ``--prepend-empty-block`` option only when the
+    fixture format being filled opts in via
+    ``BaseFixture.prepend_empty_block`` (currently
+    ``blockchain_test_engine_x``); ignored by test specs that do not
+    build a chain of blocks, and by stateful fixtures, whose chains
+    continue a live client's own head instead of a genesis the
+    framework builds. Prepending shifts every block number and hash,
+    so fixtures filled with it are not comparable with fixtures filled
+    without. The prepended payload is tagged ``TestPhase.SYNC`` in the
+    fixture.
+    """
+    prepend_empty_block_salt: str = ""
+    """
+    Value mixed into the prepended empty block's ``extra_data`` so its
+    hash is unique to this test.
+
+    The tests of a pre-allocation group share a genesis and are served
+    to one reused client. If they also shared the prepended block, the
+    first synced test would make that block known to the client and
+    every later head would have a *known* parent - executed on arrival
+    via the Engine API, with no sync triggered at all. A per-test
+    ``extra_data`` keeps the block's state identical while giving each
+    test's chain an unknown parent. The filler sets this to the pytest
+    node id.
+    """
     gas_optimization_max_gas_limit: int | None = None
     expected_benchmark_gas_used: int | None = None
     skip_gas_used_validation: bool = False

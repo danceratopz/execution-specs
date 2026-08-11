@@ -259,6 +259,15 @@ def pytest_configure(config: pytest.Config) -> None:
     )
     config.addinivalue_line(
         "markers",
+        "no_empty_block_fee_preimage: Marks a test pinning a fee value the "
+        "prepended empty block cannot reproduce - e.g. under EIP-7918's "
+        "reserve price, a small nonzero excess blob gas has no parent value "
+        "that decays to it across an empty block; it fills without the "
+        "prepended empty block because no genesis compensation exists that "
+        "preserves the test's fee environment.",
+    )
+    config.addinivalue_line(
+        "markers",
         "fixture_format_id: ID used to describe the fixture format.",
     )
     config.addinivalue_line(

@@ -178,7 +178,9 @@ def empty_block_base_fee_preimage(
     raise ValueError(
         f"no parent base fee decays to {base_fee_per_gas} on an empty "
         f"block at fork {fork.name()}; the prepended empty block cannot "
-        "preserve this test's fee environment"
+        "preserve this test's fee environment, so the test is "
+        "ineligible for the option and belongs marked "
+        "`no_empty_block_fee_preimage`"
     )
 
 
@@ -215,7 +217,9 @@ def empty_block_excess_blob_gas_preimage(
     raise ValueError(
         f"no parent excess blob gas decays to {excess_blob_gas} on an "
         f"empty block at fork {fork.name()}; the prepended empty block "
-        "cannot preserve this test's fee environment"
+        "cannot preserve this test's fee environment, so the test is "
+        "ineligible for the option and belongs marked "
+        "`no_empty_block_fee_preimage`"
     )
 
 

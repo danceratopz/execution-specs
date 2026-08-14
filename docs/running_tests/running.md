@@ -197,7 +197,7 @@ The `consume wirex` command, for each pre-allocation group:
 
 4. **Stops the client** when all tests in the group complete.
 
-Engine X fixtures carry a per-class sync block from fill time (on by default): a fully valid chain `G → T₁…Tₙ → S*` gets an appended trailer `S`, which is the block WireX announces, so every test block is an ancestor the client must fetch over devp2p on every client; a single expected-invalid block `G → S → T₁*` gets `S` prepended in-chain to give the sync a reason to start. Fixtures whose chain ends in an intentionally invalid block run as rejection tests: the peer serves the chain as-is and the client passes by refusing it.
+Engine X fixtures carry an appended sync block from fill time (on by default): every eligible chain `G → T₁…Tₙ → S*`, valid and invalid heads alike, gets an appended trailer `S`, which is the block WireX announces, so every test block is an ancestor the client must fetch over devp2p on every client. Fixtures whose chain ends in an intentionally invalid block run as rejection tests: the peer serves the chain as-is and the client passes by refusing it.
 
 See [Consume WireX](./consume/wirex.md) for the full flow, including a process diagram, the peer's behavior, rejection tests, and command options.
 

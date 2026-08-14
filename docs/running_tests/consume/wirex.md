@@ -88,7 +88,7 @@ The peer is deliberately honest. It never withholds, reorders or corrupts a resp
 
 ## Rejection Tests
 
-Fixtures containing an intentionally invalid block are not skipped; they run as rejection tests. The peer serves the chain as-is — for an invalid singleton that chain is `G → S → T₁*`, the prepended sync block giving the sync a reason to start below the block under judgement — and once the ancestry has arrived over devp2p, the client must answer `INVALID` to `engine_newPayload` for the head. Accepting an invalid chain fails the test — but only a `VALID` that holds for half a second counts as acceptance. A client answers `newPayload` from the database state of that instant, so while the chain is still arriving that answer can be an artifact rather than a judgement: geth has been observed answering a well-formed `VALID` for a block its own beacon backfill rejected fifteen milliseconds later, and `INVALID` on every ask thereafter. A verdict that outlives the sync is a real one.
+Fixtures containing an intentionally invalid block are not skipped; they run as rejection tests. The peer serves the chain as-is — the author's blocks with the appended trailer above them, `G → T₁…Tₙᵢ → S*`, so the block under judgement is itself an ancestor the client fetches over devp2p — and once the ancestry has arrived, the client must answer `INVALID` to `engine_newPayload` for the head. Accepting an invalid chain fails the test — but only a `VALID` that holds for half a second counts as acceptance. A client answers `newPayload` from the database state of that instant, so while the chain is still arriving that answer can be an artifact rather than a judgement: geth has been observed answering a well-formed `VALID` for a block its own beacon backfill rejected fifteen milliseconds later, and `INVALID` on every ask thereafter. A verdict that outlives the sync is a real one.
 
 Only the fact of rejection is asserted: the Engine API's `validationError` is free-form client text and devp2p carries no error reason at all, so matching the fixture's specific exception over this path is deliberately not attempted (the client's reason text is logged for debugging). The invalid block is executed by the client's sync path, which is distinct coverage from the Engine simulators executing the same fixture via `engine_newPayload`.
 
@@ -104,18 +104,18 @@ Tests inside each pre-allocation group are ordered by default: valid chains befo
 
 ## The Sync Block and Chain Classes
 
-The fill gives every eligible `blockchain_test_engine_x` chain one framework-built empty block `S` (on by default at fill time; `--no-sync-block` disables it), placed by the chain's own statically declared structure. In the sequences below, `G` is genesis, `T₁…Tₙ` the test's own blocks, `*` marks the block this simulator announces, and `ᵢ` the intentionally invalid block:
+The fill appends one framework-built empty block `S` above every eligible `blockchain_test_engine_x` chain's head, valid and invalid heads alike (on by default at fill time; `--no-sync-block` disables it). In the sequences below, `G` is genesis, `T₁…Tₙ` the test's own blocks, `*` marks the block this simulator announces, and `ᵢ` the intentionally invalid block:
 
 | Chain class | Sequence | Extra block | What is wire-guaranteed |
 | ----------- | -------- | ----------- | ----------------------- |
 | Valid (single or multi-block) | `G → T₁…Tₙ → S*` | appended, out-of-chain (`syncPayload`) | all of `T₁…Tₙ`, on every client |
-| Invalid singleton (expected exception or Engine API error code) | `G → S → T₁*` | prepended, in-chain (`payloads[0]`, tagged `"phase": "sync"`) | `S` only; `T₁` is judged after `S` arrives |
-| Invalid multi-block | `G → T₁…Tₙᵢ*` | none | `T₁…Tₙ₋₁` already travel the wire |
-| Marked ineligible for its class's placement | `G → T₁*` | none | nothing — skipped below the block minimum |
+| Invalid (single or multi-block) | `G → T₁…Tₙᵢ → S*` | appended, out-of-chain (`syncPayload`) | all of `T₁…Tₙᵢ`, the invalid block included |
+| Engine API error code | `G → T₁…Tₙ*` | none | `T₁…Tₙ₋₁`; the refusal itself happens at the announcement |
+| Marked ineligible, or filled with `--no-sync-block` | `G → T₁…Tₙ*` | none | `T₁…Tₙ₋₁`; singletons skip below the block minimum |
 
-The appended `S` is scaffolding, not test content: `engineNewPayloads`, `lastblockhash` and the post state keep describing exactly the chain the test author wrote, and the sync completes when the client reports `S` as its head. The prepended `S` is load-bearing ancestry — without it the invalid singleton's block has a known parent and no sync ever starts — so it lives in-chain and every consumer replays it.
+`S` is scaffolding, not test content: `engineNewPayloads`, `lastblockhash` and the post state keep describing exactly the chain the test author wrote, and the sync completes when the client reports `S` as its head (or, for a rejection test, when the client refuses the chain below it). Above a rejected head the trailer is a sync target only, never an executable continuation — its state root follows from a state transition no client would compute — which is sound because a client rejects the test's block from the ancestry long before it would execute `S`. Error-code chains carry no trailer by design: the assertion is the client's refusal of the announcement of the test's own head, so announcing anything above it would unmake the test.
 
-An appended sync payload counts toward a fixture's chain length: a valid single-block test plus its trailer is a two-block chain, both for the skip accounting and for the chain-length ordering. Fixtures whose chain is still shorter than `--wirex-min-blocks` (default 2) are skipped.
+An appended sync payload counts toward a fixture's chain length: a single-block test plus its trailer is a two-block chain, both for the skip accounting and for the chain-length ordering. Fixtures whose chain is still shorter than `--wirex-min-blocks` (default 2) are skipped.
 
 ## Wire Coverage
 

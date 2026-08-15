@@ -1397,8 +1397,16 @@ class BlockchainTest(BaseTest):
         ``sync_block_context_unavailable``): the chain then fills as
         exactly the author's own.
         """
+        # Judge against the fork the appended block would be built
+        # under, which on a transition chain need not be the one its
+        # parent was built under.
         unavailable = sync_block_context_unavailable(
-            head.header, self.fork.transitions_to()
+            head.header,
+            self.fork.fork_at(
+                block_number=int(head.header.number) + 1,
+                timestamp=int(head.header.timestamp)
+                + DEFAULT_TIMESTAMP_INCREMENT,
+            ),
         )
         if unavailable is not None:
             logger.info(

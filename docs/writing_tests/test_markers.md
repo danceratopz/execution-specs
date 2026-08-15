@@ -373,7 +373,7 @@ Examples of this include:
 
 ### `@pytest.mark.no_sync_block_state_context`
 
-This marker is used to mark tests whose chain leaves behind a state or header context the empty block the filler [appends above it](../filling_tests/filling_tests_command_line.md#the-sync-block) cannot be built on, for example a deliberately sabotaged system contract that every subsequent block calls, or a head whose pinned gas limit admits no valid child block.
+This marker is used to mark tests whose chain leaves behind a state or header context the empty block the filler [appends above it](../filling_tests/filling_tests_command_line.md#the-sync-block) cannot be built on, for example a deliberately sabotaged system contract that every subsequent block calls, a head whose pinned gas limit admits no valid child block, or a head pinning the maximum uint64 slot number, above which no slot number exists.
 
 A test so marked fills as exactly the author's chain, with no `syncPayload` in its `blockchain_test_engine_x` fixture. Without the marker the fill refuses loudly and names it, rather than emitting a fixture whose sync block cannot be built.
 

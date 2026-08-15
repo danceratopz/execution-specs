@@ -33,7 +33,11 @@ pytestmark = pytest.mark.valid_from("EIP7843")
         pytest.param(1, id="slot_one"),
         pytest.param(0x1000, id="slot_4096"),
         pytest.param(2**32, id="slot_large"),
-        pytest.param(2**64 - 1, id="slot_max_u64"),
+        pytest.param(
+            2**64 - 1,
+            id="slot_max_u64",
+            marks=pytest.mark.no_sync_block_state_context,
+        ),
     ],
 )
 def test_slotnum_value(

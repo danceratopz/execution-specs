@@ -1366,6 +1366,22 @@ class BlockchainTest(BaseTest):
             block.engine_api_error_code is None for block in self.blocks
         )
 
+    def sync_block_fork(self, head: "FixtureHeader") -> Fork:
+        """
+        Return the fork the appended block itself would be built under.
+
+        On a transition chain this need not be the fork ``head`` was
+        built under: the appended block sits one block later, and a
+        timestamp transition can fall between the two. Judging the
+        appended block against its parent's fork, or against the
+        chain's final fork, gets the wrong answer on either side of
+        that boundary.
+        """
+        return self.fork.fork_at(
+            block_number=int(head.number) + 1,
+            timestamp=int(head.timestamp) + DEFAULT_TIMESTAMP_INCREMENT,
+        )
+
     def build_sync_payload(
         self,
         t8n: FillerBackend,
@@ -1397,16 +1413,8 @@ class BlockchainTest(BaseTest):
         ``sync_block_context_unavailable``): the chain then fills as
         exactly the author's own.
         """
-        # Judge against the fork the appended block would be built
-        # under, which on a transition chain need not be the one its
-        # parent was built under.
         unavailable = sync_block_context_unavailable(
-            head.header,
-            self.fork.fork_at(
-                block_number=int(head.header.number) + 1,
-                timestamp=int(head.header.timestamp)
-                + DEFAULT_TIMESTAMP_INCREMENT,
-            ),
+            head.header, self.sync_block_fork(head.header)
         )
         if unavailable is not None:
             logger.info(

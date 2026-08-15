@@ -17,7 +17,12 @@ import pytest
 from execution_testing.base_types import Address, Hash
 from execution_testing.exceptions import BlockException, EngineAPIError
 from execution_testing.fixtures.blockchain import FixtureHeader
-from execution_testing.forks import Cancun
+from execution_testing.forks import (
+    BPO2ToAmsterdamAtTime15k,
+    Cancun,
+    Fork,
+    TransitionFork,
+)
 from execution_testing.specs.benchmark import BenchmarkTest
 from execution_testing.specs.blockchain import (
     DEFAULT_TIMESTAMP_INCREMENT,
@@ -43,10 +48,11 @@ def make_test(
     *,
     blocks: List[Block],
     sync_block: bool = True,
+    fork: Fork | TransitionFork = Cancun,
 ) -> BlockchainTest:
-    """Create a Cancun blockchain test over the given blocks."""
+    """Create a blockchain test over the given blocks."""
     return BlockchainTest(
-        fork=Cancun,
+        fork=fork,
         pre=Alloc(),
         post=Alloc(),
         blocks=blocks,
@@ -215,6 +221,33 @@ def test_blob_fields_the_fork_cannot_build_above(
     """
     head = blob_head(excess_blob_gas, blob_gas_used)
     reason = sync_block_context_unavailable(head, Cancun)
+    assert (reason is None) is available
+
+
+@pytest.mark.parametrize(
+    "head_timestamp,available",
+    [
+        pytest.param(14_000, True, id="appended_block_lands_before_the_fork"),
+        pytest.param(15_000, False, id="appended_block_lands_after_the_fork"),
+    ],
+)
+def test_head_is_judged_under_the_appended_block_s_own_fork(
+    head_timestamp: int, available: bool
+) -> None:
+    """
+    A transition chain's head is judged against the fork the appended
+    block itself lands in, not the chain's final fork.
+
+    The gas limit here is legal before Amsterdam and below the floor
+    Amsterdam raises it to, so the two forks disagree about this head.
+    Judging by the chain's final fork would refuse the appended block
+    on a chain that never reaches that fork.
+    """
+    test = make_test(blocks=[VALID], fork=BPO2ToAmsterdamAtTime15k)
+    head = blob_head(0, 0).copy(
+        gas_limit=10_000, number=1, timestamp=head_timestamp
+    )
+    reason = sync_block_context_unavailable(head, test.sync_block_fork(head))
     assert (reason is None) is available
 
 

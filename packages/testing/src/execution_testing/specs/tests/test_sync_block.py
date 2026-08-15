@@ -23,7 +23,7 @@ from execution_testing.specs.blockchain import (
     DEFAULT_TIMESTAMP_INCREMENT,
     Block,
     BlockchainTest,
-    sync_block_blob_context_derivable,
+    sync_block_context_unavailable,
     verify_sync_block_timestamp_headroom,
 )
 from execution_testing.test_types import Alloc, Environment
@@ -181,7 +181,7 @@ def blob_head(excess_blob_gas: int, blob_gas_used: int) -> FixtureHeader:
 
 
 @pytest.mark.parametrize(
-    "excess_blob_gas,blob_gas_used,derivable",
+    "excess_blob_gas,blob_gas_used,available",
     [
         pytest.param(0, 0, True, id="empty_head"),
         pytest.param(
@@ -194,7 +194,7 @@ def blob_head(excess_blob_gas: int, blob_gas_used: int) -> FixtureHeader:
             2**64 - Cancun.blob_gas_per_blob(),
             Cancun.blob_gas_per_blob(),
             False,
-            id="parent_blob_gas_overflows_uint64",
+            id="blob_gas_fields_overflow_uint64",
         ),
         pytest.param(
             2**64 - 2 * Cancun.blob_gas_per_blob(),
@@ -204,14 +204,40 @@ def blob_head(excess_blob_gas: int, blob_gas_used: int) -> FixtureHeader:
         ),
     ],
 )
-def test_sync_block_blob_context_derivable(
-    excess_blob_gas: int, blob_gas_used: int, derivable: bool
+def test_blob_fields_the_fork_cannot_build_above(
+    excess_blob_gas: int, blob_gas_used: int, available: bool
 ) -> None:
     """
     A head pinning blob fields whose child fee context cannot be
-    derived - the sum overflows uint64, or the price's Taylor series
-    would run for astronomically many steps - carries no sync block,
-    while a legitimately expensive fee market still does.
+    derived - the fields do not sum within uint64, or the price's
+    Taylor series would run for astronomically many steps - carries no
+    sync block, while a legitimately expensive fee market still does.
     """
     head = blob_head(excess_blob_gas, blob_gas_used)
-    assert sync_block_blob_context_derivable(head, Cancun) is derivable
+    reason = sync_block_context_unavailable(head, Cancun)
+    assert (reason is None) is available
+
+
+@pytest.mark.parametrize(
+    "gas_limit,available",
+    [
+        pytest.param(Cancun.minimum_block_gas_limit(), True, id="minimum"),
+        pytest.param(
+            Cancun.minimum_block_gas_limit() - 1, False, id="one_below"
+        ),
+        pytest.param(0, False, id="zero"),
+    ],
+)
+def test_gas_limit_the_fork_cannot_build_above(
+    gas_limit: int, available: bool
+) -> None:
+    """
+    The appended block inherits its parent's gas limit, so a head below
+    the fork's minimum carries no sync block. The floor is fork
+    arithmetic - from Amsterdam on it is the budget an empty block's
+    own access list needs - which is why the filler decides this rather
+    than the test author.
+    """
+    head = blob_head(0, 0).copy(gas_limit=gas_limit)
+    reason = sync_block_context_unavailable(head, Cancun)
+    assert (reason is None) is available

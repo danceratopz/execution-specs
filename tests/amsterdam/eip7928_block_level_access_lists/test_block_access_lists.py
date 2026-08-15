@@ -3703,16 +3703,7 @@ def test_bal_lexicographic_address_ordering(
     [
         pytest.param(0, id="at_boundary"),
         pytest.param(
-            -1,
-            # Without a transaction or a withdrawal to widen it, this
-            # gas limit falls one below the fork's minimum, which is
-            # the budget an empty block's own access list needs, so no
-            # valid block fits above this chain either.
-            marks=[
-                pytest.mark.exception_test,
-                pytest.mark.no_sync_block_state_context,
-            ],
-            id="below_boundary",
+            -1, marks=pytest.mark.exception_test, id="below_boundary"
         ),
     ],
 )

@@ -126,36 +126,44 @@ trillion.
 """
 
 
-def sync_block_blob_context_derivable(
+def sync_block_context_unavailable(
     head: "FixtureHeader", fork: Fork
-) -> bool:
+) -> str | None:
     """
-    Return whether a block appended above ``head`` has a derivable blob
-    fee context.
+    Return why the fork's own parameters admit no block above ``head``,
+    or ``None`` when one can be built.
 
-    A child block's blob fields follow from its parent's, and from
-    Osaka on (EIP-7918) deriving them also needs the parent's blob gas
-    price, whose Taylor series takes one step per
-    ``blob_base_fee_update_fraction`` of the parent's excess blob gas,
-    on an integer that grows at every step. Both derivations are
-    bounded for any header a chain can actually produce: excess blob
-    gas plus blob gas used fits uint64, and no reachable fee market
-    approaches ``MAX_SYNC_BLOCK_BLOB_PRICE_STEPS``.
-
-    An expected-invalid head can pin values that break either bound -
-    an excess blob gas near ``2**64`` makes the series run
-    indefinitely - and a client is no better off: it rejects such a
-    header on the same arithmetic rather than deriving a child from
-    it. Chains with such a head therefore fill without the appended
-    block.
+    Only an intentionally invalid head reaches any of these: every
+    other header's fields were derived by the fork itself. They are
+    decided here rather than by a marker on the test, because each
+    bound comes from the fork's arithmetic rather than from anything
+    the test declares - asking authors to check them would mean
+    re-deriving spec constants inside test parametrizations, which
+    goes stale whenever a fork changes one. A client is no better off
+    than the filler in any of these cases: it rejects such a header on
+    the same arithmetic rather than deriving a child from it.
     """
+    # The appended block inherits its parent's gas limit, and the
+    # fork's floor is not a constant: from Amsterdam on it is the
+    # budget an empty block's own access list needs.
+    if int(head.gas_limit) < fork.minimum_block_gas_limit():
+        return (
+            "the head's gas limit is below the fork's minimum, and the "
+            "appended block inherits it"
+        )
     if head.excess_blob_gas is None or head.blob_gas_used is None:
-        return True
+        return None
     excess_blob_gas = int(head.excess_blob_gas)
     if excess_blob_gas + int(head.blob_gas_used) > 2**64 - 1:
-        return False
+        return "the head's blob gas fields do not sum within uint64"
+    # From Osaka on (EIP-7918) a child's excess blob gas needs its
+    # parent's blob gas price, whose Taylor series takes one step per
+    # update fraction of that excess on an integer that grows at every
+    # step, so a head pinning an excess near 2**64 never finishes.
     update_fraction = fork.blob_base_fee_update_fraction()
-    return excess_blob_gas <= MAX_SYNC_BLOCK_BLOB_PRICE_STEPS * update_fraction
+    if excess_blob_gas > MAX_SYNC_BLOCK_BLOB_PRICE_STEPS * update_fraction:
+        return "the head's excess blob gas admits no evaluable blob price"
+    return None
 
 
 def verify_sync_block_timestamp_headroom(head_timestamp: int) -> None:
@@ -1384,20 +1392,18 @@ class BlockchainTest(BaseTest):
         SYNCING and fetch the ancestry it lacks. It rejects the test's
         block from that ancestry long before it would execute this one.
 
-        Return ``None`` when the head pins blob fields no child block
-        can derive a fee context from (see
-        ``sync_block_blob_context_derivable``): the chain then fills as
-        exactly the author's own. Unlike the marked ineligibilities
-        this is decided here rather than by the author, because the
-        bound depends on the fork's own blob math.
+        Return ``None`` when the head pins header fields the fork's own
+        parameters admit no block above (see
+        ``sync_block_context_unavailable``): the chain then fills as
+        exactly the author's own.
         """
-        if not sync_block_blob_context_derivable(
+        unavailable = sync_block_context_unavailable(
             head.header, self.fork.transitions_to()
-        ):
+        )
+        if unavailable is not None:
             logger.info(
-                "no sync block appended: the chain's head pins blob "
-                "fields no child block can derive a fee context from; "
-                "the chain fills as exactly the author's own"
+                f"no sync block appended: {unavailable}; the chain "
+                "fills as exactly the author's own"
             )
             return None
         env = apply_new_parent(head.env, head.header)

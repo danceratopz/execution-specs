@@ -25,28 +25,20 @@ def gas_limit_cases_by_fork(
 ) -> Generator[ParameterSet, None, None]:
     """Yield gas limit cases around the fork's minimum block gas limit."""
     minimum_block_gas_limit = fork.minimum_block_gas_limit()
-    # The invalid cases pin the head's gas limit so low that no valid
-    # child exists (a child's gas limit is bound to its parent's), so
-    # the sync block the filler would append above these chains cannot
-    # be built.
-    invalid_case_marks = [
-        pytest.mark.exception_test,
-        pytest.mark.no_sync_block_state_context,
-    ]
     yield pytest.param(
         0,
         id="zero",
-        marks=invalid_case_marks,
+        marks=pytest.mark.exception_test,
     )
     yield pytest.param(
         1,
         id="one",
-        marks=invalid_case_marks,
+        marks=pytest.mark.exception_test,
     )
     yield pytest.param(
         minimum_block_gas_limit - 1,
         id="minimum_minus_one",
-        marks=invalid_case_marks,
+        marks=pytest.mark.exception_test,
     )
     yield pytest.param(minimum_block_gas_limit, id="minimum")
 

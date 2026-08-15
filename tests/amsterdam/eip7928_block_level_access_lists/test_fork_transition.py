@@ -213,13 +213,7 @@ def test_invalid_post_fork_block_without_bal_hash_field(
         pytest.param(False, id="at_fork_within_budget"),
         pytest.param(
             True,
-            # The gas limit is one below the fork's minimum, which is
-            # the budget an empty block's own access list needs, so no
-            # valid block fits above this chain either.
-            marks=[
-                pytest.mark.exception_test,
-                pytest.mark.no_sync_block_state_context,
-            ],
+            marks=pytest.mark.exception_test,
             id="at_fork_over_budget",
         ),
     ],

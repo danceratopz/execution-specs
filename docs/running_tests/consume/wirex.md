@@ -111,7 +111,7 @@ The fill appends one framework-built empty block `S` above every eligible `block
 | Valid (single or multi-block) | `G → T₁…Tₙ → S*` | appended, out-of-chain (`syncPayload`) | all of `T₁…Tₙ`, on every client |
 | Invalid (single or multi-block) | `G → T₁…Tₙᵢ → S*` | appended, out-of-chain (`syncPayload`) | all of `T₁…Tₙᵢ`, the invalid block included |
 | Engine API error code | `G → T₁…Tₙ*` | none | `T₁…Tₙ₋₁`; the refusal itself happens at the announcement |
-| Marked ineligible, or filled with `--no-sync-block` | `G → T₁…Tₙ*` | none | `T₁…Tₙ₋₁`; singletons skip below the block minimum |
+| Filler-declined or opted-out (`sync_block=False`), or filled with `--no-sync-block` | `G → T₁…Tₙ*` | none | `T₁…Tₙ₋₁`; singletons skip below the block minimum |
 
 `S` is scaffolding, not test content: `engineNewPayloads`, `lastblockhash` and the post state keep describing exactly the chain the test author wrote, and the sync completes when the client reports `S` as its head (or, for a rejection test, when the client refuses the chain below it). Above a rejected head the trailer is a sync target only, never an executable continuation — its state root follows from a state transition no client would compute — which is sound because a client rejects the test's block from the ancestry long before it would execute `S`. Error-code chains carry no trailer by design: the assertion is the client's refusal of the announcement of the test's own head, so announcing anything above it would unmake the test.
 

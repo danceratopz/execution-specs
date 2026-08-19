@@ -1654,9 +1654,10 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
             kwargs["invalid_tx_not_last"] = invalid_tx_not_last
             # Appended sync payloads: on unless the option or the
             # test's own opt-out (a caller-passed
-            # ``sync_block=False``) withholds it. Only fixture
-            # formats with a place for the targets (engine_x) ever
-            # build them.
+            # ``sync_block=False``) withholds it. This governs only
+            # the engine_x format's optional ``syncPayloads`` list;
+            # the sync fixture format's single payload is its
+            # defining field and is built regardless.
             kwargs["sync_block"] = request.config.getoption(
                 "sync_block"
             ) and kwargs.get("sync_block", True)

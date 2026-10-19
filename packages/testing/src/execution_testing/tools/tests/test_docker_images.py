@@ -244,6 +244,14 @@ def test_catalogue() -> None:
         "blockchain_tests_engine_x",
         "blockchain_tests_sync",
     ]
+    # WireX consumes the enginex fixtures: no fixture image of its own.
+    by_name = {image.name: image for image in IMAGES}
+    assert by_name["consume-wirex"].fixture_format == (
+        by_name["consume-enginex"].fixture_format
+    )
+    assert by_name["consume-wirex"].content_path == (
+        "fixtures/blockchain_tests_engine_x"
+    )
 
 
 def test_plan_for_a_push() -> None:

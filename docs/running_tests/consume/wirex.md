@@ -13,7 +13,9 @@ WireX consumes the [Blockchain Engine X Test](../test_formats/blockchain_test_en
 
 ## Quick Start
 
-WireX runs against Hive in development mode, like the other consume simulators. See [Hive Development Mode](../hive/dev_mode.md) for setup.
+To run a published release, use the `consume-wirex` simulator image like any other EELS simulator: `./hive --sim consume-wirex --client go-ethereum`, with a tag from [Choose a tag](../hive/images/index.md#choose-a-tag). WireX needs `blockchain_tests_engine_x` fixtures filled after ethereum/execution-specs#3364, which made them consumable via devp2p sync; releases filled before it were not.
+
+To work on WireX itself, run it against Hive in development mode, like the other consume simulators. See [Hive Development Mode](../hive/dev_mode.md) for setup.
 
 1. Start Hive in development mode with one client:
 

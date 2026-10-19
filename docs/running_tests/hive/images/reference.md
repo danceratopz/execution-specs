@@ -37,6 +37,7 @@ Only the simulator images are a stable interface. The repository, fixture and te
 | `consume-rlp` | `hive/consume-rlp` | `consume rlp` | `blockchain_tests` fixtures |
 | `consume-engine` | `hive/consume-engine` | `consume engine` | `blockchain_tests_engine` fixtures |
 | `consume-enginex` | `hive/consume-enginex` | `consume enginex` | `blockchain_tests_engine_x` fixtures, pre-alloc groups included |
+| `consume-wirex` | `hive/consume-wirex` | `consume wirex` | the same `blockchain_tests_engine_x` fixtures image as `consume-enginex` |
 | `consume-sync` | `hive/consume-sync` | `consume sync` | `blockchain_tests_sync` fixtures |
 | `execute-blobs` | `hive/execute-blobs` | `execute hive -m blob_transaction_test` | the test sources of the release or fill |
 
@@ -79,7 +80,8 @@ Set with `--sim.buildarg name=value` on the image Dockerfiles. For the separate 
 | --- | --- | --- | --- |
 | `tag` | all | `latest` | Selects the tests, see Tags. Accepts `<tag>@sha256:<digest>` to pin an exact image. |
 | `image` | all | the simulator's published image | Another registry namespace or a locally built image. |
-| `disable_strict_exception_matching` | `consume-engine`, `consume-enginex` | `nimbus-el` | Clients exempt from strict exception matching; an empty value exempts none. |
+| `disable_strict_exception_matching` | `consume-engine`, `consume-enginex`, `consume-wirex` | `nimbus-el` | Clients exempt from strict exception matching; an empty value exempts none. |
+| `sync_loop_interval_ms` | `consume-wirex` | `10` | Sync loop interval hint sent to clients as `HIVE_SYNC_LOOP_INTERVAL_MS`; `0` sends none. See [WireX tuning](../../consume/wirex.md#tuning). |
 | `fork` | `execute-blobs` | `Osaka` | Fork to execute the tests for. |
 
 ## Variables and labels set in the images
@@ -98,7 +100,7 @@ These belong to the images, not to the testing package: the Dockerfiles set them
 
 Fixture and tests images contain data and labels only; they do not set runtime environment variables. The tests image records its source commit as `org.opencontainers.image.revision`; the execute simulator also records it as `org.ethereum.eest.tests-revision`.
 
-Read by the entry point at run time: `DISABLE_STRICT_EXCEPTION_MATCHING`, `FORK`, and the `HIVE_*` variables hive sets.
+Read by the entry point at run time: `DISABLE_STRICT_EXCEPTION_MATCHING`, `FORK`, and the `HIVE_*` variables hive sets. `consume wirex` also reads `HIVE_SYNC_LOOP_INTERVAL_MS`.
 
 ## Files
 

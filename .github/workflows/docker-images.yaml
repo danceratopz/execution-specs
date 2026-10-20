@@ -85,7 +85,7 @@ concurrency:
 jobs:
   plan:
     name: plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       plan: ${{ steps.plan.outputs.plan }}
       mode: ${{ steps.plan.outputs.mode }}
@@ -176,7 +176,7 @@ jobs:
     name: repository image
     needs: plan
     if: needs.plan.outputs.plan != ''
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -232,7 +232,7 @@ jobs:
     name: fixtures ${{ matrix.format }}
     needs: plan
     if: needs.plan.outputs.plan != '' && needs.plan.outputs.mode != 'push'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -292,7 +292,7 @@ jobs:
     name: tests image
     needs: plan
     if: needs.plan.outputs.plan != '' && needs.plan.outputs.mode != 'push'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       # The build helpers come from the planned commit; the test sources from
       # the release tag, or the fill commit for a nightly, checked out beside
@@ -339,7 +339,7 @@ jobs:
     name: ${{ matrix.name }} ${{ matrix.slug }}
     needs: [plan, base, fixtures, tests]
     if: always() && needs.plan.result == 'success' && needs.plan.outputs.has_images == 'true' && needs.base.result == 'success' && contains(fromJSON('["success", "skipped"]'), needs.fixtures.result) && contains(fromJSON('["success", "skipped"]'), needs.tests.result)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:

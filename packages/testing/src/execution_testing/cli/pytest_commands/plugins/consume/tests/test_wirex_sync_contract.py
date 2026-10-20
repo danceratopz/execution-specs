@@ -4,8 +4,7 @@ Tests for the wirex simulator's wire-coverage and client contracts.
 Path resolution and its classification live in
 `test_wirex_sync_targets`; this module covers what happens above a
 resolved chain: which headers and bodies the per-hash coverage check
-demands, and the identifiers isolating a multi-target fixture's
-clients.
+demands, and when a test reuses, replaces or isolates its client.
 """
 
 from dataclasses import dataclass, field
@@ -14,7 +13,7 @@ from typing import Any, cast
 
 import pytest
 
-from execution_testing.base_types import Bytes, Hash
+from execution_testing.base_types import Address, Bytes, Hash
 from execution_testing.devp2p.chain import Block, Chain
 from execution_testing.devp2p.peer import MockPeer, PeerStatistics
 from execution_testing.devp2p.protocol import ForkSchedule
@@ -26,6 +25,7 @@ from execution_testing.forks import (
     Paris,
     ParisToShanghaiAtTime15k,
 )
+from execution_testing.test_types.block_types import Withdrawal
 
 from ..simulators.helpers.exceptions import LoggedError
 from ..simulators.helpers.ruleset import ruleset
@@ -42,7 +42,6 @@ from ..simulators.wirex.client_policy import (
     HEAD_LOOKUP_TIMEOUT,
     MAX_REORG_DEPTH,
     ClientHead,
-    isolated_identifier,
     reorg_depth,
     replacement_reason,
 )
@@ -87,20 +86,56 @@ def _peer(chain: Chain, *, bodies: set[int]) -> MockPeer:
     )
 
 
-class TestRequiredWireBodies:
-    """Which bodies the wire-coverage check demands, per chain shape."""
+def _withdrawals_only(number: int) -> Block:
+    """Return a block at `number` whose body holds only a withdrawal."""
+    withdrawal = Withdrawal(
+        index=0, validator_index=0, address=Address(1), amount=1
+    )
+    return Block(
+        header=cast(FixtureHeader, _StubHeader(number, Hash(number))),
+        transactions=[],
+        withdrawals=[withdrawal],
+    )
 
-    def test_the_announced_head_is_exempt(self) -> None:
-        """A non-empty head body is never owed, so a peer may skip it."""
-        ancestors = [_block(1, empty=False), _block(2, empty=False)]
-        chain = _chain([*ancestors, _block(3, empty=False)])
-        assert required_wire_bodies(chain) == ancestors
-        assert_wire_coverage(chain, _peer(chain, bodies={1, 2}), "synced")
+
+BODY_SHAPES = {
+    # A non-empty head body is never owed: it arrives over the Engine API.
+    "announced-head-exempt": (["full", "full", "full"], [1, 2]),
+    # An empty body a client derives from its header is not owed.
+    "derivable-bodies-exempt": (["empty", "full", "empty"], [2]),
+    # The invalid block below a rejection target owes its body.
+    "rejection-target-body-owed": (["full", "empty"], [1]),
+    # Withdrawals alone make a body its header cannot stand for.
+    "withdrawals-only-body-owed": (["withdrawals", "empty"], [1]),
+}
+"""Each block's body, from block 1 up, and the bodies owed."""
+
+
+class TestRequiredWireBlocks:
+    """Which headers and bodies the wire-coverage check demands."""
+
+    @pytest.mark.parametrize(
+        "bodies,owed", BODY_SHAPES.values(), ids=BODY_SHAPES.keys()
+    )
+    def test_every_header_and_each_underivable_body_below_the_head(
+        self, bodies: list[str], owed: list[int]
+    ) -> None:
+        """Every header below the head is owed, empty body or not."""
+        chain = _chain(
+            [
+                _withdrawals_only(number)
+                if body == "withdrawals"
+                else _block(number, empty=body == "empty")
+                for number, body in enumerate(bodies, start=1)
+            ]
+        )
+        assert [b.number for b in required_wire_bodies(chain)] == owed
+        assert required_wire_headers(chain) == chain.blocks[:-1]
 
     def test_a_missing_ancestor_is_named(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """An ancestor body that never traveled fails, by number."""
+        """Coverage passes with every owed body, and names a missing one."""
         now = [0.0]
 
         def sleep(seconds: float) -> None:
@@ -116,54 +151,16 @@ class TestRequiredWireBodies:
             [
                 _block(1, empty=False),
                 _block(2, empty=False),
-                _block(3, empty=True),
+                _block(3, empty=False),
             ]
         )
+        assert_wire_coverage(chain, _peer(chain, bodies={1, 2}), "synced")
         with pytest.raises(
             LoggedError,
             match=r"The client synced, but the non-empty body/bodies of "
             r"block\(s\) 2 never traveled",
         ):
             assert_wire_coverage(chain, _peer(chain, bodies={1}), "synced")
-
-    def test_derivable_ancestor_bodies_are_exempt(self) -> None:
-        """An empty body a client derives from its header is not owed."""
-        chain = _chain(
-            [
-                _block(1, empty=True),
-                _block(2, empty=False),
-                _block(3, empty=True),
-            ]
-        )
-        assert [b.number for b in required_wire_bodies(chain)] == [2]
-
-    def test_a_rejection_target_body_is_owed(self) -> None:
-        """The invalid block below a rejection target owes its body."""
-        chain = _chain([_block(1, empty=False), _block(2, empty=True)])
-        assert [b.number for b in required_wire_bodies(chain)] == [1]
-
-
-class TestRequiredWireHeaders:
-    """Which headers the wire-coverage check demands."""
-
-    def test_every_block_below_the_head_is_owed(self) -> None:
-        """Every header but the head's is owed, empty body or not."""
-        blocks = [
-            _block(1, empty=True),
-            _block(2, empty=False),
-            _block(3, empty=True),
-        ]
-        assert required_wire_headers(_chain(blocks)) == blocks[:-1]
-
-
-class TestIsolatedClientIdentifiers:
-    """The keys a multi-target fixture's clients are managed under."""
-
-    def test_the_suffix_is_the_targets_stable_position(self) -> None:
-        """One identifier per target, suffixed by its announcement index."""
-        group = "0xdeadbeef-go-ethereum"
-        assert isolated_identifier(group, 0) == f"{group}-t0"
-        assert isolated_identifier(group, 2) == f"{group}-t2"
 
 
 def _fork(length: int, *, branch: int, shared: int = 0) -> Chain:
@@ -187,88 +184,279 @@ def _fork(length: int, *, branch: int, shared: int = 0) -> Chain:
     return _chain(blocks)
 
 
-class TestReorgDepth:
+REORGS = {
+    # Sibling chains share only genesis.
+    "forking-at-genesis": (
+        259,
+        _fork(259, branch=1),
+        _fork(268, branch=2),
+        259,
+    ),
+    # A chain extending the head's ancestry unwinds only above it.
+    "shared-trunk": (
+        259,
+        _fork(259, branch=1, shared=200),
+        _fork(268, branch=2, shared=200),
+        59,
+    ),
+    # A chain continuing the head's own chain unwinds nothing.
+    "extension": (3, _fork(3, branch=1), _fork(259, branch=1), 0),
+    # Without the head's ancestry, the fork is taken at genesis.
+    "head-on-no-served-chain": (69, None, _fork(258, branch=2), 69),
+}
+"""The head's number and chain, the chain to sync, and the depth."""
+
+
+@pytest.mark.parametrize(
+    "head_number,head_chain,chain,depth",
+    REORGS.values(),
+    ids=REORGS.keys(),
+)
+def test_a_reused_client_unwinds_down_to_the_shared_ancestry(
+    head_number: int, head_chain: Chain | None, chain: Chain, depth: int
+) -> None:
     """How far below its head a reused client must unwind."""
-
-    def test_a_chain_forking_at_genesis_unwinds_the_whole_head(self) -> None:
-        """Sibling chains share only genesis."""
-        old, new = _fork(259, branch=1), _fork(268, branch=2)
-        assert reorg_depth(259, old, new) == 259
-
-    def test_a_shared_trunk_is_not_unwound(self) -> None:
-        """A chain extending the head's ancestry unwinds only above it."""
-        old = _fork(259, branch=1, shared=200)
-        new = _fork(268, branch=2, shared=200)
-        assert reorg_depth(259, old, new) == 59
-
-    def test_an_extension_needs_no_reorg(self) -> None:
-        """A chain continuing the head's own chain unwinds nothing."""
-        assert reorg_depth(3, _fork(3, branch=1), _fork(259, branch=1)) == 0
-
-    def test_a_head_on_no_served_chain_shares_only_genesis(self) -> None:
-        """Without the head's ancestry, the fork is taken at genesis."""
-        assert reorg_depth(69, None, _fork(258, branch=2)) == 69
+    assert reorg_depth(head_number, head_chain, chain) == depth
 
 
-class TestReplacementReason:
-    """When a single-target fixture must not reuse the group client."""
+class _FakeManager:
+    """The manager calls the client fixture makes, recorded in order."""
 
-    def _reason(
+    def __init__(self, running: Any) -> None:
+        """Hold the group's `running` client, or `None`."""
+        self.running = running
+        self.calls: list[tuple[str, ...]] = []
+
+    def get_client(self, identifier: str) -> Any:
+        """Record the lookup and return the running client."""
+        self.calls.append(("get", identifier))
+        return self.running
+
+    def discard_client(self, identifier: str) -> None:
+        """Record the discard."""
+        self.calls.append(("discard", identifier))
+
+    def mark_test_completed(self, identifier: str, nodeid: str) -> None:
+        """Record the completion."""
+        self.calls.append(("completed", identifier, nodeid))
+
+
+GROUP = "0xdeadbeef-go-ethereum"
+
+
+class TestClientFixture:
+    """The client fixture acts on the reuse decision."""
+
+    @pytest.fixture
+    def booted(self, monkeypatch: pytest.MonkeyPatch) -> list[str]:
+        """Stand in for client boots, recording each identifier booted."""
+        booted: list[str] = []
+
+        def boot(*args: Any) -> Any:
+            identifier = args[2]
+            booted.append(identifier)
+            return SimpleNamespace(id=identifier)
+
+        def group_client(*_args: Any) -> Any:
+            booted.append(GROUP)
+            yield SimpleNamespace(id=GROUP)
+
+        monkeypatch.setattr(
+            client_policy, "group_identifier_of", lambda _node: GROUP
+        )
+        monkeypatch.setattr(client_policy, "boot_managed_client", boot)
+        monkeypatch.setattr(client_policy, "group_client", group_client)
+        return booted
+
+    @staticmethod
+    def _run(manager: _FakeManager, cases: list[Any]) -> Any:
+        """Run the fixture through its teardown and return its client."""
+        generator = fixture_body(client_policy.client)(
+            multi_test_hive_test=None,
+            multi_test_client_manager=manager,
+            client_type=None,
+            environment={},
+            client_genesis={},
+            total_timing_data=None,
+            request=SimpleNamespace(node=SimpleNamespace(nodeid="test[x]")),
+            sync_target_cases=cases,
+            mock_peers={},
+        )
+        client = next(generator)
+        with pytest.raises(StopIteration):
+            next(generator)
+        return client
+
+    @pytest.mark.parametrize(
+        "reason,discarded",
+        [("a deep reorg", True), (None, False)],
+        ids=["reason", "no-reason"],
+    )
+    def test_a_reason_replaces_the_group_client(
         self,
         monkeypatch: pytest.MonkeyPatch,
-        head: Chain,
-        chain: Chain,
-        *,
-        expects_rejection: bool = False,
-    ) -> str | None:
-        """Return the verdict for `chain` on a client at `head`'s top."""
+        booted: list[str],
+        reason: str | None,
+        discarded: bool,
+    ) -> None:
+        """A reason discards the running client, and no reason keeps it."""
         monkeypatch.setattr(
-            client_policy,
-            "client_head",
-            lambda _client: ClientHead(head.head.number, head.head.block_hash),
+            client_policy, "replacement_reason", lambda *_args: reason
         )
-        peer = SimpleNamespace(
-            served_chain_holding=lambda block_hash: (
-                head if head.number_of(block_hash) is not None else None
+        manager = _FakeManager(running=SimpleNamespace(id="running"))
+        self._run(manager, [SimpleNamespace()])
+        assert (("discard", GROUP) in manager.calls) == discarded
+        assert booted == [GROUP]
+
+    def test_a_first_test_has_nothing_to_replace(
+        self, monkeypatch: pytest.MonkeyPatch, booted: list[str]
+    ) -> None:
+        """Without a running client, no reason is asked for."""
+
+        def reason(*_args: Any) -> str | None:
+            raise AssertionError("there is no client to judge")
+
+        monkeypatch.setattr(client_policy, "replacement_reason", reason)
+        manager = _FakeManager(running=None)
+        self._run(manager, [SimpleNamespace()])
+        assert manager.calls == [("get", GROUP)]
+        assert booted == [GROUP]
+
+    def test_a_multi_target_fixture_runs_on_an_isolated_client(
+        self, booted: list[str]
+    ) -> None:
+        """
+        The first target boots its own client, discarded at teardown,
+        and the test still counts toward its group's completion.
+        """
+        cases = [
+            SimpleNamespace(
+                path=SimpleNamespace(index=index, total=2, name=f"t{index}")
             )
-        )
-        case = SimpleNamespace(
-            chain=chain,
-            path=SimpleNamespace(expects_rejection=expects_rejection),
-        )
-        return replacement_reason(
-            cast(Any, SimpleNamespace(id="c")),
-            cast(Any, case),
-            cast(Any, peer),
-        )
+            for index in range(2)
+        ]
+        manager = _FakeManager(running=SimpleNamespace(id="running"))
+        client = self._run(manager, cases)
+        assert client.id == booted[0] == f"{GROUP}-t0"
+        assert manager.calls == [
+            ("discard", f"{GROUP}-t0"),
+            ("completed", GROUP, "test[x]"),
+        ]
 
-    def test_a_shallow_reorg_reuses_the_client(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """A sibling chain at the depth limit runs on the reused client."""
-        head = _fork(MAX_REORG_DEPTH, branch=1)
-        assert self._reason(monkeypatch, head, _fork(70, branch=2)) is None
 
-    def test_a_deep_reorg_replaces_the_client(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """A sibling chain forking at genesis below a 259-block head."""
-        reason = self._reason(
-            monkeypatch, _fork(259, branch=1), _fork(268, branch=2)
-        )
-        assert reason is not None and "259 blocks" in reason
+def _reason(
+    monkeypatch: pytest.MonkeyPatch,
+    head: Chain,
+    chain: Chain,
+    *,
+    expects_rejection: bool = False,
+    engine_only: frozenset[int] = frozenset(),
+) -> str | None:
+    """
+    Return the verdict for `chain` on a client at `head`'s top.
 
-    def test_a_rejection_below_the_head_replaces_the_client(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """A rejection below the head is replaced before depth is checked."""
-        reason = self._reason(
-            monkeypatch,
-            _fork(10, branch=1),
-            _fork(5, branch=2),
-            expects_rejection=True,
-        )
-        assert reason is not None and "below" in reason
+    The peer served `head`'s headers, bar the blocks numbered in
+    `engine_only`, which reached the client over the Engine API.
+    """
+    monkeypatch.setattr(
+        client_policy,
+        "client_head",
+        lambda _client: ClientHead(head.head.number, head.head.block_hash),
+    )
+    peer = SimpleNamespace(
+        served_chain_holding=lambda block_hash: (
+            head if head.number_of(block_hash) is not None else None
+        ),
+        header_hashes_ever_served={
+            block.block_hash
+            for block in head.blocks
+            if block.number not in engine_only
+        },
+    )
+    case = SimpleNamespace(
+        chain=chain,
+        path=SimpleNamespace(expects_rejection=expects_rejection),
+    )
+    return replacement_reason(
+        cast(Any, SimpleNamespace(id="c")),
+        cast(Any, case),
+        cast(Any, peer),
+    )
+
+
+REPLACEMENTS = {
+    # A sibling chain at the depth limit runs on the reused client.
+    "shallow-reorg": (
+        _fork(MAX_REORG_DEPTH, branch=1),
+        _fork(70, branch=2),
+        False,
+        frozenset(),
+        None,
+    ),
+    # A sibling chain forking at genesis below a 259-block head.
+    "deep-reorg": (
+        _fork(259, branch=1),
+        _fork(268, branch=2),
+        False,
+        frozenset(),
+        "259 blocks",
+    ),
+    "extension": (
+        _fork(5, branch=1),
+        _fork(8, branch=1),
+        False,
+        frozenset(),
+        None,
+    ),
+    # A chain extending a head the client got over the Engine API alone
+    # needs that head as wire ancestry, which the client never fetches.
+    "engine-only-ancestor": (
+        _fork(5, branch=1),
+        _fork(8, branch=1),
+        False,
+        frozenset({5}),
+        "Block(s) 5 of this chain",
+    ),
+    # A rejection below the head is replaced before depth is checked.
+    "rejection-below-the-head": (
+        _fork(10, branch=1),
+        _fork(5, branch=2),
+        True,
+        frozenset(),
+        "below",
+    ),
+}
+"""
+The reused client's chain, the chain to run, whether it is a rejection,
+the blocks the client got only over the Engine API, and the reason.
+"""
+
+
+@pytest.mark.parametrize(
+    "head,chain,expects_rejection,engine_only,reason",
+    REPLACEMENTS.values(),
+    ids=REPLACEMENTS.keys(),
+)
+def test_the_reason_a_reused_client_must_be_replaced(
+    monkeypatch: pytest.MonkeyPatch,
+    head: Chain,
+    chain: Chain,
+    expects_rejection: bool,
+    engine_only: frozenset[int],
+    reason: str | None,
+) -> None:
+    """The reason names why reuse would fail, or there is none."""
+    given = _reason(
+        monkeypatch,
+        head,
+        chain,
+        expects_rejection=expects_rejection,
+        engine_only=engine_only,
+    )
+    if reason is None:
+        assert given is None
+    else:
+        assert given is not None and reason in given
 
 
 @dataclass
@@ -448,39 +636,3 @@ class TestForkSchedule:
         group = SimpleNamespace(fork=ParisToShanghaiAtTime15k)
         schedule = fixture_body(wirex.wirex_fork_schedule)(group)
         assert schedule.timestamps == (15000,)
-
-    def test_the_peer_is_dialed_with_the_schedule(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """The dialed peer computes its Status from the group's schedule."""
-        made: dict[str, Any] = {}
-
-        class _DialedPeer:
-            """Keep the peer's arguments instead of dialing."""
-
-            remote_name = "client"
-
-            def __init__(self, **arguments: Any) -> None:
-                made.update(arguments)
-
-            def connect(self, chain: Chain) -> None:
-                del chain
-
-            def start(self) -> None:
-                pass
-
-        monkeypatch.setattr(wirex, "MockPeer", _DialedPeer)
-        client = SimpleNamespace(
-            ip="127.0.0.1",
-            enode=lambda: SimpleNamespace(port=30303, id="00" * 64),
-        )
-        schedule = wirex.fork_schedule_of(ParisToShanghaiAtTime15k)
-        wirex.dial_mock_peer(
-            cast(Any, client),
-            _chain([_block(1, empty=False)]),
-            (),
-            False,
-            schedule,
-            TimingData("Total"),
-        )
-        assert made["fork_schedule"] is schedule

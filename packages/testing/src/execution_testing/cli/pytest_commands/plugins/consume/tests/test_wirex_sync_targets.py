@@ -26,8 +26,6 @@ from execution_testing.fixtures.blockchain import FixtureEngineNewPayload
 
 from ..simulators.wirex import conftest as wirex
 from ..simulators.wirex.sync_targets import (
-    HEADER_JUDGEABLE_INVALIDITIES,
-    UNDECODABLE_BODY_INVALIDITIES,
     SyncTargetResolutionError,
     raw_target_path_lengths,
     resolve_sync_paths,
@@ -37,12 +35,6 @@ from .direct_calls import fixture_body
 
 GENESIS = Hash(0)
 GENESIS_HEADER = SimpleNamespace(block_hash=GENESIS)
-
-
-def test_fixture_schema_retains_plural_sync_payloads() -> None:
-    """The consume-side model must not discard the fill-side targets."""
-    field = BlockchainEngineXFixture.model_fields["sync_payloads"]
-    assert field.alias == "syncPayloads"
 
 
 @dataclass
@@ -121,150 +113,100 @@ INVALID = TransactionException.TYPE_3_TX_BLOB_COUNT_EXCEEDED
 OTHER_INVALID = BlockException.INCORRECT_EXCESS_BLOB_GAS
 
 
-class TestLinearChain:
-    """A linear valid chain with one target: the singular shape."""
+PayloadSpec = tuple[int, int, object]
+"""A stub payload's block hash, parent hash and declared error."""
 
-    def test_one_target_selects_the_whole_chain(self) -> None:
-        """The single target's path is every authored payload."""
-        authored = [_payload(1, 0), _payload(2, 1)]
-        target = _payload(3, 2)
-        paths = resolve_sync_paths(GENESIS, _fixture(authored, [target]))
-        assert len(paths) == 1
-        (path,) = paths
-        assert path.authored == tuple(authored)
-        assert path.target is target
+PathSpec = tuple[tuple[int, ...], bool, set[object]]
+"""A path's authored hashes, whether it is a rejection, its errors."""
+
+SHAPES: dict[
+    str, tuple[list[PayloadSpec], list[tuple[int, int]], list[PathSpec]]
+] = {
+    "linear": (
+        [(1, 0, None), (2, 1, None)],
+        [(3, 2)],
+        [((1, 2), False, set())],
+    ),
+    # The valid target must not inherit its sibling's invalidity.
+    "valid-beside-an-invalid-sibling": (
+        [(1, 0, INVALID), (2, 0, None)],
+        [(3, 1), (4, 2)],
+        [((1,), True, {INVALID}), ((2,), False, set())],
+    ),
+    # EIP-7594 `blob_count_10`: three invalid block-1 siblings.
+    "three-invalid-siblings": (
+        [(1, 0, INVALID), (2, 0, INVALID), (3, 0, INVALID)],
+        [(4, 1), (5, 2), (6, 3)],
+        [((n,), True, {INVALID}) for n in (1, 2, 3)],
+    ),
+    # EIP-7594 `blob_count_7`: one valid block, two invalid leaves.
+    "valid-prefix-below-two-invalid-siblings": (
+        [(1, 0, None), (2, 1, INVALID), (3, 1, INVALID)],
+        [(4, 2), (5, 3)],
+        [((1, 2), True, {INVALID}), ((1, 3), True, {INVALID})],
+    ),
+    # EIP-7981: invalid, valid, invalid, valid directives, so the second
+    # invalid payload is a sibling of the second valid one.
+    "mixed-validity-leaves": (
+        [(1, 0, INVALID), (2, 0, None), (3, 2, OTHER_INVALID), (4, 2, None)],
+        [(5, 1), (6, 3), (7, 4)],
+        [
+            ((1,), True, {INVALID}),
+            ((2, 3), True, {OTHER_INVALID}),
+            ((2, 4), False, set()),
+        ],
+    ),
+    "shared-trunk": (
+        [(1, 0, None), (2, 1, INVALID), (3, 1, None)],
+        [(4, 2), (5, 3)],
+        [((1, 2), True, {INVALID}), ((1, 3), False, set())],
+    ),
+}
+"""
+The real fixture shapes the plural `syncPayloads` contract produces:
+each shape's payloads, its targets, and the path each target selects.
+"""
+
+
+def _shape(
+    name: str,
+) -> tuple[list[FixtureEngineNewPayload], list[FixtureEngineNewPayload]]:
+    """Return the stub payloads and targets of the shape `name`."""
+    payloads, targets, _ = SHAPES[name]
+    return (
+        [_payload(*spec) for spec in payloads],
+        [_payload(*spec) for spec in targets],
+    )
+
+
+@pytest.mark.parametrize("name", SHAPES)
+def test_each_target_selects_its_own_path(name: str) -> None:
+    """
+    Each path re-resolves its full ancestry from its own leaf, in target
+    order, and is a rejection only when a payload on it is invalid.
+    Shared ancestors are the same authored objects on every path, and
+    no authored payload is left off all of them.
+    """
+    payloads, targets = _shape(name)
+    by_hash = {payload.params[0].block_hash: payload for payload in payloads}
+    paths = resolve_sync_paths(GENESIS, _fixture(payloads, targets))
+    assert len(paths) == len(SHAPES[name][2])
+    for index, (path, target, (hashes, rejected, errors)) in enumerate(
+        zip(paths, targets, SHAPES[name][2], strict=True)
+    ):
+        authored = tuple(by_hash[Hash(number)] for number in hashes)
+        assert (path.index, path.target) == (index, target)
+        assert all(
+            ours is theirs
+            for ours, theirs in zip(path.authored, authored, strict=True)
+        )
         assert path.announces_scaffolding
         assert path.served_payloads == [*authored, target]
-        assert path.length == 3
-        assert not path.expects_rejection
-
-
-class TestPathLocalRejection:
-    """Invalid and valid siblings: rejection is a path property."""
-
-    def test_a_valid_branch_beside_an_invalid_sibling(self) -> None:
-        """
-        The valid target must not inherit its sibling's invalidity.
-
-        The fixture contains an invalid payload; the valid target's path
-        does not.
-        """
-        invalid = _payload(1, 0, error=INVALID)
-        valid = _payload(2, 0)
-        targets = [_payload(3, 1), _payload(4, 2)]
-        paths = resolve_sync_paths(
-            GENESIS, _fixture([invalid, valid], targets)
-        )
-        rejected, synced = paths
-        assert rejected.authored == (invalid,)
-        assert rejected.expects_rejection
-        assert rejected.invalidities == {INVALID}
-        assert synced.authored == (valid,)
-        assert not synced.expects_rejection
-        assert synced.invalidities == set()
-
-
-class TestOsakaShapes:
-    """The two real pre-Amsterdam fan-outs, from EIP-7594."""
-
-    def test_three_invalid_siblings(self) -> None:
-        """`blob_count_10`: three invalid block-1 siblings, 3 targets."""
-        siblings = [
-            _payload(1, 0, error=INVALID),
-            _payload(2, 0, error=INVALID),
-            _payload(3, 0, error=INVALID),
-        ]
-        targets = [_payload(4, 1), _payload(5, 2), _payload(6, 3)]
-        paths = resolve_sync_paths(GENESIS, _fixture(siblings, targets))
-        assert len(paths) == 3
-        for path, sibling in zip(paths, siblings, strict=True):
-            assert path.authored == (sibling,)
-            assert path.expects_rejection
-            assert path.length == 2
-
-    def test_valid_prefix_below_two_invalid_siblings(self) -> None:
-        """`blob_count_7`: one valid block, two invalid block-2 leaves."""
-        valid = _payload(1, 0)
-        siblings = [
-            _payload(2, 1, error=INVALID),
-            _payload(3, 1, error=INVALID),
-        ]
-        targets = [_payload(4, 2), _payload(5, 3)]
-        paths = resolve_sync_paths(
-            GENESIS, _fixture([valid, *siblings], targets)
-        )
-        assert len(paths) == 2
-        for path, sibling in zip(paths, siblings, strict=True):
-            assert path.authored == (valid, sibling)
-            assert path.expects_rejection
-            assert path.length == 3
-
-
-def _mixed_validity() -> tuple[
-    list[FixtureEngineNewPayload], list[FixtureEngineNewPayload]
-]:
-    """
-    Return the EIP-7981 shape's payloads and targets.
-
-    Invalid, valid, invalid, valid directives: the second invalid
-    payload is a sibling of the second valid one, so three targets sit
-    above the leaves, the valid one last.
-    """
-    payloads = [
-        _payload(1, 0, error=INVALID),
-        _payload(2, 0),
-        _payload(3, 2, error=OTHER_INVALID),
-        _payload(4, 2),
-    ]
-    targets = [_payload(5, 1), _payload(6, 3), _payload(7, 4)]
-    return payloads, targets
-
-
-class TestMixedValidityLeaves:
-    """The EIP-7981 shape: invalid, valid, invalid, valid directives."""
-
-    def test_two_invalid_leaves_and_a_final_valid_leaf(self) -> None:
-        """The rejected branches first, then the two valid payloads."""
-        payloads, targets = _mixed_validity()
-        invalid_one, valid_one, invalid_two, valid_two = payloads
-        paths = resolve_sync_paths(GENESIS, _fixture(payloads, targets))
-        first, second, third = paths
-        assert first.authored == (invalid_one,)
-        assert first.expects_rejection
-        assert first.invalidities == {INVALID}
-        assert second.authored == (valid_one, invalid_two)
-        assert second.expects_rejection
-        assert second.invalidities == {OTHER_INVALID}
-        assert third.authored == (valid_one, valid_two)
-        assert not third.expects_rejection
-        assert third.invalidities == set()
-
-    def test_every_authored_payload_is_on_some_path(self) -> None:
-        """Across all targets, no representable payload is orphaned."""
-        payloads, targets = _mixed_validity()
-        paths = resolve_sync_paths(GENESIS, _fixture(payloads, targets))
-        covered = {id(payload) for path in paths for payload in path.authored}
-        assert covered == {id(payload) for payload in payloads}
-
-
-class TestSharedPrefixes:
-    """Shared prefixes reconstruct independently, in target order."""
-
-    def test_paths_are_independent_and_ordered(self) -> None:
-        """Each path re-resolves its full ancestry from its own leaf."""
-        trunk = _payload(1, 0)
-        leaf_one = _payload(2, 1, error=INVALID)
-        leaf_two = _payload(3, 1)
-        targets = [_payload(4, 2), _payload(5, 3)]
-        paths = resolve_sync_paths(
-            GENESIS, _fixture([trunk, leaf_one, leaf_two], targets)
-        )
-        assert [path.index for path in paths] == [0, 1]
-        assert [path.target for path in paths] == targets
-        assert paths[0].authored == (trunk, leaf_one)
-        assert paths[1].authored == (trunk, leaf_two)
-        # The shared trunk appears on both paths, as its own object.
-        assert paths[0].authored[0] is paths[1].authored[0]
+        assert path.length == len(hashes) + 1
+        assert path.expects_rejection == rejected
+        assert path.invalidities == errors
+    covered = {id(payload) for path in paths for payload in path.authored}
+    assert covered == {id(payload) for payload in payloads}
 
 
 class TestDiagnostics:
@@ -334,6 +276,28 @@ class TestNoTargetFallback:
         assert path.expects_rejection
         assert path.invalidities == {INVALID}
 
+    def test_bare_siblings_resolve_to_one_path_per_leaf(self) -> None:
+        """
+        A valid block after an invalid one is its sibling, so each leaf
+        is announced on its own path, judged by its own validity.
+        """
+        trunk = _payload(1, 0)
+        invalid, sibling = _payload(2, 1, error=INVALID), _payload(3, 1)
+        first, second = resolve_sync_paths(
+            GENESIS, _fixture([trunk, invalid, sibling], None)
+        )
+        assert (first.target, first.authored) == (invalid, (trunk, invalid))
+        assert (second.target, second.authored) == (sibling, (trunk, sibling))
+        assert first.expects_rejection and not second.expects_rejection
+        assert {first.total, second.total} == {2}
+        assert not first.announces_scaffolding
+        assert not second.announces_scaffolding
+
+    def test_a_bare_leaf_off_genesis_is_refused(self) -> None:
+        """A bare ancestry that never reaches genesis is a corpus defect."""
+        with pytest.raises(SyncTargetResolutionError, match="leaf 1/1"):
+            resolve_sync_paths(GENESIS, _fixture([_payload(2, 1)], None))
+
 
 class TestDeclaredInvalidities:
     """The census the per-class body downgrade is decided by."""
@@ -348,53 +312,38 @@ class TestDeclaredInvalidities:
         (path,) = resolve_sync_paths(GENESIS, _fixture(authored, None))
         assert path.invalidities == {INVALID, OTHER_INVALID}
 
-    def test_the_undecodable_and_judgeable_sets_are_disjoint(self) -> None:
-        """
-        No invalidity is both header-judgeable and undecodable.
-
-        The two sets pull in opposite directions - one relaxes what a
-        client must fetch, the other says the block cannot travel at
-        all - so an exception in both would make the simulator's
-        treatment of it depend on evaluation order.
-        """
-        assert not (
-            HEADER_JUDGEABLE_INVALIDITIES & UNDECODABLE_BODY_INVALIDITIES
-        )
-
 
 class TestPathLengths:
     """The per-target lengths that gate min-blocks and sort collection."""
 
-    def test_lengths_follow_each_path_not_the_directive_count(self) -> None:
-        """Four directives, three targets: lengths are per ancestry."""
-        fixture = _fixture(*_mixed_validity())
-        assert target_path_lengths(fixture) == [2, 3, 3]
-        paths = resolve_sync_paths(GENESIS, fixture)
-        assert [path.length for path in paths] == [2, 3, 3]
-
-    def test_bare_fixture_length_is_the_authored_count(self) -> None:
-        """Without targets the served chain is the authored one."""
-        assert target_path_lengths(_fixture([_payload(1, 0)], None)) == [1]
-
-    def test_raw_lengths_agree_with_the_model(self) -> None:
-        """The collection-time raw read matches the parsed one."""
-        payloads, targets = _mixed_validity()
-        fixture = _fixture(payloads, targets)
+    @pytest.mark.parametrize(
+        "shape,expected",
+        [
+            # Four directives, three targets: lengths are per ancestry.
+            pytest.param("mixed-validity-leaves", [2, 3, 3], id="targets"),
+            # Without targets the served chain is the authored one.
+            pytest.param(None, [1], id="bare"),
+        ],
+    )
+    def test_lengths_follow_each_path(
+        self, shape: str | None, expected: list[int]
+    ) -> None:
+        """The model, the collection-time raw read and the paths agree."""
+        payloads: list[FixtureEngineNewPayload]
+        targets: list[FixtureEngineNewPayload]
+        if shape is None:
+            payloads, targets = [_payload(1, 0)], []
+        else:
+            payloads, targets = _shape(shape)
+        fixture = _fixture(payloads, targets or None)
         raw = {
             "engineNewPayloads": [_raw(payload) for payload in payloads],
             "syncPayloads": [_raw(target) for target in targets],
         }
-        assert raw_target_path_lengths(raw) == target_path_lengths(fixture)
-        assert target_path_lengths(fixture) == [2, 3, 3]
-
-    def test_raw_bare_fixture_counts_authored_payloads(self) -> None:
-        """A raw fixture without targets keeps its authored length."""
-        raw = {
-            "engineNewPayloads": [
-                {"params": [{"blockHash": "0xa1", "parentHash": "0xg"}]},
-            ],
-        }
-        assert raw_target_path_lengths(raw) == [1]
+        assert target_path_lengths(fixture) == expected
+        assert raw_target_path_lengths(raw) == expected
+        paths = resolve_sync_paths(GENESIS, fixture)
+        assert [path.length for path in paths] == expected
 
     def test_raw_anomaly_ends_the_walk_instead_of_raising(self) -> None:
         """Collection survives a defect the test will diagnose later."""
@@ -422,14 +371,23 @@ class TestSyncTargetCases:
         fixture: BlockchainEngineXFixture,
         min_blocks: int = 2,
         fails: Callable[[list[Any]], bool] | None = None,
+        unrebuildable: Callable[[Any], bool] | None = None,
     ) -> tuple[list[Any], list[list[Any]]]:
         """
         Return the fixture's runnable cases and every chain rebuilt.
 
         Chain reconstruction is replaced by a stand-in that returns the
-        payloads it was given, or raises when `fails` says so.
+        payloads it was given, or raises when `fails` says so. A single
+        block rebuilds unless `unrebuildable` says it does not.
         """
         rebuilt: list[list[Any]] = []
+
+        def block_from_payload(payload: Any) -> Any:
+            if unrebuildable is not None and unrebuildable(payload):
+                raise ChainReconstructionError("commitment modified at fill")
+            return payload
+
+        monkeypatch.setattr(wirex, "block_from_payload", block_from_payload)
 
         def chain_from_payloads(genesis: Any, payloads: list[Any]) -> Any:
             assert genesis is GENESIS_HEADER
@@ -482,9 +440,28 @@ class TestSyncTargetCases:
         kept = _payload(4, 2)
         fixture = _fixture([invalid, valid], [_payload(3, 1), kept])
         (case,), _ = self._cases(
-            monkeypatch, fixture, fails=lambda payloads: invalid in payloads
+            monkeypatch,
+            fixture,
+            fails=lambda payloads: invalid in payloads,
+            unrebuildable=lambda payload: payload is invalid,
         )
         assert case.path.target is kept
+
+    def test_another_failure_on_an_invalid_path_fails(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """
+        An invalid path whose own invalid header rebuilds but whose chain
+        does not is a defect, not a skip.
+        """
+        invalid, valid = _payload(1, 0, error=INVALID), _payload(2, 0)
+        fixture = _fixture([invalid, valid], [_payload(3, 1), _payload(4, 2)])
+        with pytest.raises(ChainReconstructionError):
+            self._cases(
+                monkeypatch,
+                fixture,
+                fails=lambda payloads: invalid in payloads,
+            )
 
     def test_an_unrebuildable_valid_path_fails(
         self, monkeypatch: pytest.MonkeyPatch

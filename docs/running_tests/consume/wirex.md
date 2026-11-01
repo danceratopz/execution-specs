@@ -227,6 +227,8 @@ A group normally shares one client. WireX starts a fresh client instead in these
 
 In the rejection, Engine-only ancestor, reorg and head lookup cases, the fresh client replaces the group's client for the rest of the group, and a warning names the reason (see [Reading Results](#reading-results)).
 
+Each group runs on a single xdist worker so that it can share its client, which would make one large group the floor on the run's duration. As in `consume enginex`, a group holding more than about half a worker's fair share of the selected tests (and more than 200 tests, a lower floor than enginex's because each test syncs a chain) is therefore split into sub-groups along whole fixture files. Each sub-group starts its own client from the same genesis and stays on one worker, which may run several sub-groups, ordered as above. A split test's node ID gains the sub-group as a `#<index>` suffix after its group; its Hive test name is unchanged.
+
 ### Wire Coverage
 
 A correct outcome is not enough: every valid sync, and every rejection path with a sync target from `syncPayloads`, also asserts per block hash that the blocks below the announced head arrived over devp2p. Each needs its header served by this peer, and its body too unless the body is empty (no transactions, no withdrawals). A failure names the missing blocks and includes the peer transcript. The head is exempt, since its payload arrives over the Engine API. A multi-target fixture is checked per path, against the client and peer that served it, so a sibling cannot vouch for another branch.

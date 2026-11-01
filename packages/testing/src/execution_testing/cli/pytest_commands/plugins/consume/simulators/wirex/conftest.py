@@ -45,6 +45,7 @@ from execution_testing.fixtures.consume import (
 from execution_testing.forks import Fork, TransitionFork
 from execution_testing.forks.transition_base_fork import TransitionBaseClass
 
+from ..helpers.group_splitter import split_oversized_groups
 from ..helpers.test_tracker import (
     GroupVariants,
     count_tests_per_group,
@@ -116,6 +117,16 @@ Clients that run only `withhold` under `--wirex-bals both`.
 nethermind requests BALs only for finalized blocks, and WireX finalizes
 only genesis, so its served tests would repeat its withheld ones.
 Matched as a substring of the Hive client name.
+"""
+
+MIN_SPLITTABLE_GROUP_SIZE = 200
+"""
+Pre-allocation groups at or below this many tests are never split.
+
+Lower than `consume enginex`'s floor: each WireX test syncs its chain
+over devp2p, which costs a sizeable fraction of a client start (about
+0.1 to 3 seconds per test against a few seconds per start), so smaller
+groups already hold up the end of a run.
 """
 
 
@@ -336,10 +347,20 @@ def _chain_properties(
 def pytest_collection_modifyitems(
     session: pytest.Session, config: pytest.Config, items: list[pytest.Item]
 ) -> None:
-    """Count tests per pre-allocation group and sort largest first."""
+    """
+    Split oversized groups, then count and sort the groups by size.
+
+    Split first, as `consume enginex` does: the counts must see the
+    sub-groups, and the chain properties are keyed by node ID, which a
+    split test's node ID changes. Each BAL variant is its own group, so
+    it is split on its own, and the order inside each group below
+    applies to each sub-group, which starts its own client.
+    """
     supported_formats = getattr(config, "supported_fixture_formats", [])
     if BlockchainEngineXFixture not in supported_formats:
         return
+
+    split_oversized_groups(config, items, MIN_SPLITTABLE_GROUP_SIZE)
 
     group_counts = count_tests_per_group(session, items)
 

@@ -1,12 +1,12 @@
 """
 Split oversized pre-alloc groups so that xdist can spread them out.
 
-`consume enginex` pins every test of a pre-alloc group to a single xdist
-worker (via `--dist loadgroup`) so that the whole group can share one
-client container. That makes a group indivisible. When one group holds a
-large share of the selected tests, as a single fork's tests do under
-`--sim.limit`, the run cannot finish before that group does, and the
-other workers idle out the tail.
+`consume enginex` and `consume wirex` pin every test of a pre-alloc group
+to a single xdist worker (via `--dist loadgroup`) so that the whole group
+can share one client container. That makes a group indivisible. When
+one group holds a large share of the selected tests, as a single fork's
+tests do under `--sim.limit`, the run cannot finish before that group
+does, and the other workers idle out the tail.
 
 Splitting an oversized group into sub-groups lifts that ceiling. Every
 sub-group starts its own client from the *same* genesis (the pre-alloc
@@ -37,21 +37,25 @@ logger = logging.getLogger(__name__)
 SUB_GROUPS_PER_WORKER = 2
 
 # Groups at or below this many tests are never split: on a small selection
-# an extra client start costs more than the scheduling gain.
+# an extra client start costs more than the scheduling gain. A simulator
+# whose tests each take far longer than a client start passes its own.
 MIN_SPLITTABLE_GROUP_SIZE = 1000
 
 
-def max_group_size(total_tests: int, worker_count: int) -> int:
+def max_group_size(
+    total_tests: int,
+    worker_count: int,
+    min_size: int = MIN_SPLITTABLE_GROUP_SIZE,
+) -> int:
     """
     Return the most tests a (sub-)group may hold.
 
     Cap each group at about half a worker's fair share of the selected
     tests, `total / (2 * workers)`, so that only a group large enough to
-    hold up the end of the run is split, but never below
-    `MIN_SPLITTABLE_GROUP_SIZE`.
+    hold up the end of the run is split, but never below `min_size`.
     """
     return max(
-        MIN_SPLITTABLE_GROUP_SIZE,
+        min_size,
         ceil(total_tests / (SUB_GROUPS_PER_WORKER * worker_count)),
     )
 
@@ -130,7 +134,9 @@ def _split_order_key(item: pytest.Item) -> tuple[str, str]:
 
 
 def split_oversized_groups(
-    config: pytest.Config, items: list[pytest.Item]
+    config: pytest.Config,
+    items: list[pytest.Item],
+    min_group_size: int = MIN_SPLITTABLE_GROUP_SIZE,
 ) -> None:
     """
     Reassign the tests of oversized pre-alloc groups to sub-groups.
@@ -138,7 +144,8 @@ def split_oversized_groups(
     Do nothing unless the run is distributed with group-aware scheduling
     over at least two workers, the only case that has anything to gain.
     Size the cap against `items`, the tests left after deselection, so
-    that a `--sim.limit` selection is split by its own group sizes.
+    that a `--sim.limit` selection is split by its own group sizes, and
+    never below `min_group_size` (see `max_group_size`).
 
     A simulator calls this first in its `pytest_collection_modifyitems`:
     before counting tests per group, which must see the sub-groups, and
@@ -156,7 +163,9 @@ def split_oversized_groups(
             groups.setdefault(group_identifier, []).append(item)
 
     max_size = max_group_size(
-        sum(len(group) for group in groups.values()), worker_count
+        sum(len(group) for group in groups.values()),
+        worker_count,
+        min_group_size,
     )
     sub_group_counts = plan_sub_group_counts(
         {identifier: len(group) for identifier, group in groups.items()},

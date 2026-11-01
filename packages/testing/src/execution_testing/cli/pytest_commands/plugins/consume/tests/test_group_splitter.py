@@ -41,8 +41,6 @@ conftest_source = textwrap.dedent(
     from execution_testing.fixtures import BlockchainEngineXFixture
     from execution_testing.fixtures.consume import TestCaseIndexFile
 
-    group_splitter.MIN_SPLITTABLE_GROUP_SIZE = {TEST_FLOOR}
-
 
     def pytest_generate_tests(metafunc):
         # Interleave the files, as the fixture index does, and name the
@@ -68,7 +66,7 @@ conftest_source = textwrap.dedent(
 
     @pytest.hookimpl(trylast=True)
     def pytest_collection_modifyitems(config, items):
-        group_splitter.split_oversized_groups(config, items)
+        group_splitter.split_oversized_groups(config, items, {TEST_FLOOR})
     """
 )
 
@@ -110,6 +108,12 @@ def test_cap_never_below_the_floor() -> None:
     """A small selection is never cut into groups below the floor."""
     assert max_group_size(4_958, 8) == MIN_SPLITTABLE_GROUP_SIZE
     assert plan_sub_group_counts({"a": 261}, max_group_size(273, 8)) == {}
+
+
+def test_simulator_floor_replaces_the_default() -> None:
+    """A simulator with slow tests may split smaller groups."""
+    assert max_group_size(1_000, 4, min_size=200) == 200
+    assert max_group_size(3_591, 4, min_size=200) == 449
 
 
 def test_only_oversized_groups_are_split() -> None:

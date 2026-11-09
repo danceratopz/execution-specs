@@ -142,6 +142,8 @@ class NimbusExceptionMapper(ExceptionMapper):
         BlockException.INVALID_STATE_ROOT: "stateRoot mismatch",
         BlockException.INVALID_RECEIPTS_ROOT: "receiptRoot mismatch",
         BlockException.INVALID_LOG_BLOOM: "bloom mismatch",
+        BlockException.INVALID_GAS_USED: "gasUsed mismatch",
+        BlockException.INVALID_REQUESTS: "requestsHash mismatch",
     }
     mapping_regex: ClassVar[Dict[ExceptionBase, str]] = {
         TransactionException.INSUFFICIENT_ACCOUNT_FUNDS: (

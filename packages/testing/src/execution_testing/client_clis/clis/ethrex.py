@@ -31,6 +31,9 @@ class EthrexExceptionMapper(ExceptionMapper):
             "Receipts Root does not match the one in "
             "the header after executing"
         ),
+        BlockException.INVALID_LOG_BLOOM: (
+            "Logs bloom does not match the one in the header after executing"
+        ),
         BlockException.INVALID_STATE_ROOT: (
             "World State Root does not match the one in "
             "the header after executing"

@@ -72,6 +72,16 @@ blocks of state (`DB_COMMIT_THRESHOLD`), and reth falls back to a path
 taking minutes.
 """
 
+FRESH_CLIENT_PER_PRE_MERGE_TEST = ("besu",)
+"""
+Clients that get a fresh client for every pre-merge test.
+
+besu syncs the first head named by hash, but once synced it never asks
+the peer for a sibling head named later, so a reused client would time
+out on every pre-merge test after its group's first. Matched as a
+substring of the Hive client name.
+"""
+
 HEAD_LOOKUP_TIMEOUT = (5.0, 10.0)
 """
 (connect, read) timeout of each attempt of the head lookup a reuse
@@ -226,7 +236,9 @@ def client(
     (case,) = sync_target_cases
     running = multi_test_client_manager.get_client(group_identifier)
     if running is not None:
-        reason = replacement_reason(running, case, mock_peers.get(running.id))
+        reason = replacement_reason(
+            running, case, mock_peers.get(running.id), client_type.name
+        )
         if reason is not None:
             # Loud, because a reason given on every test, such as a
             # failing head lookup, would quietly turn client reuse off.
@@ -244,12 +256,16 @@ def client(
 
 
 def replacement_reason(
-    running: Client, case: SyncTargetCase, peer: MockPeer | None
+    running: Client,
+    case: SyncTargetCase,
+    peer: MockPeer | None,
+    client_name: str = "",
 ) -> str | None:
     """
     Return why `case` must not run on the reused client `running`.
 
-    `None` means the client may be reused. Reuse fails for a rejection
+    `None` means the client may be reused. Reuse fails for a pre-merge
+    chain on a client in `FRESH_CLIENT_PER_PRE_MERGE_TEST`, for a rejection
     below the client's head (clients refuse to walk their head
     backwards, so the ancestry would never travel the wire), for a
     chain whose wire coverage is checked and whose ancestry holds a
@@ -257,6 +273,14 @@ def replacement_reason(
     `engine_only_ancestors`), for a reorg deeper than `MAX_REORG_DEPTH`,
     and when the client's head cannot be looked up.
     """
+    if (
+        any(name in client_name for name in FRESH_CLIENT_PER_PRE_MERGE_TEST)
+        and case.path.announces_by_hash
+    ):
+        return (
+            f"{client_name} syncs only the first pre-merge head named to "
+            "it, so every pre-merge test gets a fresh client"
+        )
     try:
         head = client_head(running)
     except Exception as error:

@@ -284,7 +284,7 @@ class TestClientFixture:
         generator = fixture_body(client_policy.client)(
             multi_test_hive_test=None,
             multi_test_client_manager=manager,
-            client_type=None,
+            client_type=SimpleNamespace(name="go-ethereum_default"),
             environment={},
             client_genesis={},
             total_timing_data=None,
@@ -557,6 +557,51 @@ class TestClientHeadLookup:
         )
         assert reason is not None
         assert "lookup failed" in reason and cause in reason
+
+
+class TestFreshClientPerPreMergeTest:
+    """besu gets a fresh client for each chain named by hash."""
+
+    @pytest.mark.parametrize(
+        "client_name, by_hash, replaced",
+        [
+            ("besu_default", True, True),
+            ("besu_default", False, False),
+            ("go-ethereum_default", True, False),
+        ],
+        ids=["besu-pre-merge", "besu-post-merge", "geth-pre-merge"],
+    )
+    def test_only_besu_pre_merge_is_replaced(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        client_name: str,
+        by_hash: bool,
+        replaced: bool,
+    ) -> None:
+        """The rule is per client and per era, nothing else is asked."""
+        chain = _fork(2, branch=1)
+        monkeypatch.setattr(
+            client_policy,
+            "client_head",
+            lambda _client: ClientHead(0, Hash(0)),
+        )
+        case = SimpleNamespace(
+            chain=chain,
+            path=SimpleNamespace(
+                announces_by_hash=by_hash,
+                expects_rejection=False,
+                checks_wire_coverage=True,
+            ),
+        )
+        reason = replacement_reason(
+            cast(Any, SimpleNamespace(id="c")),
+            cast(Any, case),
+            None,
+            client_name,
+        )
+        assert (reason is not None) == replaced
+        if replaced:
+            assert reason is not None and "fresh client" in reason
 
 
 class TestEngineRequestTimeout:

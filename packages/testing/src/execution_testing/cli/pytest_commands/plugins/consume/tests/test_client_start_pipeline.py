@@ -434,6 +434,7 @@ class TestPreMergeEnvironment:
         )
         assert environment["HIVE_TERMINAL_TOTAL_DIFFICULTY"] == str(2**63 - 1)
         assert environment["HIVE_MERGE_BLOCK_ID"] == "1000000000"
+        assert environment["HIVE_SKIP_POW"] == "1"
         assert environment["HIVE_NODETYPE"] == "full"
         assert environment["HIVE_FORK"] == fork.name()
 
@@ -448,3 +449,4 @@ class TestPreMergeEnvironment:
         )
         assert environment["HIVE_TERMINAL_TOTAL_DIFFICULTY"] == "0"
         assert "HIVE_MERGE_BLOCK_ID" not in environment
+        assert "HIVE_SKIP_POW" not in environment

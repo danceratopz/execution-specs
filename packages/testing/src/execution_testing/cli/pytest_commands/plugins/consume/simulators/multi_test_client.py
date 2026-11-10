@@ -469,6 +469,9 @@ def build_environment(
             UNREACHABLE_TERMINAL_TOTAL_DIFFICULTY
         )
         env["HIVE_MERGE_BLOCK_ID"] = str(PRE_MERGE_MERGE_BLOCK)
+        # The fixtures are filled without proof of work (NoProof), so a
+        # client that checks ethash seals while syncing must skip them.
+        env["HIVE_SKIP_POW"] = "1"
 
     environment_cache[pre_hash] = env
     return env

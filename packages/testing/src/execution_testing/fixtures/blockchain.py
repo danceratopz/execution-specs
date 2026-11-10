@@ -989,6 +989,69 @@ class BlockchainFixture(BlockchainFixtureCommon):
     transition_tool_cache_key: ClassVar[str] = "blockchain_test"
 
 
+class BlockchainXFixture(BaseFixture):
+    """
+    Blockchain test with RLP blocks that starts from a shared genesis.
+
+    The grouped counterpart of `BlockchainFixture`, the same way
+    `BlockchainEngineXFixture` is the grouped counterpart of
+    `BlockchainEngineFixture`. The blocks are the same RLP blocks a
+    `BlockchainFixture` carries, but they are built on top of the genesis of
+    the test's pre-allocation group. The fixture therefore carries no `pre`
+    and no full post state: `pre_hash` names the group (whose file holds the
+    genesis allocation) and `post_state_diff` holds the accounts the test
+    changed.
+    """
+
+    format_name: ClassVar[str] = "blockchain_test_x"
+    description: ClassVar[str] = (
+        "Tests that generate a Blockchain Test X fixture: RLP blocks on top "
+        "of a shared pre-allocation group."
+    )
+    format_phases: ClassVar[Set[FixtureFillingPhase]] = {
+        FixtureFillingPhase.FILL_AFTER_PRE_ALLOC_GENERATION,
+        FixtureFillingPhase.PRE_ALLOC_GENERATION,
+    }
+    # Never share transition tool outputs with another format: the blocks
+    # execute against the group's genesis, unlike `BlockchainFixture`'s,
+    # and the cache serves outputs by call order, not by input.
+    transition_tool_cache_key: ClassVar[str] = ""
+
+    fork: Fork | TransitionFork = Field(..., alias="network")
+    genesis: FixtureHeader = Field(..., alias="genesisBlockHeader")
+    """Genesis header of the pre-allocation group."""
+    genesis_rlp: Bytes = Field(..., alias="genesisRLP")
+    blocks: List[FixtureBlock | InvalidFixtureBlock]
+    last_block_hash: Hash = Field(..., alias="lastblockhash")
+    post_state_hash: Hash | None = Field(None)
+    config: FixtureConfig
+    seal_engine: Literal["NoProof"] = Field("NoProof")
+
+    pre_hash: AllocGroupHash
+    """Hash of the pre-allocation group this test belongs to."""
+
+    post_state_diff: Alloc
+    """Accounts the test changed, relative to the group's allocation."""
+
+    def get_fork(self) -> Fork | TransitionFork | None:
+        """Return the fork of the fixture."""
+        return self.fork
+
+    @classmethod
+    def supports_fork(cls, fork: Fork | TransitionFork) -> bool:
+        """
+        Return whether the fixture can be generated for the given fork.
+
+        Only the forks before Paris: from Paris on, `BlockchainEngineXFixture`
+        covers the pre-allocation groups, so every fork has exactly one
+        grouped format.
+        """
+        # Not `< Paris`: forks are ordered by descent, and the difficulty
+        # bomb delays (Muir, Arrow and Gray Glacier) are not ancestors of
+        # Paris, so they are neither before nor after it.
+        return not fork.fork_at(block_number=0, timestamp=0) >= Paris
+
+
 @post_state_validator()
 class BlockchainEngineFixtureCommon(BaseFixture):
     """

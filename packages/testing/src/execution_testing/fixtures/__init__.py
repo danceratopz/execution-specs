@@ -15,6 +15,7 @@ from .blockchain import (
     BlockchainEngineXFixture,
     BlockchainFixture,
     BlockchainFixtureCommon,
+    BlockchainXFixture,
 )
 from .collector import (
     FixtureCollector,
@@ -42,6 +43,7 @@ __all__ = [
     "BlockchainEngineXFixture",
     "BlockchainFixture",
     "BlockchainFixtureCommon",
+    "BlockchainXFixture",
     "FixtureCollector",
     "FixtureConsumer",
     "FixtureFillingPhase",

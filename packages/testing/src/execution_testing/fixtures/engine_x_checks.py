@@ -550,7 +550,16 @@ def verify_engine_x_execution(output_dir: Path) -> EngineXCheckResult:
     """
     engine_x_dir = output_dir / ENGINE_X_FIXTURES_DIR
     sibling_dir = output_dir / SIBLING_FIXTURES_DIR
-    if not engine_x_dir.is_dir():
+    engine_x_files = [
+        file
+        for file in sorted(engine_x_dir.rglob("*.json"))
+        if not _NON_FIXTURE_PATH_PARTS.intersection(
+            file.relative_to(engine_x_dir).parts
+        )
+    ]
+    if not engine_x_files:
+        # Possibly only the pre-allocation groups, which other grouped
+        # formats (`blockchain_test_x`) share.
         return EngineXCheckResult()
     if not sibling_dir.is_dir():
         return EngineXCheckResult(
@@ -568,10 +577,7 @@ def verify_engine_x_execution(output_dir: Path) -> EngineXCheckResult:
     compared = 0
     skipped = 0
     drifts: List[ExecutionDrift] = []
-    for engine_x_file in sorted(engine_x_dir.rglob("*.json")):
-        relative_parts = engine_x_file.relative_to(engine_x_dir).parts
-        if _NON_FIXTURE_PATH_PARTS.intersection(relative_parts):
-            continue
+    for engine_x_file in engine_x_files:
         sibling_file = _sibling_file(engine_x_file, engine_x_dir, sibling_dir)
         siblings = (
             _load_fixture_file(sibling_file, BlockchainEngineFixture)

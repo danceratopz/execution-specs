@@ -533,6 +533,27 @@ def test_no_engine_x_fixtures_is_silent(tmp_path: Path) -> None:
     assert result.skip_reason is None
 
 
+def test_shared_groups_without_engine_x_fixtures_are_silent(
+    tmp_path: Path,
+) -> None:
+    """
+    A fill whose only grouped format is `blockchain_test_x` (pre-merge
+    forks) writes the shared groups under the Engine X tree but no Engine
+    X fixture: nothing to check or warn.
+    """
+    _write_group(
+        tmp_path,
+        accounts={SENDER: Account(balance=1)},
+        test_ids=["test.py::test[fork_Frontier-]"],
+    )
+
+    result = verify_engine_x_execution(tmp_path)
+
+    assert result.compared == 0
+    assert result.skipped == 0
+    assert result.skip_reason is None
+
+
 def test_single_fixture_per_file_sibling_lookup(tmp_path: Path) -> None:
     """
     A `--single-fixture-per-file` fill embeds the fixture format name in

@@ -42,6 +42,7 @@ from ..helpers.exceptions import (
 from ..helpers.timing import TimingData
 from ..wirex.sync_targets import (
     HEADER_JUDGEABLE_INVALIDITIES,
+    RlpPathEntry,
     SyncPath,
     SyncTargetCase,
     TargetContext,
@@ -373,6 +374,9 @@ def _run_sync_target(
     path = case.path
     chain = case.chain
     head_payload = path.target
+    assert not isinstance(head_payload, RlpPathEntry), (
+        "a path of RLP blocks is announced by hash"
+    )
     head_hash = head_payload.params[0].block_hash
     expect_rejection = path.expects_rejection
 

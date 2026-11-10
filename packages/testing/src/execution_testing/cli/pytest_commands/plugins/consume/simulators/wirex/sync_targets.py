@@ -10,6 +10,12 @@ the target's `parentHash` names its leaf, and authored `parentHash`
 links lead back to genesis. List position, timestamps and
 `lastblockhash` are never consulted.
 
+A blockchain_test_x fixture has no sync payloads and no payloads at
+all: its blocks are RLP, and a block before the merge has no payload
+form. Its paths are resolved the same way from the blocks' own hashes,
+one per leaf, and each is announced by naming its leaf's hash (see
+`SyncPath.announces_by_hash`).
+
 Validity is a property of the path, not the fixture: every rejection
 expectation and invalidity census here is taken over one path's
 payloads, so a sibling's invalidity never affects another path.
@@ -17,19 +23,33 @@ payloads, so a sibling's invalidity never affects another path.
 
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
-from typing import Any, Callable, Mapping, TypeVar
+from typing import Any, Callable, Mapping, Sequence, TypeVar
 
 from hive.client import Client
 
 from execution_testing.base_types import Hash
-from execution_testing.devp2p.chain import Chain
+from execution_testing.devp2p.chain import (
+    Chain,
+    ChainReconstructionError,
+    RlpBlock,
+    UndecodableBlockError,
+    linked_chain,
+)
 from execution_testing.devp2p.peer import MockPeer
 from execution_testing.exceptions import (
     BlockException,
+    ExceptionInstanceOrList,
     TransactionException,
 )
-from execution_testing.fixtures import BlockchainEngineXFixture
-from execution_testing.fixtures.blockchain import FixtureEngineNewPayload
+from execution_testing.fixtures import (
+    BlockchainEngineXFixture,
+    BlockchainXFixture,
+)
+from execution_testing.fixtures.blockchain import (
+    FixtureBlock,
+    FixtureEngineNewPayload,
+    FixtureHeader,
+)
 from execution_testing.rpc import EngineRPC, EthRPC
 
 HEADER_JUDGEABLE_INVALIDITIES: frozenset[
@@ -75,14 +95,91 @@ class SyncTargetResolutionError(Exception):
     """
 
 
-def _block_hash(payload: FixtureEngineNewPayload) -> Hash:
-    """Return the block hash `payload` declares."""
-    return payload.params[0].block_hash
+@dataclass(frozen=True)
+class RlpPathEntry:
+    """
+    One block of a blockchain_test_x fixture, as a path holds it.
+
+    The counterpart of an authored payload: the block to serve and the
+    exception the fixture declares for it, if any. No Engine API error
+    code exists for a block that never travels the Engine API.
+    """
+
+    block: RlpBlock
+    validation_error: ExceptionInstanceOrList | None = None
+    error_code: None = None
+
+    def valid(self) -> bool:
+        """Return whether the fixture declares the block valid."""
+        return self.validation_error is None
 
 
-def _parent_hash(payload: FixtureEngineNewPayload) -> Hash:
-    """Return the parent hash `payload` declares."""
-    return payload.params[0].parent_hash
+PathEntry = FixtureEngineNewPayload | RlpPathEntry
+"""An authored block of a path: an Engine API payload or an RLP block."""
+
+
+def _block_hash(entry: PathEntry) -> Hash:
+    """Return the block hash `entry` declares."""
+    if isinstance(entry, RlpPathEntry):
+        return entry.block.block_hash
+    return entry.params[0].block_hash
+
+
+def _parent_hash(entry: PathEntry) -> Hash:
+    """Return the parent hash `entry` declares."""
+    if isinstance(entry, RlpPathEntry):
+        return entry.block.parent_hash
+    return entry.params[0].parent_hash
+
+
+@dataclass(frozen=True)
+class RlpEntries:
+    """A blockchain_test_x fixture's servable blocks, and the rest."""
+
+    entries: tuple[RlpPathEntry, ...]
+    """Every block that splits into a header and body, in fixture order."""
+
+    unservable: tuple[str, ...]
+    """Why each remaining block cannot travel devp2p, one per block."""
+
+
+def rlp_entries(fixture: BlockchainXFixture) -> RlpEntries:
+    """
+    Split a blockchain_test_x fixture's blocks into path entries.
+
+    A block whose RLP is not a header and body lists cannot be served,
+    so it is left out and described instead: it is always an invalid
+    leaf, since no block can build on a block without a hash. A valid
+    block must hash to the hash its decoded header declares, or the
+    fixture is defective and `ChainReconstructionError` is raised.
+    """
+    entries: list[RlpPathEntry] = []
+    unservable: list[str] = []
+    for position, fixture_block in enumerate(fixture.blocks):
+        is_valid = isinstance(fixture_block, FixtureBlock)
+        try:
+            block = RlpBlock.from_rlp(bytes(fixture_block.rlp))
+        except UndecodableBlockError as error:
+            if is_valid:
+                raise
+            unservable.append(f"block {position + 1} of the fixture: {error}")
+            continue
+        if isinstance(fixture_block, FixtureBlock):
+            declared = fixture_block.header.block_hash
+            if block.block_hash != declared:
+                raise ChainReconstructionError(
+                    f"block {block.number}'s RLP hashes to "
+                    f"{block.block_hash} but its header declares {declared}"
+                )
+            entries.append(RlpPathEntry(block=block))
+        else:
+            entries.append(
+                RlpPathEntry(
+                    block=block,
+                    validation_error=fixture_block.expect_exception,
+                )
+            )
+    return RlpEntries(entries=tuple(entries), unservable=tuple(unservable))
 
 
 @dataclass(frozen=True)
@@ -101,21 +198,49 @@ class SyncPath:
     total: int
     """How many targets the fixture announces."""
 
-    target: FixtureEngineNewPayload
-    """The payload announced as the sync target."""
+    target: PathEntry
+    """The block announced as the sync target."""
 
-    authored: tuple[FixtureEngineNewPayload, ...]
-    """The authored payloads on this path, ancestor-first."""
+    authored: tuple[PathEntry, ...]
+    """The authored blocks on this path, ancestor-first."""
 
     announces_scaffolding: bool
     """Whether the target is a framework sync payload above the leaf."""
 
     @property
-    def served_payloads(self) -> list[FixtureEngineNewPayload]:
-        """Return the payloads of the served chain, ancestor-first."""
+    def served(self) -> list[PathEntry]:
+        """Return the blocks of the served chain, ancestor-first."""
         if self.announces_scaffolding:
             return [*self.authored, self.target]
         return list(self.authored)
+
+    @property
+    def served_payloads(self) -> list[FixtureEngineNewPayload]:
+        """
+        Return the payloads of the served chain, ancestor-first.
+
+        Only a path of Engine API payloads has them (see
+        `announces_by_hash`).
+        """
+        payloads = [
+            entry
+            for entry in self.served
+            if not isinstance(entry, RlpPathEntry)
+        ]
+        assert len(payloads) == len(self.served), "path of RLP blocks"
+        return payloads
+
+    @property
+    def announces_by_hash(self) -> bool:
+        """
+        Return whether the target is announced by its hash alone.
+
+        A path of RLP blocks has no payload to send, so the target is
+        named in a forkchoice update only and every block of the path,
+        the target included, travels devp2p. A path of payloads sends
+        the target with `engine_newPayload`.
+        """
+        return isinstance(self.target, RlpPathEntry)
 
     @property
     def length(self) -> int:
@@ -130,7 +255,7 @@ class SyncPath:
         A target declaring an Engine API error code is a rejection too.
         """
         return (
-            any(not payload.valid() for payload in self.served_payloads)
+            any(not entry.valid() for entry in self.served)
             or self.target.error_code is not None
         )
 
@@ -140,10 +265,16 @@ class SyncPath:
         Return whether a run of this path asserts its wire coverage.
 
         A valid path always does. A rejection does only when it
-        announces a framework sync payload: without one the client may
-        judge the announced head without fetching an ancestor.
+        announces a framework sync payload, or announces by hash: a
+        payload sent as the head lets the client judge it without
+        fetching an ancestor, while a head named by hash alone must be
+        fetched over devp2p before any verdict.
         """
-        return not self.expects_rejection or self.announces_scaffolding
+        return (
+            not self.expects_rejection
+            or self.announces_scaffolding
+            or self.announces_by_hash
+        )
 
     @property
     def expected_latest_valid_hash(self) -> Hash | None:
@@ -156,17 +287,17 @@ class SyncPath:
         `None` when no served payload is invalid (a path rejected only by
         its declared Engine API error code).
         """
-        for payload in self.served_payloads:
-            if not payload.valid():
-                return _parent_hash(payload)
+        for entry in self.served:
+            if not entry.valid():
+                return _parent_hash(entry)
         return None
 
     @property
     def invalidities(self) -> set[BlockException | TransactionException]:
         """Return every exception this path's payloads declare."""
         invalidities: set[BlockException | TransactionException] = set()
-        for payload in self.served_payloads:
-            error = payload.validation_error
+        for entry in self.served:
+            error = entry.validation_error
             if error is None:
                 continue
             if isinstance(error, list):
@@ -185,6 +316,20 @@ class SyncPath:
         """Return the name logs and failures identify this path by."""
         leaf = _block_hash(self.authored[-1])
         return f"{self.name} above leaf {leaf}"
+
+
+def rlp_chain(genesis: FixtureHeader, path: SyncPath) -> Chain:
+    """
+    Return the chain a path of RLP blocks serves, rooted at `genesis`.
+
+    Raise `ChainReconstructionError` if a block does not name its
+    predecessor.
+    """
+    blocks = [
+        entry.block for entry in path.served if isinstance(entry, RlpPathEntry)
+    ]
+    assert len(blocks) == len(path.served), "path of Engine API payloads"
+    return linked_chain(genesis, blocks)
 
 
 @dataclass(frozen=True)
@@ -223,10 +368,27 @@ def resolve_sync_paths(
     """
     Return the served path behind each of the fixture's sync targets.
 
-    A fixture without targets (a chain asserting an Engine API error
-    code, one whose leaves admit no child block, one that opted out
-    with `sync_block=False`, or a fill with `--no-sync-block`) yields
-    one path per authored leaf, a payload no other payload builds on:
+    See `resolve_entry_paths`.
+    """
+    return resolve_entry_paths(
+        genesis_hash, fixture.payloads, fixture.sync_payloads
+    )
+
+
+def resolve_entry_paths(
+    genesis_hash: Hash,
+    entries: Sequence[PathEntry],
+    targets: Sequence[PathEntry] | None,
+) -> list[SyncPath]:
+    """
+    Return the served path behind each of `targets`, or of each leaf.
+
+    `entries` are a fixture's authored blocks, Engine API payloads or
+    RLP blocks, and `targets` its sync payloads. A fixture without
+    targets (a blockchain_test_x fixture, a chain asserting an Engine
+    API error code, one whose leaves admit no child block, one that
+    opted out with `sync_block=False`, or a fill with `--no-sync-block`)
+    has one path per authored leaf, a payload no other payload builds on:
     the leaf's ancestry, announced by the leaf itself. A linear fixture
     has one leaf, its last payload, and a valid payload after an
     invalid one is its sibling, so it is a leaf of its own.
@@ -234,8 +396,8 @@ def resolve_sync_paths(
     Raise `SyncTargetResolutionError` when an ancestry does not reach
     `genesis_hash` through authored payloads.
     """
-    payloads_by_hash: dict[Hash, FixtureEngineNewPayload] = {}
-    for payload in fixture.payloads:
+    payloads_by_hash: dict[Hash, PathEntry] = {}
+    for payload in entries:
         block_hash = _block_hash(payload)
         if block_hash in payloads_by_hash:
             raise SyncTargetResolutionError(
@@ -244,9 +406,9 @@ def resolve_sync_paths(
             )
         payloads_by_hash[block_hash] = payload
 
-    def ancestry(name: str, parent: Hash) -> list[FixtureEngineNewPayload]:
+    def ancestry(name: str, parent: Hash) -> list[PathEntry]:
         """Return the authored payloads from genesis up to `parent`."""
-        authored: list[FixtureEngineNewPayload] = []
+        authored: list[PathEntry] = []
         visited: set[Hash] = set()
         current = parent
         while current != genesis_hash:
@@ -266,12 +428,11 @@ def resolve_sync_paths(
         authored.reverse()
         return authored
 
-    targets = fixture.sync_payloads
     if not targets:
-        parents = {_parent_hash(payload) for payload in fixture.payloads}
+        parents = {_parent_hash(payload) for payload in entries}
         leaves = [
             payload
-            for payload in fixture.payloads
+            for payload in entries
             if _block_hash(payload) not in parents
         ]
         return [
@@ -339,13 +500,19 @@ def _path_lengths_from_links(
     return lengths
 
 
-def target_path_lengths(fixture: BlockchainEngineXFixture) -> list[int]:
+def target_path_lengths(
+    fixture: BlockchainEngineXFixture | BlockchainXFixture,
+) -> list[int]:
     """
     Return each served chain's length for an already-parsed fixture.
 
     One entry per sync target, or the authored payload count alone for
-    a fixture without targets.
+    a fixture without targets. A blockchain_test_x fixture's block count
+    is an upper bound of its longest path, as in
+    `raw_target_path_lengths`.
     """
+    if isinstance(fixture, BlockchainXFixture):
+        return [len(fixture.blocks)]
     targets = fixture.sync_payloads
     if not targets:
         return [len(fixture.payloads)]
@@ -364,7 +531,11 @@ def raw_target_path_lengths(raw_fixture: Mapping[str, Any]) -> list[int]:
 
     The collection-time counterpart of `target_path_lengths`, for the
     ordering pass that reads fixture files without model validation.
+    A blockchain_test_x fixture's block count stands in for its longest
+    path, since its links are inside the RLP (an upper bound).
     """
+    if "blocks" in raw_fixture:
+        return [len(raw_fixture["blocks"])]
     payloads = raw_fixture.get("engineNewPayloads", [])
     targets = raw_fixture.get("syncPayloads") or []
     if not targets:

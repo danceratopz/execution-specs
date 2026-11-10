@@ -17,7 +17,10 @@ from execution_testing.cli.pytest_commands.plugins.consume.simulators.wirex.conf
     bal_variants,
     withholds_only,
 )
-from execution_testing.fixtures import BlockchainEngineXFixture
+from execution_testing.fixtures import (
+    BlockchainEngineXFixture,
+    BlockchainXFixture,
+)
 from execution_testing.forks import (
     Amsterdam,
     BPO2ToAmsterdamAtTime15k,
@@ -155,7 +158,10 @@ def test_wirex_configure_installs_bal_variants(
     """The wirex config feeds its `--wirex-bals` mode to the generator."""
     config = _options(wirex_bals=mode)
     wirex.pytest_configure(cast(pytest.Config, config))
-    assert config.supported_fixture_formats == [BlockchainEngineXFixture]
+    assert config.supported_fixture_formats == [
+        BlockchainEngineXFixture,
+        BlockchainXFixture,
+    ]
     params = generate(
         [engine_x_case("a", Osaka), engine_x_case("b", Amsterdam)],
         clients=("go-ethereum_default", "nethermind_default"),

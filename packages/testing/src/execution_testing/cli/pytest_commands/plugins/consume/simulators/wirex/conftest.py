@@ -32,8 +32,13 @@ from execution_testing.devp2p.protocol import (
     ForkSchedule,
 )
 from execution_testing.devp2p.rlpx import RLPxError
-from execution_testing.fixtures import BlockchainEngineXFixture, PreAllocGroup
+from execution_testing.fixtures import (
+    BlockchainEngineXFixture,
+    BlockchainXFixture,
+    PreAllocGroup,
+)
 from execution_testing.fixtures.blockchain import (
+    FixtureBlock,
     FixtureEngineNewPayload,
     FixtureHeader,
 )
@@ -56,7 +61,10 @@ from .sync_targets import (
     UNDECODABLE_BODY_INVALIDITIES,
     SyncTargetCase,
     raw_target_path_lengths,
+    resolve_entry_paths,
     resolve_sync_paths,
+    rlp_chain,
+    rlp_entries,
     target_path_lengths,
 )
 
@@ -133,7 +141,9 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             "Skip sync targets whose served chain, target included, is "
             "shorter than this. The target arrives over the Engine API, "
             "so the default of 2 puts at least one block on devp2p. A "
-            "fixture skips only when every one of its targets does."
+            "fixture skips only when every one of its targets does. "
+            "Not applied to blockchain_test_x fixtures, whose every "
+            "block, the target included, travels devp2p."
         ),
     )
     group.addoption(
@@ -234,7 +244,10 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 def pytest_configure(config: pytest.Config) -> None:
     """Set the supported fixture formats for the wirex simulator."""
-    config.supported_fixture_formats = [BlockchainEngineXFixture]  # type: ignore[attr-defined]
+    config.supported_fixture_formats = [  # type: ignore[attr-defined]
+        BlockchainEngineXFixture,
+        BlockchainXFixture,
+    ]
     mode = BalMode(str(config.getoption("wirex_bals", "both")))
     group_variants: GroupVariants = partial(bal_variants, mode=mode)
     config.stash[group_variants_key] = group_variants
@@ -310,6 +323,14 @@ def _chain_properties(
                     any(not payload.valid() for payload in fixture.payloads),
                     max(target_path_lengths(fixture)),
                 )
+            elif isinstance(fixture, BlockchainXFixture):
+                properties[item.nodeid] = ChainProperties(
+                    any(
+                        not isinstance(block, FixtureBlock)
+                        for block in fixture.blocks
+                    ),
+                    max(target_path_lengths(fixture)),
+                )
             continue
         if not isinstance(test_case, TestCaseIndexFile) or source_path is None:
             continue
@@ -323,11 +344,13 @@ def _chain_properties(
             if raw_fixture is None:
                 continue
             payloads = raw_fixture.get("engineNewPayloads", [])
+            blocks = raw_fixture.get("blocks", [])
             properties[nodeid] = ChainProperties(
                 any(
                     payload.get("validationError") is not None
                     for payload in payloads
-                ),
+                )
+                or any("expectException" in block for block in blocks),
                 max(raw_target_path_lengths(raw_fixture)),
             )
     return properties
@@ -442,19 +465,23 @@ def _unrebuildable(payload: FixtureEngineNewPayload) -> bool:
 @pytest.fixture(scope="function")
 def sync_target_cases(
     genesis_header: FixtureHeader,
-    fixture: BlockchainEngineXFixture,
+    fixture: BlockchainEngineXFixture | BlockchainXFixture,
     wirex_min_blocks: int,
 ) -> list[SyncTargetCase]:
     """
     Rebuild the served chain behind each of this test's sync targets.
 
-    Drop a path that is too short to put a block on devp2p, that
+    A blockchain_test_x fixture is served from its RLP blocks instead
+    (see `rlp_sync_target_cases`). For an Engine X fixture, drop a path
+    that is too short to put a block on devp2p, that
     declares a body no client can decode, or whose invalid header
     cannot be rebuilt from its own payload (a commitment modified at
     fill leaves no trace in the payload); the drop message names the
     cause. Any other rebuild failure is a defect and raises.
     Skip the test only when every path is dropped, and log each drop.
     """
+    if isinstance(fixture, BlockchainXFixture):
+        return rlp_sync_target_cases(genesis_header, fixture)
     paths = resolve_sync_paths(genesis_header.block_hash, fixture)
     cases: list[SyncTargetCase] = []
     drops: list[str] = []
@@ -499,6 +526,37 @@ def sync_target_cases(
             f"targets: {reason}"
         )
     return cases
+
+
+def rlp_sync_target_cases(
+    genesis_header: FixtureHeader, fixture: BlockchainXFixture
+) -> list[SyncTargetCase]:
+    """
+    Return one sync target per leaf of a blockchain_test_x fixture.
+
+    Every block of a path, its leaf included, travels devp2p, so no path
+    is too short. An invalid block whose RLP is not a header and body
+    lists has no devp2p representation: a client drops a peer serving
+    it rather than judge it. It is omitted, and the test is skipped only
+    when no other path remains.
+    """
+    entries = rlp_entries(fixture)
+    paths = resolve_entry_paths(
+        genesis_header.block_hash, entries.entries, None
+    )
+    drops = [
+        "invalid fixture block cannot be represented over devp2p, "
+        f"{reason}"
+        for reason in entries.unservable
+    ]
+    if not paths:
+        pytest.skip("; ".join(drops) or "fixture has no block")
+    for reason in drops:
+        logger.info(f"Omitting one of this fixture's leaves: {reason}")
+    return [
+        SyncTargetCase(path=path, chain=rlp_chain(genesis_header, path))
+        for path in paths
+    ]
 
 
 @pytest.fixture(scope="session")

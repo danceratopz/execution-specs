@@ -9,26 +9,35 @@ block and parent hashes, the declared validation error, and the Engine
 API error code.
 """
 
+import json
 from dataclasses import dataclass
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Callable, cast
 
 import pytest
 
-from execution_testing.base_types import Hash
+from execution_testing.base_types import Bytes, Hash
 from execution_testing.devp2p.chain import ChainReconstructionError
 from execution_testing.exceptions import (
     BlockException,
     TransactionException,
 )
-from execution_testing.fixtures import BlockchainEngineXFixture
-from execution_testing.fixtures.blockchain import FixtureEngineNewPayload
+from execution_testing.fixtures import (
+    BlockchainEngineXFixture,
+    BlockchainXFixture,
+)
+from execution_testing.fixtures.blockchain import (
+    FixtureBlock,
+    FixtureEngineNewPayload,
+)
 
 from ..simulators.wirex import conftest as wirex
 from ..simulators.wirex.sync_targets import (
     SyncTargetResolutionError,
     raw_target_path_lengths,
     resolve_sync_paths,
+    rlp_entries,
     target_path_lengths,
 )
 from .direct_calls import fixture_body
@@ -477,3 +486,91 @@ class TestSyncTargetCases:
             self._cases(
                 monkeypatch, fixture, fails=lambda payloads: valid in payloads
             )
+
+
+SPEC_FIXTURES = Path(__file__).parents[5] / "specs" / "tests" / "fixtures"
+"""Filled blockchain_test fixtures the RLP path tests convert."""
+
+
+def _x_fixture(name: str) -> BlockchainXFixture:
+    """
+    Return the blockchain_test fixture in `name` as blockchain_test_x.
+
+    The formats share the blocks; X drops the pre and post states for a
+    group hash and a post-state diff, which path resolution never reads.
+    """
+    (raw,) = json.loads((SPEC_FIXTURES / name).read_text()).values()
+    for field in ("pre", "postState", "_info"):
+        raw.pop(field, None)
+    raw |= {"preHash": "0x" + "00" * 8, "postStateDiff": {}}
+    return BlockchainXFixture.model_validate(raw)
+
+
+LONDON_INVALID = "blockchain_london_invalid_filled.json"
+"""Blocks v1, v2, X3, v3, X4, v4: two invalid leaves beside a valid one."""
+
+
+class TestRlpPaths:
+    """A blockchain_test_x fixture yields one path per leaf block."""
+
+    def test_each_leaf_is_a_path_announced_by_hash(self) -> None:
+        """
+        The two invalid siblings and the valid head each get a path, in
+        fixture order, served from genesis; every path's coverage is
+        checked, its head included.
+        """
+        fixture = _x_fixture(LONDON_INVALID)
+        cases = wirex.rlp_sync_target_cases(fixture.genesis, fixture)
+        assert [case.chain.head.number for case in cases] == [3, 4, 4]
+        assert [case.path.expects_rejection for case in cases] == [
+            True,
+            True,
+            False,
+        ]
+        assert cases[-1].chain.head.block_hash == fixture.last_block_hash
+        for case in cases:
+            assert case.path.announces_by_hash
+            assert case.path.checks_wire_coverage
+            assert case.chain.genesis is fixture.genesis
+            assert case.chain.blocks[0].parent_hash == (
+                fixture.genesis.block_hash
+            )
+        for case in cases[:2]:
+            assert case.path.expected_latest_valid_hash == (
+                case.chain.blocks[-2].block_hash
+            )
+
+    def test_an_unservable_invalid_block_drops_its_leaf_only(self) -> None:
+        """A block that is not header and body lists leaves no path."""
+        fixture = _x_fixture(LONDON_INVALID)
+        blocks = list(fixture.blocks)
+        blocks[2] = blocks[2].model_copy(update={"rlp": Bytes(b"\x01")})
+        fixture = fixture.model_copy(update={"blocks": blocks})
+        cases = wirex.rlp_sync_target_cases(fixture.genesis, fixture)
+        assert [case.chain.head.number for case in cases] == [4, 4]
+
+    def test_a_fixture_of_unservable_blocks_skips(self) -> None:
+        """Without any servable leaf the test is skipped with the reason."""
+        fixture = _x_fixture(LONDON_INVALID)
+        invalid = fixture.blocks[2].model_copy(update={"rlp": Bytes(b"\x01")})
+        fixture = fixture.model_copy(update={"blocks": [invalid]})
+        with pytest.raises(pytest.skip.Exception, match="devp2p"):
+            wirex.rlp_sync_target_cases(fixture.genesis, fixture)
+
+    def test_a_valid_block_hashing_otherwise_is_a_defect(self) -> None:
+        """A valid block whose RLP is not its declared header fails."""
+        fixture = _x_fixture(LONDON_INVALID)
+        first = fixture.blocks[0]
+        assert isinstance(first, FixtureBlock)
+        wrong = first.model_copy(update={"rlp": fixture.blocks[1].rlp})
+        fixture = fixture.model_copy(update={"blocks": [wrong]})
+        with pytest.raises(ChainReconstructionError, match="declares"):
+            rlp_entries(fixture)
+
+    def test_collection_reads_the_raw_blocks(self) -> None:
+        """The ordering pass counts blocks, no payloads in sight."""
+        (raw_fixture,) = json.loads(
+            (SPEC_FIXTURES / LONDON_INVALID).read_text()
+        ).values()
+        assert raw_target_path_lengths(raw_fixture) == [6]
+        assert target_path_lengths(_x_fixture(LONDON_INVALID)) == [6]

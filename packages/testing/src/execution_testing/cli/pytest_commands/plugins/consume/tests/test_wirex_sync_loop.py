@@ -144,6 +144,7 @@ def _case(
         served_payloads=served_payloads,
         expects_rejection=expects_rejection,
         announces_scaffolding=announces_scaffolding,
+        announces_by_hash=False,
         checks_wire_coverage=not expects_rejection or announces_scaffolding,
         invalidities=set(invalidities),
         expected_latest_valid_hash=expected_latest_valid_hash,
@@ -714,7 +715,12 @@ class TestLatestValidHash:
         result: str,
     ) -> None:
         """A mismatch fails the test, and every other result is logged."""
-        path = cast(SyncPath, SimpleNamespace(expected_latest_valid_hash=owed))
+        path = cast(
+            SyncPath,
+            SimpleNamespace(
+                expected_latest_valid_hash=owed, announces_by_hash=False
+            ),
+        )
         chain = _chain(3, genesis_hash=100)
 
         def check() -> None:
@@ -1237,6 +1243,7 @@ def test_every_target_of_a_fixture_runs_and_is_judged(
             wirex_sync_timeout=SYNC_TIMEOUT,
             wirex_poll_interval=POLL_INTERVAL,
             wirex_announce_interval=ANNOUNCE_INTERVAL,
+            wirex_pre_merge_announce_interval=1.0,
             wirex_verdict_grace=0.0,
         )
     assert entered == [second]

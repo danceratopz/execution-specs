@@ -227,6 +227,19 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     group.addoption(
+        "--wirex-pre-merge-announce-interval",
+        action="store",
+        dest="wirex_pre_merge_announce_interval",
+        type=float,
+        default=1.0,
+        help=(
+            "Seconds between repeats of the forkchoice update naming a "
+            "pre-merge head (blockchain_test_x). With no payload to poll, "
+            "a rejection arrives only in the answer to an announcement. "
+            "Default: 1."
+        ),
+    )
+    group.addoption(
         "--wirex-poll-interval",
         action="store",
         dest="wirex_poll_interval",
@@ -445,6 +458,12 @@ def wirex_verdict_grace(request: pytest.FixtureRequest) -> float:
 def wirex_announce_interval(request: pytest.FixtureRequest) -> float:
     """Return how often to repeat the sync target announcement."""
     return float(request.config.getoption("wirex_announce_interval"))
+
+
+@pytest.fixture(scope="session")
+def wirex_pre_merge_announce_interval(request: pytest.FixtureRequest) -> float:
+    """Return how often to name a pre-merge head again."""
+    return float(request.config.getoption("wirex_pre_merge_announce_interval"))
 
 
 @pytest.fixture(scope="session")

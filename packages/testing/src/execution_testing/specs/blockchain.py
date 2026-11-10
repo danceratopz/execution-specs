@@ -66,6 +66,7 @@ from execution_testing.fixtures import (
     BlockchainEngineSyncFixture,
     BlockchainEngineXFixture,
     BlockchainFixture,
+    BlockchainXFixture,
     FixtureFormat,
     LabeledFixtureFormat,
 )
@@ -946,6 +947,7 @@ class BlockchainTest(BaseTest):
         BlockchainEngineFixture,
         BlockchainEngineSyncFixture,
         BlockchainEngineXFixture,
+        BlockchainXFixture,
         BlockchainEngineStatefulFixture,
     ]
     supported_execute_formats: ClassVar[Sequence[LabeledExecuteFormat]] = [
@@ -990,8 +992,12 @@ class BlockchainTest(BaseTest):
         used.
         """
         marker_names = [m.name for m in markers]
+        rlp_formats: List[FixtureFormat] = [
+            BlockchainFixture,
+            BlockchainXFixture,
+        ]
         if (
-            fixture_format != BlockchainFixture
+            fixture_format not in rlp_formats
             and "blockchain_test_only" in marker_names
         ):
             return True
@@ -1535,8 +1541,14 @@ class BlockchainTest(BaseTest):
     def make_fixture(
         self,
         t8n: FillerBackend,
+        fixture_format: FixtureFormat | LabeledFixtureFormat,
     ) -> FillResult:
-        """Create a fixture from the blockchain test definition."""
+        """
+        Create an RLP blocks fixture from the blockchain test definition.
+
+        `fixture_format` is `BlockchainFixture`, or `BlockchainXFixture` when
+        `self.pre` is the allocation of the test's pre-allocation group.
+        """
         for i, block in enumerate(self.blocks):
             overrides = block.engine_payload_only_overrides()
             if overrides:
@@ -1549,7 +1561,7 @@ class BlockchainTest(BaseTest):
 
         fixture_blocks: List[FixtureBlock | InvalidFixtureBlock] = []
 
-        pre, genesis = self.make_genesis(BlockchainFixture)
+        pre, genesis = self.make_genesis(fixture_format)
 
         alloc: Alloc | LazyAlloc = pre
         state_root = genesis.header.state_root
@@ -1631,27 +1643,51 @@ class BlockchainTest(BaseTest):
         self.verify_post_state(
             t8n=t8n, pre_alloc=pre, got_alloc=alloc, context=context
         )
-        fixture = BlockchainFixture(
+        config = FixtureConfig(
             fork=self.fork,
-            genesis=genesis.header,
-            genesis_rlp=genesis.rlp,
-            blocks=fixture_blocks,
-            last_block_hash=head,
-            pre=pre,
-            post_state=alloc
-            if self.include_full_post_state_in_output
-            else None,
-            post_state_hash=state_root
-            if not self.include_full_post_state_in_output
-            else None,
-            config=FixtureConfig(
-                fork=self.fork,
-                blob_schedule=FixtureBlobSchedule.from_blob_schedule(
-                    self.fork.transitions_to().blob_schedule()
-                ),
-                chain_id=self.chain_id,
+            blob_schedule=FixtureBlobSchedule.from_blob_schedule(
+                self.fork.transitions_to().blob_schedule()
             ),
+            chain_id=self.chain_id,
         )
+        post_state_hash = (
+            state_root if not self.include_full_post_state_in_output else None
+        )
+        fixture: BlockchainFixture | BlockchainXFixture
+        if fixture_format == BlockchainXFixture:
+            # Like Engine X: the group file holds the genesis allocation, so
+            # the fixture only names the group and the accounts that changed.
+            pre_alloc_group_hash = self.pre.get_alloc_grouping_hash()
+            if pre_alloc_group_hash is None:
+                raise ValueError(
+                    "Blockchain Test X fixtures require a pre-alloc group; "
+                    "was phase 1 run?"
+                )
+            fixture = BlockchainXFixture(
+                fork=self.fork,
+                genesis=genesis.header,
+                genesis_rlp=genesis.rlp,
+                blocks=fixture_blocks,
+                last_block_hash=head,
+                post_state_hash=post_state_hash,
+                config=config,
+                pre_hash=pre_alloc_group_hash,
+                post_state_diff=alloc.calculate_diff(self.pre),
+            )
+        else:
+            fixture = BlockchainFixture(
+                fork=self.fork,
+                genesis=genesis.header,
+                genesis_rlp=genesis.rlp,
+                blocks=fixture_blocks,
+                last_block_hash=head,
+                pre=pre,
+                post_state=alloc
+                if self.include_full_post_state_in_output
+                else None,
+                post_state_hash=post_state_hash,
+                config=config,
+            )
         return FillResult(
             fixture=fixture,
             gas_optimization=None,
@@ -2237,8 +2273,8 @@ class BlockchainTest(BaseTest):
             BlockchainEngineSyncFixture,
         ]:
             return self.make_hive_fixture(t8n, fixture_format)
-        elif fixture_format == BlockchainFixture:
-            return self.make_fixture(t8n)
+        elif fixture_format in (BlockchainFixture, BlockchainXFixture):
+            return self.make_fixture(t8n, fixture_format)
 
         raise Exception(f"Unknown fixture format: {fixture_format}")
 

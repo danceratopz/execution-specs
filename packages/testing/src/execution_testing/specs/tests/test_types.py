@@ -16,6 +16,7 @@ from execution_testing.client_clis import Result
 from execution_testing.client_clis.cli_types import LazyAllocStr
 from execution_testing.exceptions import BlockException, EngineAPIError
 from execution_testing.fixtures.blockchain import (
+    BlockchainFixture,
     FixtureExecutionPayloadModifier,
     FixtureHeader,
 )
@@ -373,7 +374,7 @@ class TestEnginePayloadOnlyOverrides:
             blocks=[Block(engine_new_payload_slot_number=0)],
         )
         with pytest.raises(Exception, match="blockchain_test_engine_only"):
-            test.make_fixture(sentinel.t8n)
+            test.make_fixture(sentinel.t8n, BlockchainFixture)
 
 
 class TestBalModifierRequiresException:

@@ -10,6 +10,7 @@ from execution_testing.client_clis.transition_tool import OutputCache
 from execution_testing.fixtures import (
     BlockchainEngineFixture,
     BlockchainFixture,
+    BlockchainXFixture,
     FixtureFormat,
     LabeledFixtureFormat,
     StateFixture,
@@ -189,6 +190,15 @@ class TestCacheKeyConsistency:
                     "",
                 ),
                 "blockchain_test_engine_from_state_test",
+            ),
+            (BlockchainXFixture, "blockchain_test_x"),
+            (
+                LabeledFixtureFormat(
+                    BlockchainXFixture,
+                    "blockchain_test_x_from_state_test",
+                    "",
+                ),
+                "blockchain_test_x_from_state_test",
             ),
         ],
     )

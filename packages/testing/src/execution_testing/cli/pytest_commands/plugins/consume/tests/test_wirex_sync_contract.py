@@ -560,18 +560,26 @@ class TestClientHeadLookup:
 
 
 class TestFreshClientPerPreMergeTest:
-    """besu gets a fresh client for each chain named by hash."""
+    """besu and nethermind get a fresh client per chain named by hash."""
 
     @pytest.mark.parametrize(
         "client_name, by_hash, replaced",
         [
             ("besu_default", True, True),
             ("besu_default", False, False),
+            ("nethermind_default", True, True),
+            ("nethermind_default", False, False),
             ("go-ethereum_default", True, False),
         ],
-        ids=["besu-pre-merge", "besu-post-merge", "geth-pre-merge"],
+        ids=[
+            "besu-pre-merge",
+            "besu-post-merge",
+            "nethermind-pre-merge",
+            "nethermind-post-merge",
+            "geth-pre-merge",
+        ],
     )
-    def test_only_besu_pre_merge_is_replaced(
+    def test_only_pre_merge_besu_and_nethermind_are_replaced(
         self,
         monkeypatch: pytest.MonkeyPatch,
         client_name: str,
@@ -593,15 +601,46 @@ class TestFreshClientPerPreMergeTest:
                 checks_wire_coverage=True,
             ),
         )
+        peer = SimpleNamespace(
+            served_chain_holding=lambda _block_hash: None,
+            header_hashes_ever_served=set(),
+        )
         reason = replacement_reason(
             cast(Any, SimpleNamespace(id="c")),
             cast(Any, case),
-            None,
+            cast(Any, peer),
             client_name,
         )
         assert (reason is not None) == replaced
         if replaced:
             assert reason is not None and "fresh client" in reason
+
+    def test_a_client_never_dialed_is_kept(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A client no test has named a head to yet is as good as new."""
+        monkeypatch.setattr(
+            client_policy,
+            "client_head",
+            lambda _client: ClientHead(0, Hash(0)),
+        )
+        case = SimpleNamespace(
+            chain=_fork(2, branch=1),
+            path=SimpleNamespace(
+                announces_by_hash=True,
+                expects_rejection=False,
+                checks_wire_coverage=True,
+            ),
+        )
+        assert (
+            replacement_reason(
+                cast(Any, SimpleNamespace(id="c")),
+                cast(Any, case),
+                None,
+                "besu_default",
+            )
+            is None
+        )
 
 
 class TestEngineRequestTimeout:

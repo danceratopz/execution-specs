@@ -72,13 +72,14 @@ blocks of state (`DB_COMMIT_THRESHOLD`), and reth falls back to a path
 taking minutes.
 """
 
-FRESH_CLIENT_PER_PRE_MERGE_TEST = ("besu",)
+FRESH_CLIENT_PER_PRE_MERGE_TEST = ("besu", "nethermind")
 """
 Clients that get a fresh client for every pre-merge test.
 
-besu syncs the first head named by hash, but once synced it never asks
-the peer for a sibling head named later, so a reused client would time
-out on every pre-merge test after its group's first. Matched as a
+Both sync the first pre-merge head named to them but not a sibling head
+named later, so a reused client fails every pre-merge test after its
+group's first: besu never asks the peer for the new head, and
+nethermind imports the new chain but keeps its old head. Matched as a
 substring of the Hive client name.
 """
 
@@ -276,7 +277,10 @@ def replacement_reason(
     if (
         any(name in client_name for name in FRESH_CLIENT_PER_PRE_MERGE_TEST)
         and case.path.announces_by_hash
+        and peer is not None
     ):
+        # A client never dialed (one started ahead for its group, say)
+        # has been named no head yet, so it is as fresh as a new one.
         return (
             f"{client_name} syncs only the first pre-merge head named to "
             "it, so every pre-merge test gets a fresh client"

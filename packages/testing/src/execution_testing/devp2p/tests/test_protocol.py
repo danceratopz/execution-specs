@@ -354,8 +354,15 @@ class TestStatus:
         )
         encoded = ETH_PROTOCOLS[EthVersion.ETH_68].encode_status(status)
         assert encoded.hex() == (
-            "f84f" + "44" + "01" + "83040000" + "a0" + "bb" * 32
-            + "a0" + "aa" * 32 + "c6840000000080"
+            "f84f"
+            + "44"
+            + "01"
+            + "83040000"
+            + "a0"
+            + "bb" * 32
+            + "a0"
+            + "aa" * 32
+            + "c6840000000080"
         )
 
     def test_only_eth68_lacks_the_block_range(self) -> None:

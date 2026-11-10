@@ -16,6 +16,7 @@ from hive.testing import HiveTest
 from execution_testing.base_types import to_json
 from execution_testing.fixtures import (
     BlockchainEngineXFixture,
+    BlockchainXFixture,
     PreAllocGroup,
 )
 from execution_testing.fixtures.blockchain import FixtureHeader
@@ -39,6 +40,26 @@ if TYPE_CHECKING:
     from .helpers.timing import TimingData
 
 logger = logging.getLogger(__name__)
+
+GroupedFixture = BlockchainEngineXFixture | BlockchainXFixture
+"""A fixture that names its pre-allocation group by `pre_hash`."""
+
+UNREACHABLE_TERMINAL_TOTAL_DIFFICULTY = 2**63 - 1
+"""
+The terminal total difficulty of a client that runs a pre-merge fork.
+
+No block reaches it, so no block is terminal; Hive opens the Engine
+API whenever the terminal total difficulty is set.
+"""
+
+PRE_MERGE_MERGE_BLOCK = 1_000_000_000
+"""
+The merge block number of a client that runs a pre-merge fork.
+
+Far beyond any test chain. Without a merge block number reth and
+nethermind treat every header as post-merge, whose difficulty must be
+zero, and reject the chain.
+"""
 
 multi_test_client_manager_key: pytest.StashKey["MultiTestClientManager"] = (
     pytest.StashKey()
@@ -351,7 +372,7 @@ def load_pre_alloc_group(
 
 @pytest.fixture(scope="function")
 def pre_alloc_group(
-    fixture: BlockchainEngineXFixture,
+    fixture: GroupedFixture,
     fixtures_source: FixturesSource,
     pre_alloc_group_cache: dict[AllocGroupHash, PreAllocGroup],
 ) -> PreAllocGroup:
@@ -387,7 +408,7 @@ def build_client_genesis(
 @pytest.fixture(scope="function")
 def client_genesis(
     pre_alloc_group: PreAllocGroup,
-    fixture: BlockchainEngineXFixture,
+    fixture: GroupedFixture,
     client_genesis_cache: dict[AllocGroupHash, dict],
 ) -> dict:
     """
@@ -440,6 +461,14 @@ def build_environment(
         # point-evaluation call may wait for the load.
         "HIVE_KZG_FAST_SETUP": "1",
     }
+    if "HIVE_TERMINAL_TOTAL_DIFFICULTY" not in env:
+        # A pre-merge fork's network never merges, but its client must
+        # still serve the Engine API: a forkchoice update by hash is the
+        # only way to name a head to a client without legacy sync.
+        env["HIVE_TERMINAL_TOTAL_DIFFICULTY"] = str(
+            UNREACHABLE_TERMINAL_TOTAL_DIFFICULTY
+        )
+        env["HIVE_MERGE_BLOCK_ID"] = str(PRE_MERGE_MERGE_BLOCK)
 
     environment_cache[pre_hash] = env
     return env
@@ -448,7 +477,7 @@ def build_environment(
 @pytest.fixture(scope="function")
 def environment(
     pre_alloc_group: PreAllocGroup,
-    fixture: BlockchainEngineXFixture,
+    fixture: GroupedFixture,
     check_live_port: int,
     environment_cache: dict[AllocGroupHash, dict],
 ) -> dict:
@@ -498,7 +527,7 @@ def _start_next_group_client(
     client: Client,
     multi_test_hive_test: HiveTest,
     multi_test_client_manager: MultiTestClientManager,
-    fixture: BlockchainEngineXFixture,
+    fixture: GroupedFixture,
     fixtures_source: FixturesSource,
     environment: dict[str, str],
     check_live_port: int,

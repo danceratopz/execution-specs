@@ -283,7 +283,9 @@ class TestRlpBlock:
         [
             pytest.param(b"\xf8", id="truncated"),
             pytest.param(eth_rlp.encode(b"block"), id="not-a-list"),
-            pytest.param(eth_rlp.encode([[b""] * 14, [], []]), id="short-header"),
+            pytest.param(
+                eth_rlp.encode([[b""] * 14, [], []]), id="short-header"
+            ),
             pytest.param(eth_rlp.encode([[b""] * 15, []]), id="no-uncle-list"),
             pytest.param(
                 eth_rlp.encode([[b""] * 15, b"", []]), id="body-not-a-list"
@@ -303,5 +305,7 @@ class TestRlpBlock:
         """A block that does not name its predecessor breaks the chain."""
         fixture = _rlp_fixture(RLP_FIXTURES["valid"])
         blocks = [RlpBlock.from_rlp(bytes(b.rlp)) for b in fixture.blocks]
-        with pytest.raises(ChainReconstructionError, match="block 3 does not extend"):
+        with pytest.raises(
+            ChainReconstructionError, match="block 3 does not extend"
+        ):
             linked_chain(fixture.genesis, [blocks[0], blocks[2]])

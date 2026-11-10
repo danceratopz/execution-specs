@@ -8,7 +8,14 @@ from typing import Any, Iterator, List, cast
 import pytest
 from hive.client import Client
 
-from execution_testing.forks import Osaka, Prague
+from execution_testing.forks import (
+    Berlin,
+    Frontier,
+    London,
+    Osaka,
+    Paris,
+    Prague,
+)
 
 from ..simulators import multi_test_client
 from ..simulators.client_start_pipeline import (
@@ -409,3 +416,35 @@ class TestStartNextGroupClient:
         assert next_environment["HIVE_SYNC_LOOP_INTERVAL_MS"] == "100"
         assert next_environment["HIVE_NODETYPE"] == "archive"
         assert next_environment["HIVE_FORK"] == Osaka.name()
+
+
+class TestPreMergeEnvironment:
+    """A pre-merge group's client serves the Engine API but never merges."""
+
+    @pytest.mark.parametrize("fork", [Frontier, Berlin, London])
+    def test_a_pre_merge_fork_gets_an_unreachable_merge(
+        self, fork: Any
+    ) -> None:
+        """No block is terminal, and the merge block is far away."""
+        environment = multi_test_client.build_environment(
+            cast(Any, "0xgroup"),
+            cast(Any, SimpleNamespace(fork=fork)),
+            8551,
+            {},
+        )
+        assert environment["HIVE_TERMINAL_TOTAL_DIFFICULTY"] == str(2**63 - 1)
+        assert environment["HIVE_MERGE_BLOCK_ID"] == "1000000000"
+        assert environment["HIVE_NODETYPE"] == "full"
+        assert environment["HIVE_FORK"] == fork.name()
+
+    @pytest.mark.parametrize("fork", [Paris, Prague])
+    def test_a_post_merge_fork_keeps_its_ruleset(self, fork: Any) -> None:
+        """A merged network keeps a zero difficulty and no merge block."""
+        environment = multi_test_client.build_environment(
+            cast(Any, "0xgroup"),
+            cast(Any, SimpleNamespace(fork=fork)),
+            8551,
+            {},
+        )
+        assert environment["HIVE_TERMINAL_TOTAL_DIFFICULTY"] == "0"
+        assert "HIVE_MERGE_BLOCK_ID" not in environment

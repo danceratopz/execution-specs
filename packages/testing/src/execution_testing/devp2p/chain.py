@@ -367,9 +367,7 @@ class Chain:
     then asks for bodies by hash.
     """
 
-    def __init__(
-        self, genesis: FixtureHeader, blocks: Sequence[ServedBlock]
-    ):
+    def __init__(self, genesis: FixtureHeader, blocks: Sequence[ServedBlock]):
         """Build a chain of `blocks` descending from `genesis`."""
         self.genesis = genesis
         self.blocks = list(blocks)

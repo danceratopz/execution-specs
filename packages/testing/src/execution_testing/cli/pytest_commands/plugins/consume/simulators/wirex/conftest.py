@@ -545,8 +545,7 @@ def rlp_sync_target_cases(
         genesis_header.block_hash, entries.entries, None
     )
     drops = [
-        "invalid fixture block cannot be represented over devp2p, "
-        f"{reason}"
+        f"invalid fixture block cannot be represented over devp2p, {reason}"
         for reason in entries.unservable
     ]
     if not paths:

@@ -22,6 +22,8 @@ The JSON file path plus the test name are used as the unique test identifier.
 
 The `blockchain_tests_engine_x` directory contains a special directory `pre_alloc` that stores pre-allocation group files used by all tests in this format, one per pre-allocation group with the name of the pre-alloc hash. This folder is essential for test execution and must be present alongside the test fixtures.
 
+The [Blockchain X Test](./blockchain_test_x.md) format, which covers the forks before Paris, writes its groups to the same folder.
+
 ### Pre-Allocation Group File Structure
 
 Each file in the `pre_alloc` folder corresponds to a pre-allocation group identified by a hash:
@@ -153,7 +155,7 @@ Engine API payload structure identical to the one defined in [Blockchain Engine 
 ## Usage Notes
 
 - This format is generated when using:
-    - `--generate-pre-alloc-groups` followed by `--use-pre-alloc-groups` (two invocations: phase 1 populates the `pre_alloc` folder, phase 2 generates only `BlockchainEngineXFixture`)
+    - `--generate-pre-alloc-groups` followed by `--use-pre-alloc-groups` (two invocations: phase 1 populates the `pre_alloc` folder, phase 2 generates every format the tests support, the grouped formats included)
     - `--generate-all-formats` flag (automatically triggers 2-phase execution, generates all fixture formats)
 - The `pre_alloc` folder is essential and must be distributed with the test fixtures
 - Tests are grouped by identical (fork + environment + pre-allocation) combinations

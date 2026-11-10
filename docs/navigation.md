@@ -55,6 +55,7 @@
               * [Blockchain Tests](running_tests/test_formats/blockchain_test.md)
               * [Blockchain Engine Tests](running_tests/test_formats/blockchain_test_engine.md)
               * [Blockchain Engine X Tests](running_tests/test_formats/blockchain_test_engine_x.md)
+              * [Blockchain X Tests](running_tests/test_formats/blockchain_test_x.md)
               * [Transaction Tests](running_tests/test_formats/transaction_test.md)
               * [Blockchain Sync Tests](running_tests/test_formats/blockchain_test_sync.md)
               * [Common Types](running_tests/test_formats/common_types.md)

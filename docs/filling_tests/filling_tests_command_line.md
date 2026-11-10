@@ -90,7 +90,7 @@ uv run fill tests/shanghai/eip3651_warm_coinbase/test_warm_coinbase.py::test_war
 
 ## Generating All Fixture Formats
 
-The `--generate-all-formats` flag enables generation of all fixture formats including the optimized `BlockchainEngineXFixture` in a single command:
+The `--generate-all-formats` flag enables generation of all fixture formats in a single command, including the grouped formats that start from a shared pre-allocation group: `BlockchainEngineXFixture` ([`blockchain_test_engine_x`](../running_tests/test_formats/blockchain_test_engine_x.md)) and `BlockchainXFixture` ([`blockchain_test_x`](../running_tests/test_formats/blockchain_test_x.md)):
 
 ```console
 uv run fill --generate-all-formats tests/shanghai/
@@ -99,7 +99,9 @@ uv run fill --generate-all-formats tests/shanghai/
 This flag automatically performs a two-phase execution:
 
 1. **Phase 1**: Generates pre-allocation groups for optimization.
-2. **Phase 2**: Generates all supported fixture formats (`StateFixture`, `BlockchainFixture`, `BlockchainEngineFixture`, `BlockchainEngineXFixture`, etc.).
+2. **Phase 2**: Generates all supported fixture formats (`StateFixture`, `BlockchainFixture`, `BlockchainEngineFixture`, `BlockchainEngineXFixture`, `BlockchainXFixture`, etc.).
+
+Each fork has one grouped format: `BlockchainXFixture` before Paris and `BlockchainEngineXFixture` from Paris on. Both write their pre-allocation groups to `blockchain_tests_engine_x/pre_alloc`.
 
 !!! note "Tarball output requires explicit opt-in"
     Tarball output (`.tar.gz` files) does **not** imply `--generate-all-formats`. Pass the flag explicitly to include the pre-allocation group formats:

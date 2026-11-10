@@ -112,6 +112,10 @@ class PreAllocGroupBuilder(PreAllocGroupCommon):
 
     def add_test_alloc(self, test_id: str, new_pre: Alloc) -> None:
         """Adds a pre to this builder's pre."""
+        assert test_id not in self.test_ids, (
+            f"Test {test_id} was added to pre-allocation group "
+            f"{self.group_hash} twice"
+        )
         assert self.pre.state_commitment() == new_pre.state_commitment()
         self.pre = Alloc.merge(
             self.pre,

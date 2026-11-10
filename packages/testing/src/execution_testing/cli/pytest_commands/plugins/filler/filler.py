@@ -1760,8 +1760,8 @@ def base_test_parametrizer(cls: Type[BaseTest]) -> Any:
                 )
                 return  # Skip fixture generation in phase 1
 
-            # Phase 2: Use pre-allocation groups (only for
-            # BlockchainEngineXFixture)
+            # Phase 2: Use pre-allocation groups (only for the grouped
+            # formats)
             if (
                 FixtureFillingPhase.PRE_ALLOC_GENERATION
                 in fixture_format.format_phases

@@ -67,6 +67,7 @@ class MessageCode(IntEnum):
 class EthVersion(IntEnum):
     """An implemented version of the eth capability."""
 
+    ETH_68 = 68
     ETH_69 = 69
     ETH_70 = 70
     ETH_71 = 71
@@ -315,6 +316,11 @@ class Status:
     earliest_block: int
     latest_block: int
     latest_block_hash: Hash
+    total_difficulty: int = 0
+    """
+    The total difficulty of the latest block, which only eth/68 sends:
+    eth/69 (EIP-7642) replaced it with the block range.
+    """
 
 
 @dataclass
@@ -357,8 +363,31 @@ class EthProtocol:
     has_bals: bool
     """Whether the version has GetBlockAccessLists (eth/71, EIP-8159)."""
 
+    has_block_range: bool
+    """
+    Whether the version has eth/69's (EIP-7642) block range: a Status
+    naming the earliest and latest block instead of the total
+    difficulty, and the BlockRangeUpdate message.
+    """
+
     def encode_status(self, status: Status) -> bytes:
-        """Encode the Status message (one eth/69 layout for every version)."""
+        """
+        Encode the Status message in this version's layout.
+
+        eth/68 sends the head's total difficulty and hash before the
+        genesis hash; every later version sends the eth/69 layout.
+        """
+        if not self.has_block_range:
+            return eth_rlp.encode(
+                [
+                    Uint(self.version),
+                    Uint(status.network_id),
+                    Uint(status.total_difficulty),
+                    status.latest_block_hash,
+                    status.genesis_hash,
+                    status.fork_id,
+                ]
+            )
         return eth_rlp.encode(
             [
                 Uint(self.version),
@@ -406,32 +435,45 @@ class EthProtocol:
 
 
 ETH_PROTOCOLS: Mapping[EthVersion, EthProtocol] = {
+    EthVersion.ETH_68: EthProtocol(
+        version=EthVersion.ETH_68,
+        receipts_request_has_offset=False,
+        has_bals=False,
+        has_block_range=False,
+    ),
     EthVersion.ETH_69: EthProtocol(
         version=EthVersion.ETH_69,
         receipts_request_has_offset=False,
         has_bals=False,
+        has_block_range=True,
     ),
     EthVersion.ETH_70: EthProtocol(
         version=EthVersion.ETH_70,
         receipts_request_has_offset=True,
         has_bals=False,
+        has_block_range=True,
     ),
     EthVersion.ETH_71: EthProtocol(
         version=EthVersion.ETH_71,
         receipts_request_has_offset=True,
         has_bals=True,
+        has_block_range=True,
     ),
     EthVersion.ETH_72: EthProtocol(
         version=EthVersion.ETH_72,
         receipts_request_has_offset=True,
         has_bals=True,
+        has_block_range=True,
     ),
 }
 """
 Every eth capability version this peer implements, by version number.
 
-eth/70 (EIP-7975) changes only the receipts messages, which this peer
-answers with no receipts. eth/71 (EIP-8159) adds the BAL request pair (see
+eth/68 is what a client offers on a chain before the merge (nethermind
+offers nothing later there): its Status carries the head's total
+difficulty, and it has no BlockRangeUpdate. eth/70 (EIP-7975) changes
+only the receipts messages, which this peer answers with no receipts.
+eth/71 (EIP-8159) adds the BAL request pair (see
 `MockPeer._answer_bals`). eth/72 (EIP-8070) changes only mempool blob
 propagation, which this peer takes no part in.
 """

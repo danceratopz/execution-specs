@@ -58,8 +58,11 @@ NEGOTIATIONS = {
     **{
         f"pinned-{int(version)}": ((version,), GETH_LIKE_CAPABILITIES, version)
         for version in ETH_PROTOCOLS
+        if version >= EthVersion.ETH_69
     },
     "no-common-version": ((EthVersion.ETH_71,), [("eth", 69)], None),
+    # nethermind offers only eth/68 on a chain before the merge.
+    "eth68-only-client": (tuple(ETH_PROTOCOLS), [("eth", 68)], 68),
     # A snap capability version never joins the eth negotiation.
     "other-capability": (
         (EthVersion.ETH_69, EthVersion.ETH_70, EthVersion.ETH_71),
@@ -305,10 +308,18 @@ class TestForkId:
         assert eth_rlp.encode(at_genesis).hex() == "c684bc4920d880"
 
 
+BLOCK_RANGE_VERSIONS = sorted(
+    version
+    for version, protocol in ETH_PROTOCOLS.items()
+    if protocol.has_block_range
+)
+"""The versions with eth/69's Status layout and BlockRangeUpdate."""
+
+
 class TestStatus:
     """One Status layout since eth/69; only the declared version moves."""
 
-    @pytest.mark.parametrize("version", sorted(ETH_PROTOCOLS))
+    @pytest.mark.parametrize("version", BLOCK_RANGE_VERSIONS)
     def test_status_declares_negotiated_version(
         self, version: EthVersion
     ) -> None:
@@ -326,6 +337,34 @@ class TestStatus:
         # The layout is the seven-field eth/69 one for every version.
         fields = eth_rlp.decode(encoded)
         assert isinstance(fields, list) and len(fields) == 7
+
+    def test_eth68_sends_total_difficulty_before_genesis(self) -> None:
+        """
+        eth/68's six fields: version, network, total difficulty, head
+        hash, genesis hash and fork id; no block range.
+        """
+        status = Status(
+            network_id=1,
+            genesis_hash=Hash(b"\xaa" * 32),
+            fork_id=ForkId(b"\x00" * 4, Uint(0)),
+            earliest_block=0,
+            latest_block=7,
+            latest_block_hash=Hash(b"\xbb" * 32),
+            total_difficulty=0x40000,
+        )
+        encoded = ETH_PROTOCOLS[EthVersion.ETH_68].encode_status(status)
+        assert encoded.hex() == (
+            "f84f" + "44" + "01" + "83040000" + "a0" + "bb" * 32
+            + "a0" + "aa" * 32 + "c6840000000080"
+        )
+
+    def test_only_eth68_lacks_the_block_range(self) -> None:
+        """Every implemented version from eth/69 has the block range."""
+        assert [
+            version
+            for version, protocol in ETH_PROTOCOLS.items()
+            if not protocol.has_block_range
+        ] == [EthVersion.ETH_68]
 
 
 class TestGetReceipts:

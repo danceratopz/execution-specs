@@ -308,6 +308,7 @@ class MockPeer:
             earliest_block=0,
             latest_block=chain.head.number,
             latest_block_hash=chain.head.block_hash,
+            total_difficulty=chain.total_difficulty,
         )
 
     def start(self) -> None:
@@ -329,11 +330,19 @@ class MockPeer:
         self._thread.start()
 
     def set_chain(self, chain: Chain) -> None:
-        """Serve `chain` from now on and announce its range."""
+        """
+        Serve `chain` from now on and announce its range.
+
+        eth/68 has no BlockRangeUpdate, so nothing is announced there;
+        the client learns the new head over the Engine API.
+        """
         with self._lock:
             self._chains.install(chain)
             self.statistics = self._fresh_statistics()
             session = self._session
+            protocol = self.protocol
+        if protocol is not None and not protocol.has_block_range:
+            return
         if session is not None:
             session.write_message(
                 MessageCode.BLOCK_RANGE_UPDATE,

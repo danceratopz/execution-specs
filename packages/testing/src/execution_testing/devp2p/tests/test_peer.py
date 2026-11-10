@@ -572,6 +572,7 @@ class _TimedHeader:
     number: int
     block_hash: Hash
     timestamp: int
+    difficulty: int = 0
 
 
 def _status_chain(head_timestamp: int) -> Chain:
@@ -627,6 +628,53 @@ class TestStatusForkId:
         """
         peer = _peer(fork_schedule=ForkSchedule(timestamps=(15000,)))
         assert _eth69_status(peer, head_timestamp) == expected
+
+
+def _pow_chain() -> Chain:
+    """Return a genesis of difficulty 0x20000 and two blocks above it."""
+    genesis = _TimedHeader(0, Hash(b"\x11" * 32), 0, difficulty=0x20000)
+    blocks = [
+        Block(
+            header=cast(Any, _TimedHeader(n, _hash(n), 12 * n, 0x20000 + n)),
+            transactions=[],
+            withdrawals=None,
+        )
+        for n in (1, 2)
+    ]
+    return Chain(cast(Any, genesis), blocks)
+
+
+class TestEth68:
+    """Before eth/69 the peer describes its chain by total difficulty."""
+
+    def test_status_carries_the_total_difficulty_of_the_head(self) -> None:
+        """Genesis and every block count toward the head's difficulty."""
+        peer = _peer()
+        status = peer._status(_pow_chain())
+        assert status.total_difficulty == 3 * 0x20000 + 3
+        encoded = ETH_PROTOCOLS[EthVersion.ETH_68].encode_status(status)
+        fields = eth_rlp.decode(encoded)
+        assert isinstance(fields, list)
+        assert int.from_bytes(bytes(fields[2]), "big") == 3 * 0x20000 + 3
+        assert bytes(fields[3]) == _hash(2)
+
+    @pytest.mark.parametrize(
+        "version, announced",
+        [(EthVersion.ETH_68, 0), (EthVersion.ETH_69, 1)],
+        ids=["eth68-has-no-range-update", "eth69-announces-the-range"],
+    )
+    def test_a_chain_switch_announces_a_range_from_eth69_only(
+        self, version: EthVersion, announced: int
+    ) -> None:
+        """eth/68 has no BlockRangeUpdate, so a switch sends nothing."""
+        peer = _peer()
+        peer.protocol = ETH_PROTOCOLS[version]
+        session = _RecordingSession()
+        peer._session = cast(RLPxSession, session)
+        peer.set_chain(_pow_chain())
+        assert [code for code, _ in session.messages] == [
+            MessageCode.BLOCK_RANGE_UPDATE
+        ] * announced
 
 
 def _bal_peer(bals: Dict[Hash, bytes | None], serve: bool) -> MockPeer:
@@ -694,7 +742,8 @@ class TestBalService:
         peer = _bal_peer({}, serve=True)
         peer.protocol = ETH_PROTOCOLS[version]
         session = _RecordingSession()
-        offset = [] if version == 69 else [Uint(0)]
+        protocol = ETH_PROTOCOLS[version]
+        offset = [Uint(0)] if protocol.receipts_request_has_offset else []
         payload = eth_rlp.encode([Uint(5), *offset, [_hash(1)]])
         peer._handle(
             cast(RLPxSession, session), MessageCode.GET_RECEIPTS, payload

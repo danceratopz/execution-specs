@@ -190,6 +190,19 @@ class Chain:
         """Return the last block of the chain."""
         return self.blocks[-1]
 
+    @property
+    def total_difficulty(self) -> int:
+        """
+        Return the total difficulty of the head: the sum of the
+        difficulties of genesis and every block.
+
+        Only eth/68's Status carries it. After the merge every block's
+        difficulty is zero, so it is the total difficulty of genesis.
+        """
+        return int(self.genesis.difficulty) + sum(
+            int(block.header.difficulty) for block in self.blocks
+        )
+
     def header_rlp_by_number(self, number: int) -> bytes | None:
         """Return the RLP of the header at `number`, if held."""
         if number == int(self.genesis.number):

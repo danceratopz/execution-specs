@@ -569,6 +569,7 @@ class _LoopbackHeader:
     number: int
     block_hash: Hash
     timestamp: int
+    difficulty: int = 0
 
 
 def _loopback_chain() -> Chain:

@@ -15,7 +15,7 @@ from contextlib import AbstractContextManager, nullcontext
 from hive.client import Client
 
 from execution_testing.base_types import Hash
-from execution_testing.devp2p.chain import Block, Chain
+from execution_testing.devp2p.chain import Chain, ServedBlock
 from execution_testing.devp2p.peer import MockPeer
 from execution_testing.devp2p.rlpx import RLPxError
 from execution_testing.fixtures.blockchain import (
@@ -61,21 +61,17 @@ always a wrong answer.
 """
 
 
-def required_wire_bodies(chain: Chain) -> list[Block]:
+def required_wire_bodies(chain: Chain) -> list[ServedBlock]:
     """
     Return the blocks below the head whose bodies must be served.
 
-    A body with no transactions and no withdrawals is derived from its
-    header, so it is not owed.
+    A body with no item in any of its lists is derived from its header,
+    so it is not owed (see `ServedBlock.owes_body`).
     """
-    return [
-        block
-        for block in chain.blocks[:-1]
-        if block.transactions or block.withdrawals
-    ]
+    return [block for block in chain.blocks[:-1] if block.owes_body]
 
 
-def required_wire_headers(chain: Chain) -> list[Block]:
+def required_wire_headers(chain: Chain) -> list[ServedBlock]:
     """Return the blocks below the head, whose headers must be served."""
     return chain.blocks[:-1]
 
@@ -198,7 +194,7 @@ def assert_wire_coverage(
     """
 
     def missing_blocks(
-        required: list[Block], ever_served: set[Hash]
+        required: list[ServedBlock], ever_served: set[Hash]
     ) -> list[int]:
         """Return the numbers of `required` blocks never served."""
         return [

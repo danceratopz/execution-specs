@@ -1,8 +1,10 @@
 """
-Tests for rebuilding served blocks from Engine API payloads.
+Tests for the blocks a mock peer serves.
 
-The reconstruction self-checks each header's hash but not its body, so
-these check every rebuilt body against the roots its header commits to.
+Blocks rebuilt from Engine API payloads self-check each header's hash
+but not its body, so these check every rebuilt body against the roots
+its header commits to. Blocks served from fixture RLP are checked
+against the decoded fixture blocks.
 """
 
 import dataclasses
@@ -19,6 +21,8 @@ from trie import HexaryTrie
 from execution_testing.base_types import Address, Bytes
 from execution_testing.fixtures.blockchain import (
     BlockchainEngineFixture,
+    BlockchainFixture,
+    FixtureBlock,
     FixtureEngineNewPayload,
     FixtureHeader,
 )
@@ -28,7 +32,10 @@ from ..chain import (
     Block,
     Chain,
     ChainReconstructionError,
+    RlpBlock,
+    UndecodableBlockError,
     chain_from_payloads,
+    linked_chain,
 )
 
 FIXTURES = Path(__file__).parents[2] / "specs" / "tests" / "fixtures"
@@ -72,7 +79,9 @@ def _transaction_bytes(item: Any) -> bytes:
 def _shanghai_head() -> Block:
     """Return the rebuilt head block of the Shanghai engine fixture."""
     fixture = _fixture()
-    return chain_from_payloads(fixture.genesis, fixture.payloads).head
+    return cast(
+        Block, chain_from_payloads(fixture.genesis, fixture.payloads).head
+    )
 
 
 def _tampered(payload: FixtureEngineNewPayload) -> FixtureEngineNewPayload:
@@ -95,7 +104,10 @@ class TestChainFromPayloads:
 
         assert len(chain.blocks) == len(fixture.payloads)
         assert chain.head.block_hash == bytes(fixture.last_block_hash)
-        for block, payload in zip(chain.blocks, fixture.payloads, strict=True):
+        for served, payload in zip(
+            chain.blocks, fixture.payloads, strict=True
+        ):
+            block = cast(Block, served)
             execution_payload = payload.params[0]
             assert block.block_hash == bytes(execution_payload.block_hash)
             assert chain.number_of(block.block_hash) == block.number
@@ -186,3 +198,110 @@ class TestBodyShape:
         )
         chain = Chain(genesis, [])
         assert chain.body_rlp_by_hash(genesis.block_hash) == expected
+
+
+RLP_FIXTURES = {
+    "valid": "blockchain_london_valid_filled.json",
+    "invalid": "blockchain_london_invalid_filled.json",
+}
+
+
+@functools.cache
+def _rlp_fixture(name: str) -> BlockchainFixture:
+    """Load the single blockchain_test fixture in the file `name`."""
+    (fixture,) = json.loads((FIXTURES / name).read_text()).values()
+    return BlockchainFixture.model_validate(fixture)
+
+
+def _header_list(header: FixtureHeader) -> List[Any]:
+    """Return `header` decoded into its RLP fields."""
+    return cast(List[Any], eth_rlp.decode(bytes(header.rlp)))
+
+
+class TestRlpBlock:
+    """A fixture block's RLP splits into the header and body it serves."""
+
+    def test_a_valid_chain_serves_its_fixture_headers(self) -> None:
+        """Each block hashes as declared and links to its parent."""
+        fixture = _rlp_fixture(RLP_FIXTURES["valid"])
+        blocks = []
+        for entry in fixture.blocks:
+            assert isinstance(entry, FixtureBlock)
+            block = RlpBlock.from_rlp(bytes(entry.rlp))
+            assert block.block_hash == entry.header.block_hash
+            assert block.header_rlp() == bytes(entry.header.rlp)
+            assert block.number == int(entry.header.number)
+            assert block.timestamp == int(entry.header.timestamp)
+            assert block.state_root == entry.header.state_root
+            assert block.difficulty == int(entry.header.difficulty)
+            assert block.owes_body == bool(entry.txs)
+            blocks.append(block)
+        chain = linked_chain(fixture.genesis, blocks)
+        assert chain.head.block_hash == fixture.last_block_hash
+        assert chain.total_difficulty == int(fixture.genesis.difficulty) + sum(
+            int(cast(FixtureBlock, entry).header.difficulty)
+            for entry in fixture.blocks
+        )
+
+    def test_the_body_is_the_rest_of_the_block(self) -> None:
+        """The served body is the block's lists after the header."""
+        fixture = _rlp_fixture(RLP_FIXTURES["valid"])
+        entry = fixture.blocks[0]
+        _, *body = cast(List[Any], eth_rlp.decode(bytes(entry.rlp)))
+        block = RlpBlock.from_rlp(bytes(entry.rlp))
+        assert block.body_rlp() == eth_rlp.encode(body)
+        assert Chain(fixture.genesis, [block]).body_rlp_by_hash(
+            block.block_hash
+        ) == eth_rlp.encode(body)
+
+    def test_an_invalid_block_is_served_as_declared(self) -> None:
+        """An expected-invalid block still splits; its parent links."""
+        fixture = _rlp_fixture(RLP_FIXTURES["invalid"])
+        valid = RlpBlock.from_rlp(bytes(fixture.blocks[1].rlp))
+        invalid = RlpBlock.from_rlp(bytes(fixture.blocks[2].rlp))
+        assert not isinstance(fixture.blocks[2], FixtureBlock)
+        assert invalid.parent_hash == valid.block_hash
+        assert invalid.number == valid.number + 1
+
+    @pytest.mark.parametrize(
+        "uncles, owes",
+        [([], False), (["uncle"], True)],
+        ids=["empty", "uncle-only"],
+    )
+    def test_an_uncle_alone_makes_the_body_owed(
+        self, uncles: List[str], owes: bool
+    ) -> None:
+        """A body without transactions but with an uncle is fetched."""
+        genesis = _header_list(_rlp_fixture(RLP_FIXTURES["valid"]).genesis)
+        body_uncles = [genesis for _ in uncles]
+        block = RlpBlock.from_rlp(eth_rlp.encode([genesis, [], body_uncles]))
+        assert block.owes_body is owes
+        assert block.body_rlp() == eth_rlp.encode([[], body_uncles])
+
+    @pytest.mark.parametrize(
+        "block_rlp",
+        [
+            pytest.param(b"\xf8", id="truncated"),
+            pytest.param(eth_rlp.encode(b"block"), id="not-a-list"),
+            pytest.param(eth_rlp.encode([[b""] * 14, [], []]), id="short-header"),
+            pytest.param(eth_rlp.encode([[b""] * 15, []]), id="no-uncle-list"),
+            pytest.param(
+                eth_rlp.encode([[b""] * 15, b"", []]), id="body-not-a-list"
+            ),
+            pytest.param(
+                eth_rlp.encode([[b"\x00" * 31] + [b""] * 14, [], []]),
+                id="short-parent-hash",
+            ),
+        ],
+    )
+    def test_an_unservable_block_is_refused(self, block_rlp: bytes) -> None:
+        """RLP that is not a header and body lists cannot be served."""
+        with pytest.raises(UndecodableBlockError):
+            RlpBlock.from_rlp(block_rlp)
+
+    def test_a_gap_is_refused(self) -> None:
+        """A block that does not name its predecessor breaks the chain."""
+        fixture = _rlp_fixture(RLP_FIXTURES["valid"])
+        blocks = [RlpBlock.from_rlp(bytes(b.rlp)) for b in fixture.blocks]
+        with pytest.raises(ChainReconstructionError, match="block 3 does not extend"):
+            linked_chain(fixture.genesis, [blocks[0], blocks[2]])

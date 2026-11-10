@@ -303,7 +303,7 @@ class MockPeer:
                 self.fork_schedule,
                 genesis_timestamp=int(chain.genesis.timestamp),
                 head_number=chain.head.number,
-                head_timestamp=int(chain.head.header.timestamp),
+                head_timestamp=chain.head.timestamp,
             ),
             earliest_block=0,
             latest_block=chain.head.number,

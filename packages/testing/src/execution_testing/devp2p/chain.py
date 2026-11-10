@@ -1,21 +1,26 @@
 """
-Reconstruction of consensus blocks from Engine API payloads.
+The blocks a mock peer serves, from either of two fixture sources.
 
 An Engine X fixture stores each block as the `engine_newPayload` request
 that delivers it. A payload omits the header fields the client is
 expected to derive - the two transaction and withdrawal tries, and the
 constants a post-merge header carries - so serving those blocks over the
-wire means putting them back.
+wire means putting them back. The reconstruction is self checking: a
+rebuilt header is only accepted if its hash equals the block hash the
+payload already claims.
 
-The reconstruction is self checking: a rebuilt header is only accepted if
-its hash equals the block hash the payload already claims.
+A Blockchain Test X fixture stores each block as its RLP, which a block
+before the merge is only ever expressed as (a payload has no difficulty,
+nonce or uncles). Those blocks are served as their RLP encodes them,
+uncles included.
 """
 
 import logging
 from dataclasses import dataclass
-from typing import Dict, List, Sequence
+from typing import Dict, List, Protocol, Sequence
 
 import ethereum_rlp as eth_rlp
+from ethereum_rlp.exceptions import DecodingError
 from ethereum_types.numeric import Uint
 from trie import HexaryTrie
 
@@ -47,9 +52,66 @@ def _transactions_root(transactions: Sequence[Bytes]) -> bytes:
     return trie.root_hash
 
 
+class ServedBlock(Protocol):
+    """What a mock peer and its consumer read of a block it serves."""
+
+    @property
+    def bal_rlp(self) -> bytes | None:
+        """Return the block's RLP encoded BAL, `None` before Amsterdam."""
+        ...
+
+    @property
+    def number(self) -> int:
+        """Return the block number."""
+        ...
+
+    @property
+    def block_hash(self) -> Hash:
+        """Return the block hash."""
+        ...
+
+    @property
+    def parent_hash(self) -> Hash:
+        """Return the parent's block hash."""
+        ...
+
+    @property
+    def timestamp(self) -> int:
+        """Return the block timestamp."""
+        ...
+
+    @property
+    def difficulty(self) -> int:
+        """Return the block difficulty (zero after the merge)."""
+        ...
+
+    @property
+    def state_root(self) -> Hash:
+        """Return the state root the header commits to."""
+        ...
+
+    @property
+    def owes_body(self) -> bool:
+        """
+        Return whether a client must fetch the body to hold the block.
+
+        A body with no item in any of its lists is derived from its
+        header, so syncing clients skip it.
+        """
+        ...
+
+    def header_rlp(self) -> bytes:
+        """Return the RLP encoded header."""
+        ...
+
+    def body_rlp(self) -> bytes:
+        """Return the RLP encoded block body."""
+        ...
+
+
 @dataclass
 class Block:
-    """One reconstructed block, ready to be served to a peer."""
+    """One block rebuilt from its Engine API payload, ready to be served."""
 
     header: FixtureHeader
     transactions: List[Bytes]
@@ -71,6 +133,31 @@ class Block:
         """Return the block hash."""
         return self.header.block_hash
 
+    @property
+    def parent_hash(self) -> Hash:
+        """Return the parent's block hash."""
+        return self.header.parent_hash
+
+    @property
+    def timestamp(self) -> int:
+        """Return the block timestamp."""
+        return int(self.header.timestamp)
+
+    @property
+    def difficulty(self) -> int:
+        """Return the block difficulty (zero after the merge)."""
+        return int(self.header.difficulty)
+
+    @property
+    def state_root(self) -> Hash:
+        """Return the state root the header commits to."""
+        return self.header.state_root
+
+    @property
+    def owes_body(self) -> bool:
+        """Return whether the body holds a transaction or withdrawal."""
+        return bool(self.transactions or self.withdrawals)
+
     def header_rlp(self) -> bytes:
         """Return the RLP encoded header."""
         return bytes(self.header.rlp)
@@ -91,6 +178,112 @@ class Block:
                 )
             )
         return encode_list(items)
+
+
+HEADER_PARENT_HASH = 0
+HEADER_STATE_ROOT = 3
+HEADER_DIFFICULTY = 7
+HEADER_NUMBER = 8
+HEADER_TIMESTAMP = 11
+HEADER_MINIMUM_FIELDS = 15
+"""Every header since Frontier has these 15 fields; later forks append."""
+
+
+class UndecodableBlockError(ChainReconstructionError):
+    """
+    Raised when a fixture's block RLP is not a block a peer can serve.
+
+    The RLP does not decode, or does not decode to a header and body
+    lists: a client would drop the peer for the response rather than
+    judge the block, so such a block has no devp2p representation.
+    """
+
+
+def _uint(field: object, name: str) -> int:
+    """Return the integer a header `field` encodes, or raise."""
+    if not isinstance(field, bytes) or field[:1] == b"\x00":
+        raise UndecodableBlockError(f"header {name} is not an integer")
+    return int.from_bytes(field, "big")
+
+
+def _hash32(field: object, name: str) -> Hash:
+    """Return the hash a header `field` holds, or raise."""
+    if not isinstance(field, bytes) or len(field) != 32:
+        raise UndecodableBlockError(f"header {name} is not a 32-byte hash")
+    return Hash(field)
+
+
+@dataclass(frozen=True)
+class RlpBlock:
+    """
+    One block served as its fixture RLP encodes it, uncles included.
+
+    The header and the body are served as the re-encoded parts of the
+    decoded block, which is the fixture's bytes for any canonical
+    encoding; a caller holding the block's declared hash checks it
+    against `block_hash`.
+    """
+
+    _header_rlp: bytes
+    _body_rlp: bytes
+    number: int
+    block_hash: Hash
+    parent_hash: Hash
+    timestamp: int
+    difficulty: int
+    state_root: Hash
+    owes_body: bool
+    bal_rlp: bytes | None = None
+
+    @classmethod
+    def from_rlp(cls, block_rlp: bytes) -> "RlpBlock":
+        """
+        Split a block's RLP into its served header and body.
+
+        Raise `UndecodableBlockError` when the RLP does not decode to a
+        header list of at least the Frontier fields followed by the body
+        lists.
+        """
+        try:
+            decoded = eth_rlp.decode(block_rlp)
+        except DecodingError as error:
+            raise UndecodableBlockError(
+                f"block RLP does not decode: {error}"
+            ) from error
+        if (
+            not isinstance(decoded, list)
+            or len(decoded) < 3
+            or not all(isinstance(item, list) for item in decoded)
+        ):
+            raise UndecodableBlockError(
+                "block RLP is not a header list followed by body lists"
+            )
+        header, *body = decoded
+        if len(header) < HEADER_MINIMUM_FIELDS:
+            raise UndecodableBlockError(
+                f"header has {len(header)} fields, fewer than "
+                f"{HEADER_MINIMUM_FIELDS}"
+            )
+        header_rlp = eth_rlp.encode(header)
+        return cls(
+            _header_rlp=header_rlp,
+            _body_rlp=eth_rlp.encode(body),
+            number=_uint(header[HEADER_NUMBER], "number"),
+            block_hash=Hash(Bytes(header_rlp).keccak256()),
+            parent_hash=_hash32(header[HEADER_PARENT_HASH], "parent hash"),
+            timestamp=_uint(header[HEADER_TIMESTAMP], "timestamp"),
+            difficulty=_uint(header[HEADER_DIFFICULTY], "difficulty"),
+            state_root=_hash32(header[HEADER_STATE_ROOT], "state root"),
+            owes_body=any(len(items) > 0 for items in body),
+        )
+
+    def header_rlp(self) -> bytes:
+        """Return the RLP encoded header."""
+        return self._header_rlp
+
+    def body_rlp(self) -> bytes:
+        """Return the RLP encoded block body."""
+        return self._body_rlp
 
 
 def block_from_payload(payload: FixtureEngineNewPayload) -> Block:
@@ -174,19 +367,21 @@ class Chain:
     then asks for bodies by hash.
     """
 
-    def __init__(self, genesis: FixtureHeader, blocks: Sequence[Block]):
+    def __init__(
+        self, genesis: FixtureHeader, blocks: Sequence[ServedBlock]
+    ):
         """Build a chain of `blocks` descending from `genesis`."""
         self.genesis = genesis
         self.blocks = list(blocks)
-        self._by_number: Dict[int, Block] = {
+        self._by_number: Dict[int, ServedBlock] = {
             block.number: block for block in self.blocks
         }
-        self._by_hash: Dict[Hash, Block] = {
+        self._by_hash: Dict[Hash, ServedBlock] = {
             block.block_hash: block for block in self.blocks
         }
 
     @property
-    def head(self) -> Block:
+    def head(self) -> ServedBlock:
         """Return the last block of the chain."""
         return self.blocks[-1]
 
@@ -200,7 +395,7 @@ class Chain:
         difficulty is zero, so it is the total difficulty of genesis.
         """
         return int(self.genesis.difficulty) + sum(
-            int(block.header.difficulty) for block in self.blocks
+            block.difficulty for block in self.blocks
         )
 
     def header_rlp_by_number(self, number: int) -> bytes | None:
@@ -311,11 +506,24 @@ def chain_from_payloads(
     predecessor: a chain served with a gap in it would make a client's
     sync failure look like a client bug.
     """
-    blocks = [block_from_payload(payload) for payload in payloads]
+    return linked_chain(
+        genesis, [block_from_payload(payload) for payload in payloads]
+    )
 
+
+def linked_chain(
+    genesis: FixtureHeader, blocks: Sequence[ServedBlock]
+) -> Chain:
+    """
+    Return the chain of `blocks` above `genesis`, each naming the last.
+
+    Raise `ChainReconstructionError` at the first block that does not
+    name its predecessor: a chain served with a gap in it would make a
+    client's sync failure look like a client bug.
+    """
     parent_hash = genesis.block_hash
     for block in blocks:
-        if block.header.parent_hash != parent_hash:
+        if block.parent_hash != parent_hash:
             raise ChainReconstructionError(
                 f"block {block.number} does not extend its predecessor"
             )

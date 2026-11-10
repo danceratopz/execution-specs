@@ -811,9 +811,6 @@ def _run_sync_target(
     assert_wire_coverage(chain, mock_peer, "reached the expected head")
 
 
-PRE_MERGE_FORKCHOICE_VERSION = 1
-"""The forkchoice update version that names a pre-merge head."""
-
 CANONICAL_HEAD_TIMEOUT = 10.0
 """
 Seconds a client that imported the named head may take to make it its
@@ -850,8 +847,9 @@ def _run_pre_merge_target(
     Make one client sync or reject a chain whose head it knows by hash.
 
     A pre-merge head has no payload form, so the only announcement is
-    `engine_forkchoiceUpdatedV1` naming it, with the zero hash as safe
-    and finalized block, repeated every `announce_interval`. The client
+    an `engine_forkchoiceUpdated` naming it (V1 before the merge, see
+    `SyncTargetCase.forkchoice_version`), with the zero hash as safe and
+    finalized block, repeated every `announce_interval`. The client
     fetches every block from the peer, the head included. A valid chain
     passes once the head is the client's canonical head with the
     expected state root; an invalid one once a forkchoice update answers
@@ -894,13 +892,14 @@ def _run_pre_merge_target(
         response = engine_rpc.forkchoice_updated(
             forkchoice_state=head_state,
             payload_attributes=None,
-            version=PRE_MERGE_FORKCHOICE_VERSION,
+            version=case.forkchoice_version,
         )
         status = response.payload_status
         answer = _describe_status(status)
         if not answers or answers[-1] != answer:
             logger.info(
-                f"{prefix}forkchoiceUpdatedV1 for head {chain.head.number} "
+                f"{prefix}forkchoiceUpdatedV{case.forkchoice_version} for "
+                f"head {chain.head.number} "
                 f"answered {answer}"
             )
         answers.append(answer)
@@ -949,7 +948,8 @@ def _run_pre_merge_target(
                 if status.status == PayloadStatusEnum.VALID:
                     raise LoggedError(
                         f"{prefix}Client accepted the invalid chain: "
-                        "forkchoiceUpdatedV1 answered VALID for the invalid "
+                        f"forkchoiceUpdatedV{case.forkchoice_version} "
+                        "answered VALID for the invalid "
                         f"head {head_hash}. {transcript()}"
                     )
                 if time.monotonic() >= deadline:

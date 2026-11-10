@@ -344,6 +344,11 @@ class SyncTargetCase:
 
     path: SyncPath
     chain: Chain
+    forkchoice_version: int = 1
+    """
+    The `engine_forkchoiceUpdated` version that names a head by hash:
+    that of the head's fork, and 1 before the merge.
+    """
 
 
 @dataclass(frozen=True)

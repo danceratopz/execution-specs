@@ -574,3 +574,20 @@ class TestRlpPaths:
         ).values()
         assert raw_target_path_lengths(raw_fixture) == [6]
         assert target_path_lengths(_x_fixture(LONDON_INVALID)) == [6]
+
+
+@pytest.mark.parametrize(
+    "name, version",
+    [
+        (LONDON_INVALID, 1),
+        ("chainid_cancun_blockchain_test_tx_type_0.json", 3),
+    ],
+    ids=["pre-merge", "cancun"],
+)
+def test_the_forkchoice_version_follows_the_head_fork(
+    name: str, version: int
+) -> None:
+    """A head named by hash uses its fork's forkchoice update, V1 before."""
+    fixture = _x_fixture(name)
+    cases = wirex.rlp_sync_target_cases(fixture.genesis, fixture)
+    assert {case.forkchoice_version for case in cases} == {version}

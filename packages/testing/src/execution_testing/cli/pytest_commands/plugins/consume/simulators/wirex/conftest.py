@@ -571,10 +571,23 @@ def rlp_sync_target_cases(
         pytest.skip("; ".join(drops) or "fixture has no block")
     for reason in drops:
         logger.info(f"Omitting one of this fixture's leaves: {reason}")
-    return [
-        SyncTargetCase(path=path, chain=rlp_chain(genesis_header, path))
-        for path in paths
-    ]
+    cases = []
+    for path in paths:
+        chain = rlp_chain(genesis_header, path)
+        head = chain.head
+        head_fork = fixture.fork.fork_at(
+            block_number=head.number, timestamp=head.timestamp
+        )
+        cases.append(
+            SyncTargetCase(
+                path=path,
+                chain=chain,
+                forkchoice_version=(
+                    head_fork.engine_forkchoice_updated_version() or 1
+                ),
+            )
+        )
+    return cases
 
 
 @pytest.fixture(scope="session")

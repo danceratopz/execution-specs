@@ -67,6 +67,7 @@ from execution_testing.fixtures.engine_x_checks import (
     ENGINE_X_FIXTURES_DIR,
     EngineXCheckError,
     EngineXExecutionDriftError,
+    verify_blockchain_x_execution,
     verify_engine_x_execution,
 )
 from execution_testing.fixtures.pre_alloc_groups import (
@@ -1018,25 +1019,24 @@ def pytest_terminal_summary(
                 yellow=True,
             )
 
-    engine_x_warning = getattr(config, "engine_x_check_warning", None)
-    if engine_x_warning is not None:
+    grouped_check_warning = getattr(config, "grouped_check_warning", None)
+    if grouped_check_warning is not None:
         terminalreporter.write_sep(
             "=",
-            " WARNING: Engine X execution consistency check skipped ",
+            " WARNING: grouped execution consistency check skipped ",
             bold=True,
             yellow=True,
         )
-        terminalreporter.write_line(engine_x_warning, yellow=True)
+        terminalreporter.write_line(grouped_check_warning, yellow=True)
 
-    engine_x_error = getattr(config, "engine_x_check_error", None)
-    if engine_x_error is not None:
+    for check_error in getattr(config, "grouped_check_errors", []):
         title = (
-            " ERROR: Engine X execution drift "
-            if isinstance(engine_x_error, EngineXExecutionDriftError)
-            else " ERROR: Engine X execution consistency check failed "
+            " ERROR: execution drift in a pre-allocation group "
+            if isinstance(check_error, EngineXExecutionDriftError)
+            else " ERROR: grouped execution consistency check failed "
         )
         terminalreporter.write_sep("=", title, bold=True, red=True)
-        terminalreporter.write_line(str(engine_x_error), red=True)
+        terminalreporter.write_line(str(check_error), red=True)
 
 
 def _aggregate_cache_stats(node: Any) -> None:
@@ -2267,42 +2267,53 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
             file.unlink()
         _log_timing(f"Lock files removed in {time.time() - t0:.1f}s")
 
-    # Loudly fail the fill if pre-alloc group packing changed any Engine X
-    # test's execution. The check reports through the terminal summary
-    # instead of raising: an exception from this hook would abort the
-    # terminal reporter before the FAILURES section prints (hiding any
-    # test failures, which the drift report may be the explanation for)
-    # and would skip the index merge and tarball below. Drift still fails
-    # the fill via the session exit status. The check runs on unclean
-    # sessions too: a leaked account that breaks a test's post-state is
-    # exactly the failure the drift report diagnoses.
+    # Loudly fail the fill if pre-alloc group packing changed the
+    # execution of any test of a grouped format. The checks report through
+    # the terminal summary instead of raising: an exception from this hook
+    # would abort the terminal reporter before the FAILURES section prints
+    # (hiding any test failures, which the drift report may be the
+    # explanation for) and would skip the index merge and tarball below.
+    # Drift still fails the fill via the session exit status. The checks
+    # run on unclean sessions too: a leaked account that breaks a test's
+    # post-state is exactly the failure the drift report diagnoses.
     if not session.config.getoption("optimistic_pre_alloc_grouping_disabled"):
-        _log_timing("verify_engine_x_execution: starting...")
+        _log_timing("grouped execution checks: starting...")
         t0 = time.time()
-        try:
-            engine_x_check = verify_engine_x_execution(
-                fixture_output.directory
-            )
-        except EngineXCheckError as check_error:
-            logger.error(str(check_error))
-            session.config.engine_x_check_error = check_error  # type: ignore[attr-defined] # noqa: E501
+        check_errors: List[EngineXCheckError] = []
+        skip_reasons: List[str] = []
+        # Engine X covers the groups from Paris on; Blockchain Test X the
+        # groups of the forks before it. One failing check does not skip
+        # the other.
+        for verify in (
+            verify_engine_x_execution,
+            verify_blockchain_x_execution,
+        ):
+            try:
+                grouped_check = verify(fixture_output.directory)
+            except EngineXCheckError as check_error:
+                logger.error(str(check_error))
+                check_errors.append(check_error)
+                continue
+            if grouped_check.compared > 0:
+                logger.info(grouped_check.summary)
+            if grouped_check.skip_reason is not None:
+                logger.warning(grouped_check.skip_reason)
+                skip_reasons.append(grouped_check.skip_reason)
+        if check_errors:
+            session.config.grouped_check_errors = check_errors  # type: ignore[attr-defined] # noqa: E501
             session.exitstatus = pytest.ExitCode.TESTS_FAILED
-        else:
-            if engine_x_check.compared > 0:
-                logger.info(engine_x_check.summary)
-            if engine_x_check.skip_reason is not None:
-                logger.warning(engine_x_check.skip_reason)
-                # Repeated in the terminal summary; a log line alone is
-                # easy to miss.
-                session.config.engine_x_check_warning = (  # type: ignore[attr-defined] # noqa: E501
-                    engine_x_check.skip_reason
-                )
+        if skip_reasons:
+            # Repeated in the terminal summary; a log line alone is easy
+            # to miss.
+            session.config.grouped_check_warning = "\n".join(  # type: ignore[attr-defined] # noqa: E501
+                skip_reasons
+            )
         _log_timing(
-            f"verify_engine_x_execution: done in {time.time() - t0:.1f}s"
+            f"grouped execution checks: done in {time.time() - t0:.1f}s"
         )
     elif (fixture_output.directory / ENGINE_X_FIXTURES_DIR).is_dir():
         logger.info(
-            "Engine X execution consistency check skipped: optimistic "
+            "Grouped execution consistency checks skipped: optimistic "
             "pre-alloc grouping is disabled."
         )
 

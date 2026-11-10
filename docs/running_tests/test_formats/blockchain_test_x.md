@@ -49,7 +49,7 @@ For each [`BlockchainTestXFixture`](#blockchaintestxfixture) test object in the 
 
 Every test of a group is an independent chain that forks at the group's genesis, so a client reused across the group must be able to switch to the head of each test in turn.
 
-No `consume` command reads this format yet. The planned Hive consumer is [`consume wirex`](../consume/wirex.md), which already reuses one client per pre-allocation group for Blockchain Engine X Tests and delivers their blocks over devp2p.
+[`consume wirex`](../consume/wirex.md) reads this format: it reuses one client per pre-allocation group and makes the client sync each test's blocks from a mock devp2p peer. It names each test's last block by hash in a forkchoice update (see [Pre-Merge Forks](../consume/wirex.md#pre-merge-forks)).
 
 ## Structures
 

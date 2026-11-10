@@ -2,11 +2,11 @@
 
 The WireX simulator (`eels/consume-wirex`) makes the client under test full sync each test's chain from a deterministic mock devp2p peer implemented inside the testing framework.
 
-The goal is to check, using the consensus test corpus, that clients can download blocks from a peer over devp2p and execute them. It does not try to test every part of historical sync. WireX intends to replace [`consume rlp`](../running.md#rlp) for post-Merge forks: instead of a client-specific offline import at startup, the same blocks travel the client's production peer-to-peer path.
+The goal is to check, using the consensus test corpus, that clients can download blocks from a peer over devp2p and execute them. It does not try to test every part of historical sync. WireX intends to replace [`consume rlp`](../running.md#rlp): instead of a client-specific offline import at startup, the same blocks travel the client's production peer-to-peer path.
 
-WireX consumes the [Blockchain Engine X Test](../test_formats/blockchain_test_engine_x.md) fixture format and reuses one client per pre-allocation group, like [`consume enginex`](../running.md#enginex). Each test is an independent chain forking at the group's genesis. Two things differ from EngineX:
+WireX consumes two grouped fixture formats: [Blockchain Engine X Tests](../test_formats/blockchain_test_engine_x.md) for Paris onward, and [Blockchain X Tests](../test_formats/blockchain_test_x.md) for the forks before Paris (see [Pre-Merge Forks](#pre-merge-forks)). It reuses one client per pre-allocation group, like [`consume enginex`](../running.md#enginex). Each test is an independent chain forking at the group's genesis. Two things differ from EngineX:
 
-- EngineX sends every block with `engine_newPayload`. WireX sends only the head it announces that way; the client downloads every block below it from the mock peer.
+- EngineX sends every block with `engine_newPayload`. WireX sends only the head it announces that way; the client downloads every block below it from the mock peer. A pre-merge head is not sent at all, only named by its hash.
 - EngineX resets the client to genesis with a forkchoice update before each test. WireX never resets the client between tests (see [The Control Plane and the Data Plane](#the-control-plane-and-the-data-plane)).
 
 [Test Ordering and Client Reuse](#test-ordering-and-client-reuse) lists when WireX starts a fresh client instead of reusing the group's client.
@@ -27,7 +27,7 @@ WireX runs against Hive in development mode, like the other consume simulators. 
     export HIVE_SIMULATOR=http://127.0.0.1:3000
     ```
 
-3. Fill Blockchain Engine X fixtures. `fill` writes this format only with `--generate-all-formats` (see [Generating All Fixture Formats](../../filling_tests/filling_tests_command_line.md#generating-all-fixture-formats)). A fixture release carries it only if it was filled with that flag; see [Consume Cache and Fixture Inputs](./cache.md) for using a release as `--input`.
+3. Fill Blockchain Engine X fixtures, and Blockchain X fixtures for forks before Paris. `fill` writes these formats only with `--generate-all-formats` (see [Generating All Fixture Formats](../../filling_tests/filling_tests_command_line.md#generating-all-fixture-formats)). A fixture release carries it only if it was filled with that flag; see [Consume Cache and Fixture Inputs](./cache.md) for using a release as `--input`.
 
     ```bash
     uv run fill --generate-all-formats --output=fixtures tests/prague/
@@ -63,6 +63,7 @@ The WireX options are:
 | `--wirex-verdict-grace` | `15` (seconds) | [Tuning](#tuning) |
 | `--wirex-sync-loop-interval` | the simulator's `HIVE_SYNC_LOOP_INTERVAL_MS`, else `10` (milliseconds) | [Tuning](#tuning) |
 | `--wirex-announce-interval` | `3` (seconds) | [Process Diagram](#process-diagram) |
+| `--wirex-pre-merge-announce-interval` | `1` (seconds) | [How a Pre-Merge Test Runs](#how-a-pre-merge-test-runs) |
 | `--wirex-poll-interval` | `0.005` (seconds) | [Process Diagram](#process-diagram) |
 | `--wirex-eth-version` | `auto` | [The Mock Peer](#the-mock-peer) |
 | `--wirex-no-sort-by-chain-length` | off | [Test Ordering and Client Reuse](#test-ordering-and-client-reuse) |
@@ -80,6 +81,8 @@ An Amsterdam-onward test ID ends in the mode it ran under, `-bal_withheld` or `-
 ### Skipped Sync Targets
 
 A path is the chain from genesis up to one sync target (see [Sync Targets and Chain Classes](#sync-targets-and-chain-classes)). WireX skips a sync target when its path, target included, has fewer blocks than `--wirex-min-blocks` (default 2). The target itself arrives over the Engine API, so a one-block path would put nothing on devp2p.
+
+`--wirex-min-blocks` does not apply to [pre-merge forks](#pre-merge-forks), whose every block travels devp2p.
 
 A fixture without `syncPayloads` has its own last block as its only target. Each of its single-block tests is then a one-block path and is skipped by default, so a run on such fixtures can skip many tests. To run them anyway, pass `--wirex-min-blocks 1`; those tests then deliver their block over the Engine API only and check nothing on devp2p.
 
@@ -168,7 +171,7 @@ The simulator polls for the head block instead of repeating the forkchoice updat
 
 ### The Mock Peer
 
-The peer lives in `execution_testing.devp2p`: an RLPx transport (ECIES handshake, frame MACs, Snappy compression, p2p v5) and the eth wire protocol, versions 69 to 72. The highest version both sides share wins and is recorded in each test's transcript; `--wirex-eth-version` pins one (the default, `auto`, lets negotiation pick), so a client that lacks it fails the handshake loudly.
+The peer lives in `execution_testing.devp2p`: an RLPx transport (ECIES handshake, frame MACs, Snappy compression, p2p v5) and the eth wire protocol, versions 68 to 72 (eth/68 for clients waiting for the merge, see [The Mock Peer Before the Merge](#the-mock-peer-before-the-merge)). The highest version both sides share wins and is recorded in each test's transcript; `--wirex-eth-version` pins one (the default, `auto`, lets negotiation pick), so a client that lacks it fails the handshake loudly.
 
 The peer is deliberately honest: it never withholds, reorders or corrupts a response, so a sync failure is a finding about the client or the fixture, not the peer.
 
@@ -204,7 +207,7 @@ With a sync target from `syncPayloads`, the verdict must also have been reached 
 
 Only the fact of rejection is asserted, never its cause: `validationError` is free-form client text and devp2p carries no reason at all. The client's reason is logged.
 
-If an `INVALID` answer gives a `latestValidHash`, it must be the parent of the first invalid block on the path. Any other hash fails the test, so a client that blames a valid block fails. A null hash is accepted. The all-zero hash names a PoW ancestor, which here can only be genesis, so it passes only when genesis is the expected hash. An `INVALID_BLOCK_HASH` answer fails the test, since every served payload hashes to its `blockHash`. The log shows the result after `latestValidHash check:` as `match`, `null` (no hash given), `unchecked` (no block on the path is invalid, so there is no hash to match) or `mismatch` (the test fails). After every rejection, WireX also sends the payload of the block the hash should name, the parent of the first invalid block, and requires `VALID`, so a client that rejects a valid block below the invalid one fails even when it gives no hash. Genesis needs no check.
+If an `INVALID` answer gives a `latestValidHash`, it must be the parent of the first invalid block on the path. Any other hash fails the test, so a client that blames a valid block fails. A null hash is accepted. The all-zero hash names a PoW ancestor, which after the merge can only be genesis, so it passes only when genesis is the expected hash (before the merge it always passes, see [Verdicts Before the Merge](#verdicts-before-the-merge)). An `INVALID_BLOCK_HASH` answer fails the test, since every served payload hashes to its `blockHash`. The log shows the result after `latestValidHash check:` as `match`, `null` (no hash given), `unchecked` (no block on the path is invalid, so there is no hash to match) or `mismatch` (the test fails). After every rejection, WireX also sends the payload of the block the hash should name, the parent of the first invalid block, and requires `VALID`, so a client that rejects a valid block below the invalid one fails even when it gives no hash. Genesis needs no check.
 
 A fixture that declares an Engine API error code for its head passes when the client refuses `engine_newPayload` with that code. As in EngineX, the refusal must come from `engine_newPayload` itself, so any answer fails the test, `INVALID` included.
 
@@ -224,6 +227,7 @@ A group normally shares one client. WireX starts a fresh client instead in these
 - Engine-only ancestor: the chain's ancestry holds a block the reused client got only over the Engine API, such as the head an earlier fixture without sync targets announced. The client keeps that block without fetching it, so it would never travel the wire.
 - Head lookup failure: WireX cannot read the reused client's head.
 - `--wirex-bals both`: each BAL mode has its own client (see [Block Access Lists](#block-access-lists)).
+- besu and nethermind before the merge: every pre-merge test gets a fresh client, since both sync only the first pre-merge head named to them (see [Client Support](#client-support)). A client started for the group and not yet named a head is used as it is.
 
 In the rejection, Engine-only ancestor, reorg and head lookup cases, the fresh client replaces the group's client for the rest of the group, and a warning names the reason (see [Reading Results](#reading-results)).
 
@@ -235,6 +239,81 @@ The evidence is cumulative per client: tests of one group may declare byte-ident
 
 The peer records a response only after writing it, so a failed send never reads as service. A fast client can import the chain moments before the evidence lands, so a missing block is re-read until a short grace period has passed before it fails the test.
 
+## Pre-Merge Forks
+
+WireX runs forks before Paris (Frontier to London) from the [Blockchain X Test](../test_formats/blockchain_test_x.md) format, `blockchain_test_x`. Its blocks are RLP, the only form a proof-of-work block has: an Engine API payload has no difficulty, nonce or uncles. Its pre-allocation groups are in the same `pre_alloc` folder as those of Blockchain Engine X, and a group still boots one client. A run reads both formats from the same `--input`, and routes each fixture by its format.
+
+`fill --generate-all-formats` writes Blockchain X fixtures for the forks before Paris and Blockchain Engine X fixtures from Paris on, so every fork has exactly one grouped format. A pre-merge test runs from `blockchain_tests_x` and a post-merge test from `blockchain_tests_engine_x`; a fixture release contains both, so a WireX run over a release covers the whole corpus.
+
+### How a Pre-Merge Test Runs
+
+A pre-merge client still serves the Engine API, and a forkchoice update is the only way left to name a head to it: legacy proof-of-work sync, where a client followed the chain with the highest total difficulty its peers announced, is gone from current clients. WireX names the test's last block by its hash and the client fetches the rest over devp2p, exactly as a node syncing mainnet from its Frontier genesis does.
+
+- There is no `engine_newPayload` and no sync target: the head is named in `engine_forkchoiceUpdatedV1` with the zero hash as safe and finalized block, so every block of the chain travels devp2p, the head included. Single-block tests run too, and `--wirex-min-blocks` does not apply.
+- The peer serves each block as the fixture's RLP encodes it, uncles included.
+- With no payload to poll, a verdict on an invalid chain arrives only in the answer to a forkchoice update, so the head is named again every `--wirex-pre-merge-announce-interval` seconds (default 1).
+- Each leaf of the fixture's blocks is a path, as for an Engine X fixture without sync targets: a valid chain, and each invalid block with its ancestors. A fixture with several paths runs each on its own client (see [Test Ordering and Client Reuse](#test-ordering-and-client-reuse)).
+
+```mermaid
+sequenceDiagram
+    participant S as Simulator (pytest)
+    participant E as Client: Engine API
+    participant D as Client: devp2p
+    participant P as MockPeer
+
+    S->>P: set_chain(chain), no BlockRangeUpdate on eth/68
+    loop every second until a verdict
+        S->>E: forkchoiceUpdatedV1(head hash, safe=finalized=0x0)
+        E-->>S: SYNCING (or INVALID)
+    end
+    D->>P: GetBlockHeaders (from the head hash)
+    P-->>D: headers, head included
+    D->>P: GetBlockBodies (non-empty bodies)
+    P-->>D: bodies
+    note over D: full sync executes every block
+    S->>E: eth_getBlockByHash(head), then eth_getBlockByNumber(latest)
+```
+
+### Client Configuration
+
+A pre-merge group's client is configured once, from nothing that depends on a test:
+
+| Setting | Value | Why |
+| ------- | ----- | --- |
+| Fork rules | The Hive ruleset of the group's fork | As `consume rlp`: the fork's rules from genesis, later forks at block 2000, never reached |
+| `HIVE_TERMINAL_TOTAL_DIFFICULTY` | 2^63-1 | No block is terminal, and Hive opens the Engine API only when it is set |
+| `HIVE_MERGE_BLOCK_ID` | 1000000000 | Without a merge block number, reth and nethermind treat every header as post-merge and reject the chain (a post-merge header must have zero difficulty) |
+| `HIVE_SKIP_POW` | `1` | The fixtures are filled without proof of work (`NoProof`), so a client that checks ethash seals while syncing must skip them |
+| `HIVE_NODETYPE` | `full` | Every block is executed |
+
+The head a test names is not terminal and the terminal total difficulty is never reached. Clients sync to it anyway: fork choice follows the Engine API, not total difficulty, so a reused client moves from a long chain to a short sibling chain when it is named.
+
+### The Mock Peer Before the Merge
+
+The peer speaks eth/68 as well as eth/69 to eth/72. A client offers only eth/68 when it waits for the merge (nethermind adds later versions only once it has reached the terminal block). eth/68's Status carries the head's total difficulty, which the peer sums from genesis and the served headers, and eth/68 has no BlockRangeUpdate, so a chain switch announces nothing. The fork id advertises the genesis rules only, since the next fork, at block 2000, lies beyond every test head.
+
+### Verdicts Before the Merge
+
+- A valid chain passes when the client has imported the head, made it its canonical head, and the head's state root matches the fixture. The forkchoice answers are logged but not required to be `VALID`.
+- An invalid chain passes when a forkchoice update answers `INVALID`. A client that refused every proof-of-work head would also answer `INVALID`, so every header of the path, the head's included, must have been served by the peer. Bodies are not required: a client may reject a block from its header alone and fetch no body.
+- `VALID` for an invalid head fails at once, as after the merge.
+- The Engine API names a proof-of-work ancestor with the all-zero `latestValidHash`, and every ancestor of a pre-merge block is one, so the all-zero hash always matches here. The parent of the first invalid block also matches; any other hash fails.
+- An invalid block devp2p cannot carry is skipped with its path: a block whose RLP is not a header and body lists, a body no client decodes (as in [Rejection Tests](#rejection-tests)), a block that hashes like an earlier block of the fixture, or one whose parent is not on the fixture's chain.
+- A rejection shows that the client refused the path, not that it holds the blocks below the first invalid one valid. So WireX then names the parent of the first invalid block by hash, unless it is genesis, and requires it to pass as a valid chain would.
+
+### Client Support
+
+| Client | Pre-merge status |
+| ------ | ---------------- |
+| go-ethereum | Syncs every pre-merge test on a reused client. |
+| erigon | Syncs every pre-merge test on a reused client. It answers a rejection with the hash of the proof-of-work parent instead of the all-zero hash, which WireX accepts since it names the right block. |
+| reth | Syncs on a reused client, but gives no verdict on a block holding a transaction whose sender cannot be recovered (a bad signature or chain id): it drops the peer and fetches the body again after each redial. |
+| besu | Syncs on a fresh client per test (see [Test Ordering and Client Reuse](#test-ordering-and-client-reuse)). Its sync accepts a block whose gas limit is below the 5000 minimum, which its RLP import rejects, and it gives no verdict on a transaction whose sender cannot be recovered. |
+| nethermind | Checks ethash seals during its forward header sync, which no configuration turns off, so it rejects every `NoProof` chain. With a client change that skips seal checks when `HIVE_SKIP_POW` is set, it syncs on a fresh client per test. It offers only eth/68 before the merge. |
+| nimbus-el | Syncs chains of two or more blocks. It starts no sync for a head at most one block above its fork choice base, so a single-block test never gets a verdict. `forkchoiceUpdatedV1` answers `INVALID` for a proof-of-work head it already holds, since the head is below the terminal total difficulty. |
+
+ethrex does not support forks before Paris, and consume deselects its tests for them.
+
 ## Relationship to Other Simulators
 
 |                        | `consume rlp`                       | `consume sync`                          | `consume wirex`                                    |
@@ -243,7 +322,7 @@ The peer records a response only after writing it, so a failed send never reads 
 | Client code path       | Client-specific offline import      | Production sync path                    | Production sync path                               |
 | Determinism            | Deterministic                       | Depends on the serving client           | Deterministic peer, transcripted                   |
 | Clients per test       | One per fixture                     | Two per fixture                         | Reused group client; one isolated client per target for multi-target fixtures |
-| Fork support           | All forks                           | Post-Merge only                         | Post-Merge only                                    |
+| Fork support           | All forks                           | Post-Merge only                         | All forks (Blockchain X before Paris)              |
 | Invalid-block fixtures | Rejection implied by final head     | Rejected via Engine API, never synced   | Targeted paths travel devp2p; rejection asserted   |
 
-`consume sync` validates client-to-client interoperability on a handful of fixtures; WireX runs the whole test corpus on post-Merge forks against a single deterministic peer. `consume rlp` remains the only simulator covering pre-Merge forks.
+`consume sync` validates client-to-client interoperability on a handful of fixtures; WireX runs the whole test corpus against a single deterministic peer, pre-Merge forks included on the clients that support them (see [Client Support](#client-support)). `consume rlp` stays the simulator for clients that cannot sync pre-Merge chains yet, and for fixtures devp2p cannot carry (blocks whose RLP is not a header and body lists).

@@ -603,7 +603,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         dest="generate_all_formats",
         default=False,
         help=(
-            "Generate all fixture formats including BlockchainEngineX. "
+            "Generate all fixture formats, including the grouped formats "
+            "blockchain_test_engine_x and blockchain_test_x. "
             "Enables two-phase execution: Phase 1 generates pre-allocation "
             "groups, phase 2 generates all supported fixture formats."
         ),

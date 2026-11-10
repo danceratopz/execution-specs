@@ -37,7 +37,10 @@ class FixtureOutput(BaseModel):
     )
     should_generate_all_formats: bool = Field(
         default=False,
-        description="Generate all formats including BlockchainEngineXFixture.",
+        description=(
+            "Generate all formats, including the grouped formats "
+            "BlockchainEngineXFixture and BlockchainXFixture."
+        ),
     )
 
     @property
@@ -65,7 +68,13 @@ class FixtureOutput(BaseModel):
 
     @property
     def pre_alloc_groups_folder_path(self) -> Path:
-        """Return the path for pre-allocation groups folder."""
+        """
+        Return the path for pre-allocation groups folder.
+
+        Every grouped format (`BlockchainEngineXFixture`,
+        `BlockchainXFixture`) reads its groups from this one folder: a group
+        does not depend on the fixture format.
+        """
         # Local import: fixtures.collector imports from this module.
         from execution_testing.fixtures.blockchain import (
             BlockchainEngineXFixture,

@@ -77,7 +77,7 @@ A digest stays pullable while the registry retains the image. No retention perio
 Published simulator images pair each branch head with the branch's current release. Any other pair, such as an older release against a newer commit, or a release against a commit from another branch, can be assembled locally in about half a minute from the primitive images: the repository image has a `sha-` tag for each published framework build, and fixture and tests images have tags for published releases. Superseded pushes may have no repository image; build one from a checkout for such a commit.
 
 1. Clone or update execution-specs. The build script is `packages/testing/docker/hive/build.sh`.
-2. Pick the framework commit and the release. Commit: `ghcr.io/ethereum/execution-specs:sha-<7 hex>`, or a branch tag such as `ghcr.io/ethereum/execution-specs:glamsterdam-devnet-8`. Release: its tag as it appears on the images, for example `v20.0.1`. The script takes the fixture image of the simulator's format, or the tests image for an execute simulator, from the registry you name.
+2. Pick the framework commit and the release. Commit: `ghcr.io/ethereum/execution-specs:sha-<7 hex>`, or a branch tag such as `ghcr.io/ethereum/execution-specs:glamsterdam-devnet-8`. Release: its tag as it appears on the images, for example `v20.0.1`. The script takes the fixture image of each of the simulator's formats, or the tests image for an execute simulator, from the registry you name.
 3. Build the image. Docker pulls the inputs if they are missing, the fixture image being the large one:
 
     ```bash

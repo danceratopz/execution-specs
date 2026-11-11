@@ -59,16 +59,40 @@ fi
 if [ -n "$fixtures" ]; then
     if [ "$fixtures" = /fixtures ]; then
         if [ -f "$staged/fixtures.tar.gz" ]; then
-            # The image's own format, the one fixture directory beside .meta.
-            format=$(find "$fixtures_dir" -mindepth 1 -maxdepth 1 -type d ! -name .meta -exec basename {} \; | head -n 1)
-            if [ -z "$format" ]; then
+            # The image's own formats, the fixture directories beside .meta.
+            formats=$(find "$fixtures_dir" -mindepth 1 -maxdepth 1 -type d ! -name .meta -exec basename {} \; | sort)
+            if [ -z "$formats" ]; then
                 echo "eels-legacy-build: error: no fixture format in $fixtures_dir to extract" >&2
                 exit 1
             fi
+            members=""
+            for format in $formats; do
+                members="$members fixtures/$format"
+            done
             rm -rf "$fixtures_dir"
             mkdir -p "$fixtures_dir"
+            # A release from before one of the formats existed lacks its
+            # directory; extract the formats it has.
+            # shellcheck disable=SC2086 # one member per format
             tar -xzf "$staged/fixtures.tar.gz" -C "$fixtures_dir" --strip-components=1 \
-                fixtures/.meta "fixtures/$format"
+                fixtures/.meta $members 2> "$staged/tar.log" || {
+                if grep -v -e "Not found in archive" -e "Exiting with failure status" "$staged/tar.log" >&2; then
+                    echo "eels-legacy-build: error: extracting $staged/fixtures.tar.gz failed" >&2
+                    exit 1
+                fi
+            }
+            extracted=""
+            for format in $formats; do
+                if [ -d "$fixtures_dir/$format" ]; then
+                    extracted="$extracted $format"
+                else
+                    echo "eels-legacy-build: warning: the staged fixtures have no $format" >&2
+                fi
+            done
+            if [ -z "$extracted" ] || [ ! -d "$fixtures_dir/.meta" ]; then
+                echo "eels-legacy-build: error: the staged fixtures have none of:" $formats >&2
+                exit 1
+            fi
             printf '%s\n' /fixtures > "$state/fixtures"
         fi
         # Without a staged tarball, /fixtures is the image's own content.

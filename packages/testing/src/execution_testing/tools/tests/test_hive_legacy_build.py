@@ -129,6 +129,55 @@ def test_staged_tarball_replaces_the_image_fixtures(root: Path) -> None:
     assert calls(root) == []
 
 
+@pytest.mark.parametrize(
+    "in_tarball",
+    [
+        pytest.param(
+            ["blockchain_tests_engine_x", "blockchain_tests_x"], id="both"
+        ),
+        pytest.param(["blockchain_tests_engine_x"], id="older-release"),
+    ],
+)
+def test_staged_tarball_replaces_every_image_format(
+    root: Path, in_tarball: list[str]
+) -> None:
+    """
+    An image with two formats keeps both; a release from before one of
+    them existed keeps the formats it has.
+    """
+    (root / "fixtures" / "blockchain_tests").rmdir()
+    for directory in ("blockchain_tests_engine_x", "blockchain_tests_x"):
+        (root / "fixtures" / directory).mkdir()
+    source = root / "source" / "fixtures"
+    for directory in [".meta", "state_tests", *in_tarball]:
+        (source / directory).mkdir(parents=True)
+        (source / directory / "a.json").write_text("{}")
+    with tarfile.open(root / "staged" / "fixtures.tar.gz", "w:gz") as tar:
+        tar.add(source, arcname="fixtures")
+    result = run(root, fixtures="/fixtures")
+    assert result.returncode == 0, result.stderr
+    assert sorted(p.name for p in (root / "fixtures").iterdir()) == [
+        ".meta",
+        *in_tarball,
+    ]
+    if len(in_tarball) == 1:
+        assert "have no blockchain_tests_x" in result.stderr
+    assert state(root) == {"fixtures": "/fixtures"}
+
+
+def test_staged_tarball_without_the_image_formats(root: Path) -> None:
+    """A tarball with none of the image's formats fails the build."""
+    source = root / "source" / "fixtures"
+    for directory in (".meta", "state_tests"):
+        (source / directory).mkdir(parents=True)
+        (source / directory / "a.json").write_text("{}")
+    with tarfile.open(root / "staged" / "fixtures.tar.gz", "w:gz") as tar:
+        tar.add(source, arcname="fixtures")
+    result = run(root, fixtures="/fixtures")
+    assert result.returncode != 0
+    assert "none of: blockchain_tests" in result.stderr
+
+
 def test_image_fixtures_without_a_staged_tarball(root: Path) -> None:
     """`fixtures=/fixtures` alone names the image's own fixtures."""
     result = run(root, fixtures="/fixtures")

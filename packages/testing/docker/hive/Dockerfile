@@ -1,6 +1,8 @@
 # Hive simulator image for a consume simulator: the fixture image of the
 # release, the format the simulator consumes, with the repository image at the
-# branch head flattened on top. Published as
+# branch head flattened on top. A simulator that consumes a second format
+# (consume-wirex) is built with `--target second-format`, which adds that
+# format's fixture image and an index that covers both. Published as
 # ghcr.io/ethereum/execution-specs/hive/<simulator>. The tag selects the version
 # of the tests, here the fixtures, and the framework follows the branch; the
 # execute counterpart is Dockerfile.execute. The fixture image is the base layer
@@ -19,10 +21,12 @@
 # Both are required: the repository and fixture images carry no channel tags.
 ARG BASE_REF
 ARG FIXTURES_REF
+# The fixture image of the second format; only `second-format` reads it.
+ARG EXTRA_FIXTURES_REF=${FIXTURES_REF}
 
 FROM ${BASE_REF} AS base
 
-FROM ${FIXTURES_REF}
+FROM ${FIXTURES_REF} AS consume
 COPY --from=base / /
 COPY entrypoint.sh /usr/local/bin/eels-simulator
 COPY legacy_build.sh /usr/local/bin/eels-legacy-build
@@ -50,3 +54,22 @@ LABEL org.opencontainers.image.source="https://github.com/${EEST_REPOSITORY}" \
 
 WORKDIR /execution-specs/packages/testing
 ENTRYPOINT ["eels-simulator"]
+
+# A second fixture format: its directory, and an index that lists the test
+# cases of both formats. Both fixture images come from the same release, so
+# the rest of .meta is the same in each.
+FROM ${EXTRA_FIXTURES_REF} AS extra_fixtures
+
+FROM base AS merged_index
+COPY merge_index.py /merge_index.py
+RUN --mount=type=bind,from=consume,source=/fixtures/.meta,target=/first \
+    --mount=type=bind,from=extra_fixtures,source=/fixtures/.meta,target=/second \
+    python3 /merge_index.py /first/index.json /second/index.json /out/index.json
+
+FROM consume AS second-format
+ARG EXTRA_FORMAT
+COPY --from=extra_fixtures /fixtures/${EXTRA_FORMAT} /fixtures/${EXTRA_FORMAT}
+COPY --from=merged_index /out/index.json /fixtures/.meta/index.json
+
+# The default target: a simulator that consumes one format.
+FROM consume

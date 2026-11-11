@@ -37,7 +37,7 @@ Only the simulator images are a stable interface. The repository, fixture and te
 | `consume-rlp` | `hive/consume-rlp` | `consume rlp` | `blockchain_tests` fixtures |
 | `consume-engine` | `hive/consume-engine` | `consume engine` | `blockchain_tests_engine` fixtures |
 | `consume-enginex` | `hive/consume-enginex` | `consume enginex` | `blockchain_tests_engine_x` fixtures, pre-alloc groups included |
-| `consume-wirex` | `hive/consume-wirex` | `consume wirex` | `blockchain_tests_engine_x` fixtures, pre-alloc groups included |
+| `consume-wirex` | `hive/consume-wirex` | `consume wirex` | `blockchain_tests_engine_x` and `blockchain_tests_x` fixtures, pre-alloc groups included |
 | `consume-sync` | `hive/consume-sync` | `consume sync` | `blockchain_tests_sync` fixtures |
 | `execute-blobs` | `hive/execute-blobs` | `execute hive -m blob_transaction_test` | the test sources of the release or fill |
 
@@ -119,10 +119,11 @@ All under `packages/testing/`.
 | `docker/fixtures/subset_index.py` | `subset_index.py <src .meta> <dst .meta> --format-dir <dir>`: writes the `.meta` directory of a subset with `index.json` filtered and `test_count`, `fixture_formats` and `forks` recomputed. `root_hash` is cleared. |
 | `docker/tests/Dockerfile` | The tests image: a `tests/` tree under `/execution-specs/tests`. |
 | `docker/tests/build.sh` | `build.sh <git ref or tests dir> <image>`: exports the `tests/` tree of a release tag with `git archive`, or takes a checked-out directory, and builds the image. |
-| `docker/hive/Dockerfile` | A consume simulator image. Build arguments `BASE_REF`, `FIXTURES_REF`, `EEST_SIMULATOR`, and the provenance arguments above. |
+| `docker/hive/Dockerfile` | A consume simulator image. Build arguments `BASE_REF`, `FIXTURES_REF`, `EEST_SIMULATOR`, and the provenance arguments above. The target `second-format` adds the fixture image of a second format, build arguments `EXTRA_FIXTURES_REF` and `EXTRA_FORMAT`, with an index that covers both formats. |
 | `docker/hive/Dockerfile.execute` | An execute simulator image: the repository image with its `tests/` replaced by a tests image. Build arguments `BASE_REF`, `TESTS_REF`, `EEST_SIMULATOR`, and the provenance arguments. |
-| `docker/hive/build.sh` | `build.sh <simulator> <base ref> <registry> <tag> <image>`: picks the Dockerfile and the fixture or tests image for the simulator and builds it. `-` as the registry names local images. Provenance is taken from the environment. |
-| `docker/hive/check.sh` | `check.sh <simulator> <image>`: verifies a built image before it is published. A consume image must carry a non-empty index whose entries all point to files in the image; an execute image must collect the release's tests under the image's framework. |
+| `docker/hive/build.sh` | `build.sh <simulator> <base ref> <registry> <tag> <image>`: picks the Dockerfile and the fixture images or the tests image for the simulator and builds it. `-` as the registry names local images. Provenance is taken from the environment. |
+| `docker/hive/check.sh` | `check.sh <simulator> <image>`: verifies a built image before it is published. A consume image must carry a non-empty index of exactly its formats whose entries all point to files in the image, and the pre-alloc groups when it carries a grouped format; an execute image must collect the release's tests under the image's framework. |
+| `docker/hive/merge_index.py` | `merge_index.py <first index.json> <second index.json> <output>`: writes the index of an image that carries two formats, the test cases of both with `test_count`, `fixture_formats` and `forks` recomputed. |
 | `docker/hive/entrypoint.sh` | Entry point of the hive simulator images, installed as `eels-simulator`. Selects the command from `EEST_SIMULATOR`. |
 | `src/execution_testing/tools/docker_images.py` | The image catalogue and every naming rule: branch tags, release names, which branch a release belongs to, the channel tags a release holds, and the tags each image receives. `plan()` computes a publishing run. |
 | `src/execution_testing/tools/tests/test_docker_images.py` | Tests of the naming rules and the plan. |

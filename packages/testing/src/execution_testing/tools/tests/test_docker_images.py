@@ -244,6 +244,7 @@ def test_catalogue() -> None:
         "blockchain_tests_engine",
         "blockchain_tests_engine_x",
         "blockchain_tests_sync",
+        "blockchain_tests_x",
     ]
 
 
@@ -268,10 +269,10 @@ def test_plan_for_a_push() -> None:
         newest["image"] == "ghcr.io/ethereum/execution-specs/hive/consume-rlp"
     )
     assert newest["kind"] == "consume"
-    assert newest["requires"] == (
+    assert newest["requires"] == [
         "ghcr.io/ethereum/execution-specs/fixtures/blockchain_tests"
         ":glamsterdam-devnet-v8.1.4"
-    )
+    ]
     assert newest["release"] == "tests-glamsterdam-devnet@v8.1.4"
     assert newest["slug"] == "glamsterdam-devnet-v8.1.4"
     # Only the channel moves; the release tag stays as the release built it.
@@ -280,9 +281,18 @@ def test_plan_for_a_push() -> None:
     assert newest["immutable"] == ""
     blobs = images[-1]
     assert blobs["name"] == "execute-blobs" and blobs["kind"] == "execute"
-    assert blobs["requires"] == (
+    assert blobs["requires"] == [
         "ghcr.io/ethereum/execution-specs/tests:glamsterdam-devnet-v8.1.4"
-    )
+    ]
+    wirex = next(i for i in images if i["name"] == "consume-wirex")
+    assert wirex["requires"] == [
+        "ghcr.io/ethereum/execution-specs/fixtures/"
+        f"{fixture_format}:glamsterdam-devnet-v8.1.4"
+        for fixture_format in (
+            "blockchain_tests_engine_x",
+            "blockchain_tests_x",
+        )
+    ], "the base layer's fixture image first"
     assert blobs["tags"] == newest["tags"]
 
     # The main line: the channel owner by version, not the newest publication.
@@ -502,7 +512,7 @@ def test_plan_for_a_nightly() -> None:
     # Reported by its commit, tagged and built from `nightly` only.
     assert result["images"][0]["release"] == "nightly-1a2b3c4"
     assert result["images"][0]["slug"] == "nightly"
-    assert result["images"][0]["requires"].endswith(":nightly")
+    assert result["images"][0]["requires"][0].endswith(":nightly")
     assert result["images"][0]["commit"] == "1a2b3c4d5e"
     assert result["images"][0]["tags"] == ["nightly"]
     assert result["images"][0]["legacy"] is None

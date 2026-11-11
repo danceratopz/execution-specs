@@ -68,8 +68,11 @@ class Image:
     """Image name; for hive simulators the hive simulator directory name."""
     family: str
     """Registry namespace; also the `docker/<family>` directory building it."""
-    fixture_format: str | None = None
-    """Fixture format the image carries: a consume simulator."""
+    fixture_formats: tuple[str, ...] = ()
+    """
+    Fixture formats the image carries: a consume simulator. The fixture
+    image of the first is its base layer.
+    """
     tests: bool = False
     """Whether the image carries a release's test sources: execute."""
 
@@ -81,27 +84,33 @@ class Image:
     @property
     def kind(self) -> str:
         """Return `consume` for an image with fixtures, else `execute`."""
-        return "consume" if self.fixture_format else "execute"
+        return "consume" if self.fixture_formats else "execute"
 
     @property
-    def content_path(self) -> str:
+    def content_paths(self) -> list[str]:
         """
-        Return the image path of the test content the image is built from.
+        Return the image paths of the test content the image is built from.
 
-        The fixture image of its format for a consume simulator, e.g.
-        `fixtures/blockchain_tests_engine`, else the tests image.
+        The fixture image of each of its formats for a consume simulator,
+        e.g. `fixtures/blockchain_tests_engine`, else the tests image.
         """
-        if self.fixture_format:
-            return f"{FIXTURES_IMAGE}/{self.fixture_format}"
-        return TESTS_IMAGE
+        if self.fixture_formats:
+            return [f"{FIXTURES_IMAGE}/{f}" for f in self.fixture_formats]
+        return [TESTS_IMAGE]
 
 
 IMAGES: tuple[Image, ...] = (
-    Image("consume-rlp", "hive", "blockchain_tests"),
-    Image("consume-engine", "hive", "blockchain_tests_engine"),
-    Image("consume-enginex", "hive", "blockchain_tests_engine_x"),
-    Image("consume-wirex", "hive", "blockchain_tests_engine_x"),
-    Image("consume-sync", "hive", "blockchain_tests_sync"),
+    Image("consume-rlp", "hive", ("blockchain_tests",)),
+    Image("consume-engine", "hive", ("blockchain_tests_engine",)),
+    Image("consume-enginex", "hive", ("blockchain_tests_engine_x",)),
+    # Engine X from Paris on, Blockchain X before it; both read the
+    # pre-allocation groups under `blockchain_tests_engine_x/pre_alloc`.
+    Image(
+        "consume-wirex",
+        "hive",
+        ("blockchain_tests_engine_x", "blockchain_tests_x"),
+    ),
+    Image("consume-sync", "hive", ("blockchain_tests_sync",)),
     Image("execute-blobs", "hive", tests=True),
 )
 """Every published image; adding one here adds it to the publishing plan."""
@@ -109,7 +118,7 @@ IMAGES: tuple[Image, ...] = (
 
 def fixture_formats() -> list[str]:
     """Return the fixture formats some image carries, sorted."""
-    return sorted({i.fixture_format for i in IMAGES if i.fixture_format})
+    return sorted({f for image in IMAGES for f in image.fixture_formats})
 
 
 def check_tag(tag: str) -> str:
@@ -588,7 +597,9 @@ def plan(
                 "family": image.family,
                 "kind": image.kind,
                 "image": f"{registry}/{image.path}",
-                "requires": f"{registry}/{image.content_path}:{slug}",
+                "requires": [
+                    f"{registry}/{path}:{slug}" for path in image.content_paths
+                ],
                 "release": release,
                 "slug": slug,
                 "commit": commit,

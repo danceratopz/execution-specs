@@ -364,20 +364,25 @@ jobs:
         id: content
         if: needs.plan.outputs.mode == 'push'
         env:
-          REQUIRES: ${{ matrix.requires }}
+          REQUIRES: ${{ join(matrix.requires, ' ') }}
         run: |
           # A missing tag reads "not found"; a package that does not exist
           # yet is refused like one this job cannot read ("denied", 403).
-          # Any other registry error still fails.
-          if docker buildx imagetools inspect "$REQUIRES" > /dev/null 2> inspect.log; then
-            echo "published=true" >> "$GITHUB_OUTPUT"
-          elif grep -qiE "not found|denied|403 forbidden" inspect.log; then
-            echo "::notice::$REQUIRES is not published yet; run a release build first"
-            echo "published=false" >> "$GITHUB_OUTPUT"
-          else
-            cat inspect.log >&2
-            exit 1
-          fi
+          # Any other registry error still fails. Every content image the
+          # simulator is built from must be published.
+          published=true
+          for required in $REQUIRES; do
+            if docker buildx imagetools inspect "$required" > /dev/null 2> inspect.log; then
+              continue
+            elif grep -qiE "not found|denied|403 forbidden" inspect.log; then
+              echo "::notice::$required is not published yet; run a release build first"
+              published=false
+            else
+              cat inspect.log >&2
+              exit 1
+            fi
+          done
+          echo "published=$published" >> "$GITHUB_OUTPUT"
 
       - name: Build and check
         if: steps.content.outputs.published != 'false'

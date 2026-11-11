@@ -149,12 +149,16 @@ def rlp_entries(fixture: BlockchainXFixture) -> RlpEntries:
 
     A block whose RLP is not a header and body lists cannot be served,
     so it is left out and described instead: it is always an invalid
-    leaf, since no block can build on a block without a hash. A valid
+    leaf, since no block can build on a block without a hash. So is an
+    invalid block that hashes like an earlier block (a hash names one
+    block only) or whose parent is neither genesis nor an earlier block
+    of the fixture (a modified parent hash). A valid
     block must hash to the hash its decoded header declares, or the
     fixture is defective and `ChainReconstructionError` is raised.
     """
     entries: list[RlpPathEntry] = []
     unservable: list[str] = []
+    known = {fixture.genesis.block_hash}
     for position, fixture_block in enumerate(fixture.blocks):
         is_valid = isinstance(fixture_block, FixtureBlock)
         try:
@@ -172,6 +176,22 @@ def rlp_entries(fixture: BlockchainXFixture) -> RlpEntries:
                     f"{block.block_hash} but its header declares {declared}"
                 )
             entries.append(RlpPathEntry(block=block))
+        elif block.block_hash in known:
+            # A body changed under a valid header, say: a hash can name
+            # one block only, so the peer could not serve both.
+            unservable.append(
+                f"block {position + 1} of the fixture: it hashes like an "
+                "earlier block of the fixture, so it cannot be served "
+                "beside it"
+            )
+            continue
+        elif block.parent_hash not in known:
+            unservable.append(
+                f"block {position + 1} of the fixture: its parent "
+                f"{block.parent_hash} is neither genesis nor an earlier "
+                "block of the fixture"
+            )
+            continue
         else:
             entries.append(
                 RlpPathEntry(
@@ -179,6 +199,7 @@ def rlp_entries(fixture: BlockchainXFixture) -> RlpEntries:
                     validation_error=fixture_block.expect_exception,
                 )
             )
+        known.add(block.block_hash)
     return RlpEntries(entries=tuple(entries), unservable=tuple(unservable))
 
 
@@ -227,7 +248,8 @@ class SyncPath:
             for entry in self.served
             if not isinstance(entry, RlpPathEntry)
         ]
-        assert len(payloads) == len(self.served), "path of RLP blocks"
+        if len(payloads) != len(self.served):
+            raise TypeError("a path of RLP blocks has no payloads")
         return payloads
 
     @property
@@ -328,7 +350,8 @@ def rlp_chain(genesis: FixtureHeader, path: SyncPath) -> Chain:
     blocks = [
         entry.block for entry in path.served if isinstance(entry, RlpPathEntry)
     ]
-    assert len(blocks) == len(path.served), "path of Engine API payloads"
+    if len(blocks) != len(path.served):
+        raise TypeError("a path of Engine API payloads has no RLP blocks")
     return linked_chain(genesis, blocks)
 
 

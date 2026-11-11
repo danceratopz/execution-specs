@@ -15,6 +15,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Callable, cast
 
+import ethereum_rlp as eth_rlp
 import pytest
 
 from execution_testing.base_types import Bytes, Hash
@@ -591,3 +592,49 @@ def test_the_forkchoice_version_follows_the_head_fork(
     fixture = _x_fixture(name)
     cases = wirex.rlp_sync_target_cases(fixture.genesis, fixture)
     assert {case.forkchoice_version for case in cases} == {version}
+
+
+class TestRlpDrops:
+    """Invalid RLP leaves devp2p cannot carry drop alone, with a reason."""
+
+    @staticmethod
+    def _with_block(index: int, block: Any) -> BlockchainXFixture:
+        """Return the London fixture with block `index` replaced."""
+        fixture = _x_fixture(LONDON_INVALID)
+        blocks = list(fixture.blocks)
+        blocks[index] = block
+        return fixture.model_copy(update={"blocks": blocks})
+
+    def test_an_undecodable_body_drops_its_leaf(self) -> None:
+        """A body no client decodes drops its path, not its siblings'."""
+        fixture = _x_fixture(LONDON_INVALID)
+        invalid = fixture.blocks[2].model_copy(
+            update={"expect_exception": BlockException.RLP_STRUCTURES_ENCODING}
+        )
+        fixture = self._with_block(2, invalid)
+        cases = wirex.rlp_sync_target_cases(fixture.genesis, fixture)
+        assert [case.chain.head.number for case in cases] == [4, 4]
+
+    def test_a_duplicate_hash_drops_its_leaf(self) -> None:
+        """An invalid block hashing like a valid one cannot be served."""
+        fixture = _x_fixture(LONDON_INVALID)
+        duplicate = fixture.blocks[2].model_copy(
+            update={"rlp": fixture.blocks[1].rlp}
+        )
+        fixture = self._with_block(2, duplicate)
+        cases = wirex.rlp_sync_target_cases(fixture.genesis, fixture)
+        assert [case.chain.head.number for case in cases] == [4, 4]
+
+    def test_an_unknown_parent_drops_its_leaf(self) -> None:
+        """An invalid block whose parent is on no path cannot be served."""
+        fixture = _x_fixture(LONDON_INVALID)
+        decoded = eth_rlp.decode(bytes(fixture.blocks[2].rlp))
+        assert isinstance(decoded, list) and isinstance(decoded[0], list)
+        decoded[0][0] = b"\x11" * 32
+        orphan = fixture.blocks[2].model_copy(
+            update={"rlp": Bytes(eth_rlp.encode(decoded))}
+        )
+        fixture = self._with_block(2, orphan)
+        entries = rlp_entries(fixture)
+        assert len(entries.unservable) == 1
+        assert "parent" in entries.unservable[0]

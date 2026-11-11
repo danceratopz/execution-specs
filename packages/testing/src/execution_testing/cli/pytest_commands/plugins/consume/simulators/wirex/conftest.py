@@ -554,19 +554,30 @@ def rlp_sync_target_cases(
     Return one sync target per leaf of a blockchain_test_x fixture.
 
     Every block of a path, its leaf included, travels devp2p, so no path
-    is too short. An invalid block whose RLP is not a header and body
-    lists has no devp2p representation: a client drops a peer serving
-    it rather than judge it. It is omitted, and the test is skipped only
-    when no other path remains.
+    is too short. An invalid block that devp2p cannot represent (see
+    `rlp_entries`), or whose body no client decodes (see
+    `UNDECODABLE_BODY_INVALIDITIES`), is omitted with its path: a client
+    drops a peer serving it rather than judge it. The test is skipped
+    only when no other path remains.
     """
     entries = rlp_entries(fixture)
-    paths = resolve_entry_paths(
-        genesis_header.block_hash, entries.entries, None
-    )
     drops = [
         f"invalid fixture block cannot be represented over devp2p, {reason}"
         for reason in entries.unservable
     ]
+    paths = []
+    for path in resolve_entry_paths(
+        genesis_header.block_hash, entries.entries, None
+    ):
+        undecodable = path.invalidities & UNDECODABLE_BODY_INVALIDITIES
+        if undecodable:
+            drops.append(
+                "invalid fixture cannot be represented over devp2p: no "
+                "conformant client decodes a body declaring "
+                f"{', '.join(sorted(str(e) for e in undecodable))}"
+            )
+            continue
+        paths.append(path)
     if not paths:
         pytest.skip("; ".join(drops) or "fixture has no block")
     for reason in drops:

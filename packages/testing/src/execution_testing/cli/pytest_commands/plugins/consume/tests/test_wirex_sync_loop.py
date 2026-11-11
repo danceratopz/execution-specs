@@ -80,10 +80,11 @@ def clock(monkeypatch: pytest.MonkeyPatch) -> FakeClock:
 
 @dataclass
 class _StubHeader:
-    """The two header fields a served block is read by."""
+    """The header fields a served block is read by."""
 
     number: int
     block_hash: Hash
+    difficulty: int = 0
 
 
 def _chain(length: int, genesis_hash: int = 0) -> Chain:

@@ -313,14 +313,20 @@ def check_latest_valid_hash(
     `SyncPath.expected_latest_valid_hash`); any other hash means the
     client blamed the wrong block, perhaps a valid ancestor. A null hash,
     which the Engine API allows when the client cannot determine one,
-    passes and is logged. The all-zero hash names a PoW ancestor: after
-    the merge that can only be genesis, so it passes only when genesis is
-    owed, while on a path announced by hash (a pre-merge chain) every
-    ancestor is a PoW block, so it always passes.
+    passes and is logged. The all-zero hash names a PoW ancestor, so it
+    passes when genesis is owed, or a served block with a nonzero
+    difficulty (a block before the merge).
     """
     expected = path.expected_latest_valid_hash
     got = payload_status.latest_valid_hash
     status = payload_status.status
+
+    def is_pow_block(block_hash: Hash) -> bool:
+        """Return whether `block_hash` names a served PoW block."""
+        return any(
+            block.block_hash == block_hash and block.difficulty > 0
+            for block in chain.blocks
+        )
 
     def describe(block_hash: Hash) -> str:
         """Return `block_hash` with its block number on `chain`, if any."""
@@ -343,11 +349,11 @@ def check_latest_valid_hash(
             "naming the PoW genesis as the latest valid ancestor"
         )
         return
-    if got == Hash(0) and path.announces_by_hash:
+    if got == Hash(0) and expected is not None and is_pow_block(expected):
         logger.info(
             f"{prefix}{LATEST_VALID_HASH_CHECK} match: the all-zero hash, "
             "naming a PoW block as the latest valid ancestor (expected "
-            f"ancestor {describe(expected) if expected else 'none'})"
+            f"{describe(expected)})"
         )
         return
     if expected is None:
@@ -853,7 +859,9 @@ def _run_pre_merge_target(
     fetches every block from the peer, the head included. A valid chain
     passes once the head is the client's canonical head with the
     expected state root; an invalid one once a forkchoice update answers
-    INVALID. Every answer the client gives is logged as it changes.
+    INVALID and the valid parent of the first invalid block, unless it
+    is genesis, then passes as a valid chain would. Every answer the
+    client gives is logged as it changes.
     """
     path = case.path
     chain = case.chain
@@ -880,17 +888,16 @@ def _run_pre_merge_target(
                 )
             genesis_verified_clients.add(client.id)
 
-    head_state = ForkchoiceState(
-        head_block_hash=head_hash,
-        safe_block_hash=Hash(0),
-        finalized_block_hash=Hash(0),
-    )
     answers: list[str] = []
 
-    def announce() -> PayloadStatus:
-        """Name the head in a forkchoice update and return its status."""
+    def announce(target: ServedBlock = head) -> PayloadStatus:
+        """Name `target` in a forkchoice update and return its status."""
         response = engine_rpc.forkchoice_updated(
-            forkchoice_state=head_state,
+            forkchoice_state=ForkchoiceState(
+                head_block_hash=target.block_hash,
+                safe_block_hash=Hash(0),
+                finalized_block_hash=Hash(0),
+            ),
             payload_attributes=None,
             version=case.forkchoice_version,
         )
@@ -899,8 +906,7 @@ def _run_pre_merge_target(
         if not answers or answers[-1] != answer:
             logger.info(
                 f"{prefix}forkchoiceUpdatedV{case.forkchoice_version} for "
-                f"head {chain.head.number} "
-                f"answered {answer}"
+                f"block {target.number} answered {answer}"
             )
         answers.append(answer)
         return status
@@ -927,30 +933,36 @@ def _run_pre_merge_target(
             f"{mock_peer.statistics.transcript}"
         )
 
-    logger.info(
-        f"{prefix}Naming head block {head.number} by hash to trigger a "
-        f"sync of {len(chain.blocks)} block(s) over devp2p"
-    )
+    def sync_to(target_chain: Chain, what: str) -> None:
+        """
+        Require the client to make `target_chain`'s head its canonical head.
 
-    if expect_rejection:
-        with timing_data.time(f"{prefix}Reject invalid chain"):
-            # Every header of the path, the head's included, must travel
-            # before the verdict counts (see `assert_wire_coverage`);
-            # bodies are not owed, as a header rejection fetches none.
+        The head is named until the client imports it, then again until
+        it is canonical; its state root must match, and every block of
+        the chain must have traveled the wire. `what` names the head in
+        messages.
+        """
+        target = target_chain.head
+        target_hash = target.block_hash
+        with timing_data.time(f"{prefix}Sync from peer"):
             clock = VerdictClock(
-                chain, mock_peer, require_bodies=False, include_head=True
+                target_chain, mock_peer, require_bodies=True, include_head=True
             )
             gave_up = False
             deadline = time.monotonic() + sync_timeout
-            status = announce()
+            status = announce(target)
             next_announcement = time.monotonic() + announce_interval
-            while status.status not in REJECTED_STATUSES:
-                if status.status == PayloadStatusEnum.VALID:
+            imported = False
+            while True:
+                if eth_rpc.get_block_by_hash(target_hash, full_txs=False):
+                    imported = True
+                    break
+                if status.status in REJECTED_STATUSES:
+                    # Read the head first: a client may answer INVALID for
+                    # a head it already holds.
                     raise LoggedError(
-                        f"{prefix}Client accepted the invalid chain: "
-                        f"forkchoiceUpdatedV{case.forkchoice_version} "
-                        "answered VALID for the invalid "
-                        f"head {head_hash}. {transcript()}"
+                        f"{prefix}Client rejected {what} {target_hash}: "
+                        f"{_describe_status(status)}. {transcript()}"
                     )
                 if time.monotonic() >= deadline:
                     break
@@ -959,64 +971,84 @@ def _run_pre_merge_target(
                     break
                 if time.monotonic() >= next_announcement:
                     if not mock_peer.alive:
-                        redial("mid-rejection")
-                    status = announce()
+                        redial("mid-sync")
+                    status = announce(target)
                     next_announcement = time.monotonic() + announce_interval
-                    continue
                 time.sleep(poll_interval)
-            if status.status not in REJECTED_STATUSES:
-                clock.report("missing", prefix)
+            clock.report("given" if imported else "missing", prefix)
+            if not imported:
                 raise LoggedError(
-                    f"{prefix}Client never rejected the invalid head "
-                    f"{head_hash} within "
-                    f"{waited_out(gave_up, verdict_grace, sync_timeout)} "
-                    f"(last status: {status.status}). {transcript()}"
+                    f"{prefix}Client never imported {what} {target_hash} "
+                    "within "
+                    f"{waited_out(gave_up, verdict_grace, sync_timeout)}. "
+                    f"{transcript()}"
                 )
-        clock.report("given", prefix)
+
+        with timing_data.time(f"{prefix}Verify head"):
+            # The import may precede the head switch, so the head is
+            # named again until it is canonical.
+            deadline = time.monotonic() + CANONICAL_HEAD_TIMEOUT
+            while True:
+                head_block = eth_rpc.get_block_by_number("latest")
+                if head_block is not None and head_block["hash"] == str(
+                    target_hash
+                ):
+                    break
+                if time.monotonic() >= deadline:
+                    got = None if head_block is None else head_block["hash"]
+                    raise LoggedError(
+                        f"{prefix}Client imported {what} {target_hash} but "
+                        f"its head is {got} after {CANONICAL_HEAD_TIMEOUT}s "
+                        f"(last answer: {_describe_status(status)}). "
+                        f"{transcript()}"
+                    )
+                status = announce(target)
+                time.sleep(min(announce_interval, CANONICAL_HEAD_TIMEOUT / 10))
+            if head_block["stateRoot"] != str(target.state_root):
+                raise LoggedError(
+                    f"{prefix}Client head {target_hash} has state root "
+                    f"{head_block['stateRoot']}, expected {target.state_root}"
+                )
+
         statistics = mock_peer.statistics
         logger.info(
-            f"{prefix}Client rejected the invalid head at block "
-            f"{head.number} with {_describe_status(status)} after the peer "
-            f"served {statistics.headers_served} header(s) and "
-            f"{statistics.bodies_served} body/bodies"
+            f"{prefix}Synced to block {target.number}: peer served "
+            f"{statistics.headers_served} header(s) in "
+            f"{statistics.header_requests} request(s) and "
+            f"{statistics.bodies_served} body/bodies in "
+            f"{statistics.body_requests} request(s); forkchoice answers "
+            f"{list(dict.fromkeys(answers))}"
         )
-        check_latest_valid_hash(path, chain, status, prefix)
         assert_wire_coverage(
-            chain,
-            mock_peer,
-            "rejected the invalid chain",
-            require_bodies=False,
-            include_head=True,
+            target_chain, mock_peer, f"reached {what}", include_head=True
         )
-        parent = path.expected_latest_valid_hash
-        if parent is not None and parent != genesis_header.block_hash:
-            held = eth_rpc.get_block_by_hash(parent, full_txs=False)
-            logger.info(
-                f"{prefix}Valid prefix check: the client "
-                + ("holds" if held else "does not hold")
-                + f" {parent}, the parent of the invalid block"
-            )
+
+    logger.info(
+        f"{prefix}Naming head block {head.number} by hash to trigger a "
+        f"sync of {len(chain.blocks)} block(s) over devp2p"
+    )
+
+    if not expect_rejection:
+        sync_to(chain, "the fixture head")
         return
 
-    with timing_data.time(f"{prefix}Sync from peer"):
+    with timing_data.time(f"{prefix}Reject invalid chain"):
+        # Every header of the path, the head's included, must travel
+        # before the verdict counts (see `assert_wire_coverage`); bodies
+        # are not owed, as a header rejection fetches none.
         clock = VerdictClock(
-            chain, mock_peer, require_bodies=True, include_head=True
+            chain, mock_peer, require_bodies=False, include_head=True
         )
         gave_up = False
         deadline = time.monotonic() + sync_timeout
         status = announce()
         next_announcement = time.monotonic() + announce_interval
-        imported = False
-        while True:
-            if eth_rpc.get_block_by_hash(head_hash, full_txs=False):
-                imported = True
-                break
-            if status.status in REJECTED_STATUSES:
-                # Read the head first: a client may answer INVALID for a
-                # head it already holds.
+        while status.status not in REJECTED_STATUSES:
+            if status.status == PayloadStatusEnum.VALID:
                 raise LoggedError(
-                    f"{prefix}Client rejected the chain at head {head_hash}: "
-                    f"{_describe_status(status)}. {transcript()}"
+                    f"{prefix}Client accepted the invalid chain: "
+                    f"forkchoiceUpdatedV{case.forkchoice_version} answered "
+                    f"VALID for the invalid head {head_hash}. {transcript()}"
                 )
             if time.monotonic() >= deadline:
                 break
@@ -1025,53 +1057,51 @@ def _run_pre_merge_target(
                 break
             if time.monotonic() >= next_announcement:
                 if not mock_peer.alive:
-                    redial("mid-sync")
+                    redial("mid-rejection")
                 status = announce()
                 next_announcement = time.monotonic() + announce_interval
+                continue
             time.sleep(poll_interval)
-        clock.report("given" if imported else "missing", prefix)
-        if not imported:
+        if status.status not in REJECTED_STATUSES:
+            clock.report("missing", prefix)
             raise LoggedError(
-                f"{prefix}Client never imported the fixture head "
+                f"{prefix}Client never rejected the invalid head "
                 f"{head_hash} within "
-                f"{waited_out(gave_up, verdict_grace, sync_timeout)}. "
-                f"{transcript()}"
+                f"{waited_out(gave_up, verdict_grace, sync_timeout)} "
+                f"(last status: {status.status}). {transcript()}"
             )
-
-    with timing_data.time(f"{prefix}Verify head"):
-        # The import may precede the head switch, so the head is named
-        # again until it is canonical.
-        deadline = time.monotonic() + CANONICAL_HEAD_TIMEOUT
-        while True:
-            head_block = eth_rpc.get_block_by_number("latest")
-            if head_block is not None and head_block["hash"] == str(head_hash):
-                break
-            if time.monotonic() >= deadline:
-                got = None if head_block is None else head_block["hash"]
-                raise LoggedError(
-                    f"{prefix}Client imported {head_hash} but its head is "
-                    f"{got} after {CANONICAL_HEAD_TIMEOUT}s. {transcript()}"
-                )
-            announce()
-            time.sleep(min(announce_interval, CANONICAL_HEAD_TIMEOUT / 10))
-        if head_block["stateRoot"] != str(head.state_root):
-            raise LoggedError(
-                f"{prefix}Client head {head_hash} has state root "
-                f"{head_block['stateRoot']}, expected {head.state_root}"
-            )
-
+    clock.report("given", prefix)
     statistics = mock_peer.statistics
     logger.info(
-        f"{prefix}Synced to block {head.number}: peer served "
-        f"{statistics.headers_served} header(s) in "
-        f"{statistics.header_requests} request(s) and "
-        f"{statistics.bodies_served} body/bodies in "
-        f"{statistics.body_requests} request(s); forkchoice answers "
-        f"{list(dict.fromkeys(answers))}"
+        f"{prefix}Client rejected the invalid head at block "
+        f"{head.number} with {_describe_status(status)} after the peer "
+        f"served {statistics.headers_served} header(s) and "
+        f"{statistics.bodies_served} body/bodies"
     )
+    check_latest_valid_hash(path, chain, status, prefix)
     assert_wire_coverage(
-        chain, mock_peer, "reached the expected head", include_head=True
+        chain,
+        mock_peer,
+        "rejected the invalid chain",
+        require_bodies=False,
+        include_head=True,
     )
+    # A rejection shows the client refused the path, not that it holds
+    # the blocks below the first invalid one valid, so the parent of the
+    # first invalid block is named and must become the head.
+    parent = path.expected_latest_valid_hash
+    if parent is not None and parent != genesis_header.block_hash:
+        number = chain.number_of(parent)
+        assert number is not None, "the parent of an invalid block is served"
+        prefix_chain = Chain(
+            chain.genesis,
+            [block for block in chain.blocks if block.number <= number],
+        )
+        logger.info(
+            f"{prefix}Naming block {number}, the valid parent of the "
+            "invalid block, to confirm the client holds it valid"
+        )
+        sync_to(prefix_chain, "the valid parent of the invalid block")
 
 
 def test_blockchain_via_wirex(

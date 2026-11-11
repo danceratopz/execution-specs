@@ -137,6 +137,7 @@ class FakeEngine:
     versions: list[int] = field(default_factory=list)
     times: list[float] = field(default_factory=list)
     clock: FakeClock | None = None
+    eth: "FakeEth | None" = None
 
     def forkchoice_updated(
         self,
@@ -147,6 +148,8 @@ class FakeEngine:
     ) -> ForkchoiceUpdateResponse:
         """Record the update and answer this call's verdict."""
         assert payload_attributes is None
+        if self.eth is not None:
+            self.eth.name(forkchoice_state.head_block_hash)
         call = len(self.states)
         self.states.append(forkchoice_state)
         self.versions.append(version)
@@ -169,40 +172,61 @@ class FakeEngine:
 
 @dataclass
 class FakeEth:
-    """An eth API whose head is imported at `imported_at` fake seconds."""
+    """
+    An eth API whose head is imported at `imported_at` fake seconds.
+
+    `held` blocks are imported from the start. The canonical head is the
+    last block a forkchoice update named, once it is imported, as a
+    client sets it; `state_root` overrides the fixture head's root.
+    """
 
     clock: FakeClock
     case: SyncTargetCase
     imported_at: float
     state_root: Hash | None = None
     held: set[Hash] = field(default_factory=set)
+    named: Hash | None = None
+
+    def name(self, block_hash: Hash) -> None:
+        """Record the block a forkchoice update named."""
+        self.named = block_hash
+
+    def imported(self, block_hash: Hash) -> bool:
+        """Return whether the client holds `block_hash` now."""
+        return block_hash in self.held or (
+            block_hash == self.case.chain.head.block_hash
+            and self.clock.now >= self.imported_at
+        )
 
     def get_block_by_hash(
         self, block_hash: Hash, full_txs: bool = True
     ) -> Any:
-        """Return the head once imported, and any held block."""
+        """Return an imported block."""
         del full_txs
-        if block_hash in self.held:
-            return {"hash": str(block_hash)}
-        if (
-            block_hash == self.case.chain.head.block_hash
-            and self.clock.now >= self.imported_at
-        ):
+        if self.imported(block_hash):
             return {"hash": str(block_hash)}
         return None
 
     def get_block_by_number(
         self, block_number: int | str = "latest", full_txs: bool = True
     ) -> Any:
-        """Return genesis for 0 and the head once imported."""
+        """Return genesis for 0 and the canonical head otherwise."""
         del full_txs
-        if block_number == 0:
-            return {"hash": str(GENESIS_HASH)}
-        head = self.case.chain.head
-        if self.clock.now < self.imported_at:
+        named = self.named
+        if block_number == 0 or named is None or not self.imported(named):
             return {"hash": str(GENESIS_HASH), "stateRoot": "0x"}
-        root = head.state_root if self.state_root is None else self.state_root
-        return {"hash": str(head.block_hash), "stateRoot": str(root)}
+        number = self.case.chain.number_of(named)
+        assert number is not None
+        block = self.case.chain.blocks[number - 1]
+        root = block.state_root
+        if block is self.case.chain.head and self.state_root is not None:
+            root = self.state_root
+        return {"hash": str(named), "stateRoot": str(root)}
+
+
+def _prefix(case: SyncTargetCase) -> set[Hash]:
+    """Return the hashes of every block below the head of `case`."""
+    return {block.block_hash for block in case.chain.blocks[:-1]}
 
 
 @dataclass
@@ -238,6 +262,7 @@ def _run(
     peer: FakePeer | None = None,
 ) -> None:
     """Run the pre-merge runner for `case` against the fakes."""
+    engine.eth = eth
     test_via_wirex._run_pre_merge_target(
         case=case,
         client=cast(Any, type("Client", (), {"id": "client"})()),
@@ -292,7 +317,7 @@ class TestValidChain:
         """INVALID for a head the client does not hold is a verdict."""
         case = _case(2)
         engine = FakeEngine(verdict=lambda _call: PayloadStatusEnum.INVALID)
-        with pytest.raises(LoggedError, match="rejected the chain"):
+        with pytest.raises(LoggedError, match="rejected the fixture head"):
             _run(case, engine, FakeEth(clock, case, imported_at=NEVER))
         assert clock.now < ANNOUNCE_INTERVAL
 
@@ -332,15 +357,40 @@ class TestInvalidChain:
             ),
             latest_valid_hash=Hash(0),
         )
-        _run(case, engine, FakeEth(clock, case, imported_at=NEVER))
-        assert len(engine.states) == 3
+        eth = FakeEth(clock, case, imported_at=NEVER, held=_prefix(case))
+        _run(case, engine, eth)
+        # Three updates name the invalid head, the last one rejected,
+        # then one names its valid parent, block 2.
+        assert [state.head_block_hash for state in engine.states] == [
+            Hash(3),
+            Hash(3),
+            Hash(3),
+            Hash(2),
+        ]
 
     def test_bodies_are_not_owed(self, clock: FakeClock) -> None:
         """A header rejection fetches no body, and needs none."""
+        case = _case(1, invalid_head=True)
+        engine = FakeEngine(verdict=lambda _call: PayloadStatusEnum.INVALID)
+        peer = FakePeer(case.chain, unserved_bodies=(1,))
+        _run(case, engine, FakeEth(clock, case, NEVER), peer)
+        assert len(engine.states) == 1
+
+    def test_the_valid_parent_must_be_held(self, clock: FakeClock) -> None:
+        """A client that never imports the valid parent fails."""
         case = _case(2, invalid_head=True)
         engine = FakeEngine(verdict=lambda _call: PayloadStatusEnum.INVALID)
-        peer = FakePeer(case.chain, unserved_bodies=(1, 2))
-        _run(case, engine, FakeEth(clock, case, NEVER), peer)
+        with pytest.raises(LoggedError, match="valid parent"):
+            _run(case, engine, FakeEth(clock, case, NEVER))
+
+    def test_the_valid_parent_body_must_travel(self, clock: FakeClock) -> None:
+        """The valid parent counts as a valid chain, bodies and all."""
+        case = _case(2, invalid_head=True)
+        engine = FakeEngine(verdict=lambda _call: PayloadStatusEnum.INVALID)
+        peer = FakePeer(case.chain, unserved_bodies=(1,))
+        eth = FakeEth(clock, case, NEVER, held=_prefix(case))
+        with pytest.raises(LoggedError, match="non-empty body"):
+            _run(case, engine, eth, peer)
 
     def test_the_head_header_must_travel(self, clock: FakeClock) -> None:
         """A verdict on a head never fetched is no wire evidence."""
@@ -380,4 +430,4 @@ class TestInvalidChain:
             verdict=lambda _call: PayloadStatusEnum.INVALID,
             latest_valid_hash=Hash(2),
         )
-        _run(case, engine, FakeEth(clock, case, NEVER, held={Hash(2)}))
+        _run(case, engine, FakeEth(clock, case, NEVER, held=_prefix(case)))
